@@ -39,11 +39,11 @@ function Error404() {
                 height: { xs: 130, sm: 300 }
               }}
             >
-              <Image src={error404} alt="mantis" layout="fill" priority />
+              <Image src={error404} alt="mantis" layout="fill" />
             </Grid>
             <Grid item sx={{ position: 'relative' }}>
               <Box sx={{ position: 'absolute', top: 60, left: -40, width: { xs: 130, sm: 390 }, height: { xs: 115, sm: 330 } }}>
-                <Image src={TwoCone} alt="mantis" layout="fill" priority />
+                <Image src={TwoCone} alt="mantis" layout="fill" />
               </Box>
             </Grid>
           </Stack>

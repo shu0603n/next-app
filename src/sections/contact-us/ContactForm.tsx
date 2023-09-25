@@ -54,9 +54,7 @@ function ContactForm() {
       <Grid container spacing={5} justifyContent="center">
         <Grid item xs={12} sm={10} lg={9}>
           <Stack alignItems="center" justifyContent="center" spacing={2}>
-            <Button variant="text" sx={{ p: 0, textTransform: 'none', '&:hover': { bgcolor: 'transparent' } }}>
-              Get In touch
-            </Button>
+            <Typography color="primary">Get In touch</Typography>
             <Typography align="center" variant="h2">
               Lorem isume dolor elits.
             </Typography>
@@ -68,26 +66,19 @@ function ContactForm() {
         <Grid item xs={12} sm={10} lg={9}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
-              <TextField fullWidth type="text" placeholder="Name" sx={{ '& .MuiOutlinedInput-input': { opacity: 0.5 } }} />
+              <TextField fullWidth type="text" placeholder="Name" />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField fullWidth type="text" placeholder="Company Name" sx={{ '& .MuiOutlinedInput-input': { opacity: 0.5 } }} />
+              <TextField fullWidth type="text" placeholder="Company Name" />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField fullWidth type="email" placeholder="Email Address" sx={{ '& .MuiOutlinedInput-input': { opacity: 0.5 } }} />
+              <TextField fullWidth type="email" placeholder="Email Address" />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField fullWidth type="number" placeholder="Phone Number" sx={{ '& .MuiOutlinedInput-input': { opacity: 0.5 } }} />
+              <TextField fullWidth type="number" placeholder="Phone Number" inputProps={{ min: 0 }} />
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField
-                select
-                fullWidth
-                placeholder="Company Size"
-                sx={{ '& .MuiOutlinedInput-input': { opacity: 0.5 } }}
-                value={size}
-                onChange={handleCompanySize}
-              >
+              <TextField select fullWidth placeholder="Company Size" value={size} onChange={handleCompanySize}>
                 {sizes.map((option, index) => (
                   <MenuItem key={index} value={option.value}>
                     {option.label}
@@ -96,14 +87,7 @@ function ContactForm() {
               </TextField>
             </Grid>
             <Grid item xs={12} md={6}>
-              <TextField
-                select
-                fullWidth
-                placeholder="Project Budget"
-                sx={{ '& .MuiOutlinedInput-input': { opacity: 0.5 } }}
-                value={budget}
-                onChange={handleProjectBudget}
-              >
+              <TextField select fullWidth placeholder="Project Budget" value={budget} onChange={handleProjectBudget}>
                 {currencies.map((option, index) => (
                   <MenuItem key={index} value={option.value}>
                     {option.label}
@@ -112,7 +96,7 @@ function ContactForm() {
               </TextField>
             </Grid>
             <Grid item xs={12}>
-              <TextField fullWidth multiline rows={4} placeholder="Message" sx={{ '& .MuiOutlinedInput-input': { opacity: 0.5 } }} />
+              <TextField fullWidth multiline rows={4} placeholder="Message" />
             </Grid>
           </Grid>
         </Grid>

@@ -2,12 +2,12 @@ import { ReactNode } from 'react';
 
 // material-ui
 import { alpha, styled } from '@mui/material/styles';
-import { MUIStyledCommonProps } from '@mui/system';
 import { Box, Theme } from '@mui/material';
 
 // third-party
 import SimpleBar, { Props } from 'simplebar-react';
 import { BrowserView, MobileView } from 'react-device-detect';
+import { MUIStyledCommonProps } from '@mui/system';
 
 // root style
 const RootStyle = styled(BrowserView)({

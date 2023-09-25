@@ -1,4 +1,5 @@
-import { ReactNode, useEffect, useState, ReactElement } from 'react';
+/* eslint-disable */
+import { ReactNode, useEffect, useState } from 'react';
 
 // third-party
 import { IntlProvider, MessageFormatElement } from 'react-intl';
@@ -7,12 +8,19 @@ import { IntlProvider, MessageFormatElement } from 'react-intl';
 import useConfig from 'hooks/useConfig';
 import { I18n } from 'types/config';
 
-// helper for react 18 overload
-const MyIntlProvider: any = IntlProvider;
-
 // load locales files
 const loadLocaleData = (locale: I18n) => {
-  return import('utils/locales/en.json');
+  switch (locale) {
+    case 'fr':
+      return import('utils/locales/fr.json');
+    case 'ro':
+      return import('utils/locales/ro.json');
+    case 'zh':
+      return import('utils/locales/zh.json');
+    case 'en':
+    default:
+      return import('utils/locales/en.json');
+  }
 };
 
 // ==============================|| LOCALIZATION ||============================== //
@@ -35,9 +43,9 @@ const Locales = ({ children }: Props) => {
   return (
     <>
       {messages && (
-        <MyIntlProvider locale={i18n} defaultLocale="en" messages={messages}>
-          {children as ReactElement}
-        </MyIntlProvider>
+        <IntlProvider locale={i18n} defaultLocale="en" messages={messages}>
+          {children as React.ReactElement}
+        </IntlProvider>
       )}
     </>
   );

@@ -9,11 +9,11 @@ import { motion } from 'framer-motion';
 import useConfig from 'hooks/useConfig';
 import AnimateButton from 'components/@extended/AnimateButton';
 
-// types
-import { ThemeDirection, ThemeMode } from 'types/config';
-
 // assets
 import { SendOutlined } from '@ant-design/icons';
+
+// types
+import { ThemeDirection, ThemeMode } from 'types/config';
 
 const imgfooterlogo = 'assets/images/landing/codedthemes-logo.svg';
 const imgfootersoc1 = 'assets/images/landing/img-soc1.svg';
@@ -107,7 +107,11 @@ const FooterBlock = ({ isFull }: showProps) => {
               maxWidth: 700,
               position: 'absolute',
               top: '-28%',
-              right: 0
+              right: 0,
+              ...(theme.direction === ThemeDirection.RTL && {
+                transform: 'scaleX(-1)',
+                float: 'none'
+              })
             }}
           />
           <Container>

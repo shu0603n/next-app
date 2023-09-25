@@ -1,5 +1,5 @@
 // next
-import Image from 'next/image';
+import Image from 'next/legacy/image';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
@@ -62,7 +62,7 @@ function ContactHeader() {
               background: theme.palette.mode === ThemeMode.DARK ? theme.palette.grey.A700 : theme.palette.grey[100]
             }}
           >
-            <Image src={worldMap} alt="mantis" layout="fixed" width={imagWidth} height={imagHight} priority />
+            <Image src={worldMap} alt="mantis" layout="fixed" width={imagWidth} height={imagHight} />
           </Box>
         </Stack>
       </Container>

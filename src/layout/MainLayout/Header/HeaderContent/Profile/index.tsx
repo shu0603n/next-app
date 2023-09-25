@@ -31,12 +31,13 @@ import Transitions from 'components/@extended/Transitions';
 import IconButton from 'components/@extended/IconButton';
 import useUser from 'hooks/useUser';
 
+// types
+import { ThemeMode } from 'types/config';
+
 // assets
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 
 // types
-import { ThemeMode } from 'types/config';
-
 interface TabPanelProps {
   children?: ReactNode;
   dir?: string;
