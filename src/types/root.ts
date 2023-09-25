@@ -5,14 +5,20 @@ import { SvgIconTypeMap } from '@mui/material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
 
 // types
+import { CalendarProps } from './calendar';
 import { MenuProps } from './menu';
 import { SnackbarProps } from './snackbar';
+import { KanbanStateProps } from './kanban';
+import { InvoiceProps } from './invoice';
 
 // ==============================|| ROOT TYPES  ||============================== //
 
 export type RootStateProps = {
+  calendar: CalendarProps;
   menu: MenuProps;
   snackbar: SnackbarProps;
+  kanban: KanbanStateProps;
+  invoice: InvoiceProps;
 };
 
 export type KeyedObject = {

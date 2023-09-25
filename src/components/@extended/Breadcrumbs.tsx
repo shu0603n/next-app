@@ -1,4 +1,5 @@
 import { CSSProperties, ReactElement, useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 // next
 import NextLink from 'next/link';
@@ -8,7 +9,7 @@ import { useTheme } from '@mui/material/styles';
 import { Divider, Grid, Typography } from '@mui/material';
 import MuiBreadcrumbs from '@mui/material/Breadcrumbs';
 
-// project imports
+// project import
 import MainCard from 'components/MainCard';
 
 // assets
@@ -54,6 +55,7 @@ const Breadcrumbs = ({
   ...others
 }: Props) => {
   const theme = useTheme();
+  const location = useRouter();
   const [main, setMain] = useState<NavItemType | undefined>();
   const [item, setItem] = useState<NavItemType>();
 
@@ -65,44 +67,6 @@ const Breadcrumbs = ({
     color: theme.palette.secondary.main
   };
 
-  let currentPath = document.location.pathname;
-
-  // only used for component demo breadcrumbs
-  if (currentPath.includes('/components-overview/breadcrumbs')) {
-    currentPath = '/apps/kanban/board';
-  }
-
-  if (currentPath.includes('/apps/kanban/backlogs')) {
-    currentPath = '/apps/kanban/board';
-  }
-
-  useEffect(() => {
-    if (currentPath.includes('/apps/profiles/user/payment')) {
-      setItem(undefined);
-    }
-  }, [item, currentPath]);
-
-  // set active item state
-  const getCollapse = (menu: NavItemType) => {
-    if (menu.children) {
-      menu.children.filter((collapse: NavItemType) => {
-        if (collapse.type && collapse.type === 'collapse') {
-          getCollapse(collapse as { children: NavItemType[]; type?: string });
-          if (collapse.url === currentPath) {
-            setMain(collapse);
-            setItem(collapse);
-          }
-        } else if (collapse.type && collapse.type === 'item' && collapse.breadcrumbs !== false) {
-          if (currentPath.includes(collapse.url!)) {
-            setMain(menu);
-            setItem(collapse);
-          }
-        }
-        return false;
-      });
-    }
-  };
-
   useEffect(() => {
     navigation?.items?.map((menu: NavItemType, index: number) => {
       if (menu.type && menu.type === 'group') {
@@ -111,6 +75,44 @@ const Breadcrumbs = ({
       return false;
     });
   });
+
+  let customLocation = location.asPath;
+
+  // only used for component demo breadcrumbs
+  if (customLocation.includes('/components-overview/breadcrumbs')) {
+    customLocation = '/apps/kanban/board';
+  }
+
+  if (customLocation.includes('/apps/kanban/backlogs')) {
+    customLocation = '/apps/kanban/board';
+  }
+
+  useEffect(() => {
+    if (customLocation.includes('/apps/profiles/user/payment')) {
+      setItem(undefined);
+    }
+  }, [item, customLocation]);
+
+  // set active item state
+  const getCollapse = (menu: NavItemType) => {
+    if (menu.children) {
+      menu.children.filter((collapse: NavItemType) => {
+        if (collapse.type && collapse.type === 'collapse') {
+          getCollapse(collapse as { children: NavItemType[]; type?: string });
+          if (collapse.url === customLocation) {
+            setMain(collapse);
+            setItem(collapse);
+          }
+        } else if (collapse.type && collapse.type === 'item') {
+          if (customLocation === collapse.url) {
+            setMain(menu);
+            setItem(collapse);
+          }
+        }
+        return false;
+      });
+    }
+  };
 
   // item separator
   const SeparatorIcon = separator!;
@@ -127,14 +129,13 @@ const Breadcrumbs = ({
   if (main && main.type === 'collapse' && main.breadcrumbs === true) {
     CollapseIcon = main.icon ? main.icon : ApartmentOutlined;
     mainContent = (
-      <NextLink href={currentPath} passHref legacyBehavior>
+      <NextLink href={document.location.pathname} passHref legacyBehavior>
         <Typography variant="h6" sx={{ textDecoration: 'none' }} color="textSecondary">
           {icons && <CollapseIcon style={iconSX} />}
           {main.title}
         </Typography>
       </NextLink>
     );
-
     breadcrumbContent = (
       <MainCard
         border={card}
@@ -174,7 +175,7 @@ const Breadcrumbs = ({
   }
 
   // items
-  if (item && item.type === 'item' && item.breadcrumbs !== false) {
+  if (item && item.type === 'item') {
     itemTitle = item.title;
 
     ItemIcon = item.icon ? item.icon : ApartmentOutlined;
@@ -186,48 +187,50 @@ const Breadcrumbs = ({
     );
 
     // main
-    breadcrumbContent = (
-      <MainCard
-        border={card}
-        sx={card === false ? { mb: 3, bgcolor: 'transparent', ...sx } : { mb: 3, ...sx }}
-        {...others}
-        content={card}
-        shadow="none"
-      >
-        <Grid
-          container
-          direction={rightAlign ? 'row' : 'column'}
-          justifyContent={rightAlign ? 'space-between' : 'flex-start'}
-          alignItems={rightAlign ? 'center' : 'flex-start'}
-          spacing={1}
+    if (item.breadcrumbs !== false) {
+      breadcrumbContent = (
+        <MainCard
+          border={card}
+          sx={card === false ? { mb: 3, bgcolor: 'transparent', ...sx } : { mb: 3, ...sx }}
+          {...others}
+          content={card}
+          shadow="none"
         >
-          {title && !titleBottom && (
+          <Grid
+            container
+            direction={rightAlign ? 'row' : 'column'}
+            justifyContent={rightAlign ? 'space-between' : 'flex-start'}
+            alignItems={rightAlign ? 'center' : 'flex-start'}
+            spacing={1}
+          >
+            {title && !titleBottom && (
+              <Grid item>
+                <Typography variant="h2">{item.title}</Typography>
+              </Grid>
+            )}
             <Grid item>
-              <Typography variant="h2">{item.title}</Typography>
+              <MuiBreadcrumbs aria-label="breadcrumb" maxItems={maxItems || 8} separator={separatorIcon}>
+                <NextLink href="/" passHref legacyBehavior>
+                  <Typography color="textSecondary" variant="h6" sx={{ textDecoration: 'none' }}>
+                    {icons && <HomeOutlined style={iconSX} />}
+                    {icon && !icons && <HomeFilled style={{ ...iconSX, marginRight: 0 }} />}
+                    {(!icon || icons) && 'Home'}
+                  </Typography>
+                </NextLink>
+                {mainContent}
+                {itemContent}
+              </MuiBreadcrumbs>
             </Grid>
-          )}
-          <Grid item>
-            <MuiBreadcrumbs aria-label="breadcrumb" maxItems={maxItems || 8} separator={separatorIcon}>
-              <NextLink href="/" passHref legacyBehavior>
-                <Typography color="textSecondary" variant="h6" sx={{ textDecoration: 'none' }}>
-                  {icons && <HomeOutlined style={iconSX} />}
-                  {icon && !icons && <HomeFilled style={{ ...iconSX, marginRight: 0 }} />}
-                  {(!icon || icons) && 'Home'}
-                </Typography>
-              </NextLink>
-              {mainContent}
-              {itemContent}
-            </MuiBreadcrumbs>
+            {title && titleBottom && (
+              <Grid item sx={{ mt: card === false ? 0.25 : 1 }}>
+                <Typography variant="h2">{item.title}</Typography>
+              </Grid>
+            )}
           </Grid>
-          {title && titleBottom && (
-            <Grid item sx={{ mt: card === false ? 0.25 : 1 }}>
-              <Typography variant="h2">{item.title}</Typography>
-            </Grid>
-          )}
-        </Grid>
-        {card === false && divider !== false && <Divider sx={{ mt: 2 }} />}
-      </MainCard>
-    );
+          {card === false && divider !== false && <Divider sx={{ mt: 2 }} />}
+        </MainCard>
+      );
+    }
   }
 
   return breadcrumbContent;

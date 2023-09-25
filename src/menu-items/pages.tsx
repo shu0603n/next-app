@@ -18,12 +18,54 @@ const pages: NavItemType = {
   type: 'group',
   children: [
     {
-      id: 'contact-us',
-      title: <FormattedMessage id="contact-us" />,
-      type: 'item',
-      url: '/contact-us',
-      icon: icons.PhoneOutlined,
-      target: true
+      id: 'authentication',
+      title: <FormattedMessage id="authentication" />,
+      type: 'collapse',
+      icon: icons.LoginOutlined,
+      children: [
+        {
+          id: 'login',
+          title: <FormattedMessage id="login" />,
+          type: 'item',
+          url: '/auth/login',
+          target: true
+        },
+        {
+          id: 'register',
+          title: <FormattedMessage id="register" />,
+          type: 'item',
+          url: '/auth/register',
+          target: true
+        },
+        {
+          id: 'forgot-password',
+          title: <FormattedMessage id="forgot-password" />,
+          type: 'item',
+          url: '/auth/forgot-password',
+          target: true
+        },
+        {
+          id: 'reset-password',
+          title: <FormattedMessage id="reset-password" />,
+          type: 'item',
+          url: '/auth/reset-password',
+          target: true
+        },
+        {
+          id: 'check-mail',
+          title: <FormattedMessage id="check-mail" />,
+          type: 'item',
+          url: '/auth/check-mail',
+          target: true
+        },
+        {
+          id: 'code-verification',
+          title: <FormattedMessage id="code-verification" />,
+          type: 'item',
+          url: '/auth/code-verification',
+          target: true
+        }
+      ]
     },
     {
       id: 'maintenance',
@@ -60,6 +102,21 @@ const pages: NavItemType = {
           target: true
         }
       ]
+    },
+    {
+      id: 'contact-us',
+      title: <FormattedMessage id="contact-us" />,
+      type: 'item',
+      url: '/contact-us',
+      icon: icons.PhoneOutlined,
+      target: true
+    },
+    {
+      id: 'pricing',
+      title: <FormattedMessage id="pricing" />,
+      type: 'item',
+      url: '/pricing',
+      icon: icons.DollarOutlined
     }
   ]
 };
