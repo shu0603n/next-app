@@ -13,18 +13,17 @@ jobs:
 
       - name: Clear npm cache
         run: npm cache clean -f
-  
+
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: 20.4.0
-          
+
       - name: Install dependencies and build
         run: |
           node --version
           npm --version
       - run: yarn install && yarn build
-      
       - name: ssh key generate
         run: |
           echo "$SSH_PRIVATE_KEY" > key
@@ -32,10 +31,10 @@ jobs:
           cat key  # デバッグのために秘密鍵を表示
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          
+
       - name: rsync deploy
         run: |
           ssh -i key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 10022 -vvv xs739875@sv14591.xserver.jp echo "SSH connection successful"
-          rsync -auzrv -e "ssh -i key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 10022" --delete ./next-app/* xs739875@sv14591.xserver.jp:/home/xs739875/m-u-i.net/public_html/ --exclude .htaccess
+          rsync -auzrv -e "ssh -i key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p 10022" --delete ./.next/* xs739875@sv14591.xserver.jp:/home/xs739875/m-u-i.net/public_html/ --exclude .htaccess
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}

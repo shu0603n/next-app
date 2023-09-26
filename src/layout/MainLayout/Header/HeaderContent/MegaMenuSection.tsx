@@ -262,6 +262,14 @@ const MegaMenuSection = () => {
                                   <ListItemText primary="Pricing" />
                                 </ListItemButton>
                               </NextLink>
+                              <NextLink href="/pricing" passHref legacyBehavior>
+                                <ListItemButton disableRipple component={Link} target="_blank">
+                                  <ListItemIcon>
+                                    <Dot size={7} color="secondary" variant="outlined" />
+                                  </ListItemIcon>
+                                  <ListItemText primary="Pricing" />
+                                </ListItemButton>
+                              </NextLink>
                               <NextLink href="/apps/profiles/user/payment" passHref legacyBehavior>
                                 <ListItemButton disableRipple component={Link} target="_blank">
                                   <ListItemIcon>
