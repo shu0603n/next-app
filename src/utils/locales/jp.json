@@ -1,5 +1,8 @@
 {
-  "TOP": "トップ",
+  "top": "トップ",
+  "employee": "社員情報",
+  "parameter": "パラメーター",
+  "position": "役職",
   "accordion": "Accordion",
   "account-profile": "Account Profile",
   "action-bar": "Action Bar",
