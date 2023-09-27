@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, FC, Fragment, MouseEvent, ReactElement } from 'react';
+import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement } from 'react';
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
