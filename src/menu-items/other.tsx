@@ -52,6 +52,21 @@ const other: NavItemType = {
       icon: icons.ChromeOutlined
     },
     {
+      id: 'parameter',
+      title: <FormattedMessage id="parameter" />,
+      type: 'collapse',
+      icon: icons.MenuUnfoldOutlined,
+      children: [
+        {
+          id: 'position',
+          title: <FormattedMessage id="position" />,
+          type: 'item',
+          url: '/parameter/position',
+          icon: icons.ChromeOutlined
+        }
+      ]
+    },
+    {
       id: 'sample-page',
       title: <FormattedMessage id="sample-page" />,
       type: 'item',

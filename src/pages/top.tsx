@@ -47,14 +47,13 @@ const Top = () => {
     fields: Array<any>;
     rowAsArray: boolean;
     rowCount: number;
-    rows: Array<Usres>;
+    rows: Array<Param>;
     viaNeonFetch: boolean;
   };
 
-  type Usres = {
-    user_id: string;
-    email: string;
-    password: string;
+  type Param = {
+    id: string;
+    name: string;
   };
 
   return (
@@ -62,11 +61,11 @@ const Top = () => {
       <MainCard title="Sample Card">
         <Typography variant="body2">
           {/* データをマップして表示 */}
-          <p>-----------Usersテーブル------------</p>
+          <p>-----------テーブル------------</p>
           {tableData?.data.rows.map((item) => (
             // <div key={item.user_id}>{item.email}</div>
-            <p key={item.user_id}>
-              {item.user_id} {item.email} {item.password}
+            <p key={item.id}>
+              {item.id} {item.name}
             </p>
           ))}
         </Typography>
