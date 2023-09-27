@@ -46,8 +46,8 @@ import TablePagination from './TablePagination';
 import TableRow from './TableRow';
 import Tabs from './Tabs';
 import ToggleButton from './ToggleButton';
-import TreeItem from './TreeItem';
 import Tooltip from './Tooltip';
+import TreeItem from './TreeItem';
 import Typography from './Typography';
 
 // ==============================|| OVERRIDES - MAIN ||============================== //

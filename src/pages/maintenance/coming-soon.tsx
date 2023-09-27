@@ -55,7 +55,7 @@ function ComingSoon() {
     <Page title="Coming Soon">
       <Grid container spacing={4} direction="column" alignItems="center" justifyContent="center" sx={{ minHeight: '100vh', py: 2 }}>
         <Grid item xs={12}>
-          <Image src={coming} alt="mantis" layout="fixed" width={matchDownSM ? 360 : 490} height={matchDownSM ? 310 : 420} priority />
+          <Image src={coming} alt="mantis" layout="fixed" width={matchDownSM ? 360 : 490} height={matchDownSM ? 310 : 420} />
         </Grid>
         <Grid item xs={12}>
           <Stack spacing={1} justifyContent="center" alignItems="center" sx={{ mt: 4 }}>

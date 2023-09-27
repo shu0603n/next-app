@@ -4,7 +4,7 @@ import { SyntheticEvent } from 'react';
 import { Alert, Button, Fade, Grow, Slide, SlideProps } from '@mui/material';
 import MuiSnackbar from '@mui/material/Snackbar';
 
-// project-import
+// project import
 import IconButton from './IconButton';
 import { dispatch, useSelector } from 'store';
 import { closeSnackbar } from 'store/reducers/snackbar';

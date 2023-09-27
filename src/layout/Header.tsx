@@ -90,6 +90,13 @@ const Header = ({ handleDrawerOpen, layout, ...others }: Props) => {
               <Typography component="div" sx={{ textAlign: 'left', display: 'inline-block' }}>
                 <Logo reverse to="/" />
               </Typography>
+              <Chip
+                label={process.env.REACT_APP_VERSION}
+                variant="outlined"
+                size="small"
+                color="secondary"
+                sx={{ mt: 0.5, ml: 1, fontSize: '0.725rem', height: 20, '& .MuiChip-label': { px: 0.5 } }}
+              />
             </Stack>
             <Stack
               direction="row"
@@ -112,6 +119,11 @@ const Header = ({ handleDrawerOpen, layout, ...others }: Props) => {
                   </Link>
                 </NextLink>
               )}
+              <NextLink href="/components-overview/buttons" passHref legacyBehavior>
+                <Link className="header-link" color={handleDrawerOpen ? 'primary' : 'white'} underline="none">
+                  Components
+                </Link>
+              </NextLink>
               <Link className="header-link" color="white" href="https://codedthemes.gitbook.io/mantis/" target="_blank" underline="none">
                 Documentation
               </Link>

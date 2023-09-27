@@ -20,7 +20,6 @@ const Dot = ({ color, size, variant, sx }: Props) => {
 
   return (
     <Box
-      component="span"
       sx={{
         width: size || 8,
         height: size || 8,
