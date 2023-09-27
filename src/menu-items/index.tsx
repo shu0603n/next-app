@@ -13,7 +13,7 @@ import { NavItemType } from 'types/menu';
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems: { items: NavItemType[] } = {
-  items: [widget, applications, formsTables, chartsMap, pages, other, parameter]
+  items: [other, widget, applications, formsTables, chartsMap, pages, parameter]
 };
 
 export default menuItems;
