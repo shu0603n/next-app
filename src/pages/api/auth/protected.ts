@@ -3,6 +3,11 @@ import { getSession } from 'next-auth/react';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  // ログインがモックの為
+  // ▽
+  res.send({ protected: true });
+  return;
+  // △
   const session = await getSession({ req });
 
   if (session) {

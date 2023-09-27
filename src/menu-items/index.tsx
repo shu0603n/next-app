@@ -5,6 +5,7 @@ import formsTables from './forms-tables';
 import chartsMap from './charts-map';
 import other from './other';
 import pages from './pages';
+import parameter from './parameter';
 
 // types
 import { NavItemType } from 'types/menu';
@@ -12,7 +13,7 @@ import { NavItemType } from 'types/menu';
 // ==============================|| MENU ITEMS ||============================== //
 
 const menuItems: { items: NavItemType[] } = {
-  items: [widget, applications, formsTables, chartsMap, pages, other]
+  items: [widget, applications, formsTables, chartsMap, pages, other, parameter]
 };
 
 export default menuItems;

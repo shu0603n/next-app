@@ -1,5 +1,5 @@
 // next
-import NextAuth from 'next-auth';
+import NextAuth, { Session } from 'next-auth';
 import Auth0Provider from 'next-auth/providers/auth0';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import CognitoProvider from 'next-auth/providers/cognito';
@@ -18,7 +18,7 @@ export let users = [
 ];
 
 export default NextAuth({
-  secret: process.env.NEXTAUTH_SECRET_KEY,
+  secret: process.env.NEXT_PUBLIC_SECRET,
   providers: [
     Auth0Provider({
       name: 'Auth0',
@@ -58,6 +58,30 @@ export default NextAuth({
       },
       async authorize(credentials) {
         try {
+          // TODO　Vercal環境でnext authが使えないため、モックデータで対処する
+          // ▽モックデータを返す
+          const sessionData: Session = {
+            user: {
+              name: 'John Doe',
+              email: 'john@example.com',
+              image: 'https://example.com/avatar.jpg' // プロフィール画像のURL
+            },
+            expires: '2023-12-31T23:59:59Z', // セッションの有効期限
+            id: undefined,
+            provider: 'login',
+            tocken: {
+              provider: 'login',
+              iat: 1695786826,
+              exp: 1695873226,
+              jti: '4abe0a6e-1d6f-4c2c-8615-0c5af364f25a'
+            }
+          };
+          const mockUpdateSession: (data?: any) => Promise<Session | null> = async (data) => {
+            return sessionData;
+          };
+          const session = await mockUpdateSession();
+          return { update: session, data: sessionData, status: 'authenticated' };
+          // △モックデータを返す
           const user = await axios.post('/api/account/login', {
             password: credentials?.password,
             email: credentials?.email
