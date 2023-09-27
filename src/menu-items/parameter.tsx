@@ -56,7 +56,7 @@ const parameter: NavItemType = {
           id: 'position',
           title: <FormattedMessage id="position" />,
           type: 'item',
-          url: '/',
+          url: '/parameter/position',
           target: true
         }
       ]
