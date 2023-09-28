@@ -160,25 +160,32 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               <Grid container spacing={3}>
                 <Grid item xs={12} md={8}>
                   <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="id">ID</InputLabel>
-                        <TextField fullWidth id="id" {...getFieldProps('id')} value={customer !== null ? customer.id : ''} disabled />
-                        {JSON.stringify(customer)}
-                      </Stack>
-                    </Grid>
+                    {customer !== null && (
+                      <Grid item xs={12}>
+                        <Stack spacing={1.25}>
+                          <InputLabel htmlFor="id">ID</InputLabel>
+                          <TextField
+                            fullWidth
+                            id="id"
+                            {...getFieldProps('id')}
+                            placeholder={customer ? customer.id : ''}
+                            // disabled
+                          />
+                        </Stack>
+                      </Grid>
+                    )}
+
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="name">パラメーター</InputLabel>
                         <TextField
                           fullWidth
                           id="name"
-                          placeholder="パラメーターを入力してください"
+                          placeholder={customer !== null ? customer.name : 'パラメーターを入力してください'}
                           {...getFieldProps('name')}
                           error={Boolean(touched.name && errors.name)}
                           helperText={touched.name && errors.name}
                         />
-                        {JSON.stringify(customer)}
                       </Stack>
                     </Grid>
                   </Grid>
