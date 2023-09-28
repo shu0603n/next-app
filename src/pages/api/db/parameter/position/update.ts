@@ -6,13 +6,20 @@ export default async function handler(request: NextApiRequest, response: NextApi
     const id = request.query.id as string;
     const name = request.query.name as string;
     if (!id || !name) throw new Error('パラメーターが不足しています');
-    console.log(`UPDATE Position SET name = '${name}' WHERE id = ${Number(id)};`);
-    await sql`UPDATE Position SET name = ${name.toString()} WHERE id = ${Number(id)};`;
+    console.log(`UPDATE Position SET name = '${name}' WHERE id = ${id};`);
+    const result = await sql`UPDATE Position SET name = ${name.toString()} WHERE id = ${Number(id)};`;
+    console.log(result);
+    if (result.rowCount === 0) {
+      throw new Error('対象のIDが存在しませんでした');
+    }
+    if (result.rowCount !== 1) {
+      throw new Error('複数のレコードが更新されてしまった可能性があります');
+    }
 
-    const { rows } = await sql`SELECT * FROM Position;`;
-    return response.status(200).json({ rows });
+    const data = await sql`SELECT * FROM position;`;
+    return response.status(200).json({ data });
   } catch (error) {
-    console.log(error);
-    return response.status(500).json(error);
+    console.error('エラーが発生しました:', error);
+    return response.status(500).json({ error: 'データを取得できませんでした。' });
   }
 }
