@@ -174,6 +174,20 @@ async function fetchTableData() {
   }
 }
 
+async function fetchTechnicTableData() {
+  try {
+    const response = await fetch('/api/db/parameter/technic/select');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+
 const defaultRes: dbResponse = {
   data: {
     command: '',
@@ -190,6 +204,7 @@ const defaultRes: dbResponse = {
 // CustomerSkillPageコンポーネント
 const CustomerSkillPage = () => {
   const [tableData, setTableData] = useState<dbResponse>(defaultRes); // データを保持する状態変数
+  const [technicTableData, setTechnicTableData] = useState<dbResponse>(defaultRes); // データを保持する状態変数
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
@@ -201,7 +216,17 @@ const CustomerSkillPage = () => {
         // エラーハンドリング
         console.error('Error:', error);
       });
+
+    fetchTechnicTableData()
+      .then((data) => {
+        setTechnicTableData(data); // データを状態に設定
+      })
+      .catch((error) => {
+        // エラーハンドリング
+        console.error('Error:', error);
+      });
   }, []); // 空の依存リストを指定することで、一度だけ実行される
+  console.log(technicTableData);
 
   const theme = useTheme();
 
@@ -228,6 +253,10 @@ const CustomerSkillPage = () => {
       {
         Header: 'パラメーター',
         accessor: 'name'
+      },
+      {
+        Header: '技術区分',
+        accessor: 'technic_id'
       },
       {
         Header: 'アクション',

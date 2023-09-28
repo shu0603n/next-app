@@ -49,7 +49,7 @@ const parameter: NavItemType = {
           id: 'skill',
           title: <FormattedMessage id="skill" />,
           type: 'item',
-          url: '/'
+          url: '/parameter/skill'
         },
         {
           id: 'position',
