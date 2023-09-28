@@ -19,6 +19,7 @@ import { openSnackbar } from 'store/reducers/snackbar';
 
 // アセット
 import { DeleteFilled } from '@ant-design/icons';
+import { dbResponse } from 'types/dbResponse';
 
 // 定数
 const getInitialValues = (customer: FormikValues | null) => {
@@ -28,6 +29,7 @@ const getInitialValues = (customer: FormikValues | null) => {
   };
 
   if (customer) {
+    newCustomer.id = customer.id;
     newCustomer.name = customer.name;
     return _.merge({}, newCustomer, customer);
   }
@@ -40,9 +42,10 @@ const getInitialValues = (customer: FormikValues | null) => {
 export interface Props {
   customer?: any;
   onCancel: () => void;
+  onReload: (data: dbResponse) => void;
 }
 
-const AddCustomer = ({ customer, onCancel }: Props) => {
+const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   const isCreating = !customer;
 
   const CustomerSchema = Yup.object().shape({
@@ -61,20 +64,21 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
       try {
-        console.log(values.name);
         if (customer) {
           fetch(`/api/db/parameter/position/update?id=${values.id}&name=${values.name}`)
             .then((response) => {
               if (!response.ok) {
-                throw new Error('データの更新に失敗しました。');
+                throw new Error('更新に失敗しました。');
               }
               return response.json();
             })
             .then((data) => {
+              console.log(data);
+              onReload(data);
               dispatch(
                 openSnackbar({
                   open: true,
-                  message: 'パラメーターが正常に更新されました。',
+                  message: '正常に更新されました。',
                   variant: 'alert',
                   alert: {
                     color: 'success'
@@ -101,15 +105,16 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
           fetch(`/api/db/parameter/position/insert?name=${values.name}`)
             .then((response) => {
               if (!response.ok) {
-                throw new Error('データの追追加に失敗しました。');
+                throw new Error('更新に失敗しました。');
               }
               return response.json();
             })
             .then((data) => {
+              onReload(data);
               dispatch(
                 openSnackbar({
                   open: true,
-                  message: 'パラメーターが正常に追加されました。',
+                  message: '正常に追加されました。',
                   variant: 'alert',
                   alert: {
                     color: 'success'
@@ -158,7 +163,13 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="id">ID</InputLabel>
-                        <TextField fullWidth id="id" {...getFieldProps('id')} />
+                        <TextField
+                          fullWidth
+                          id="id"
+                          {...getFieldProps('id')}
+                          //  disabled
+                        />
+                        {JSON.stringify(customer)}
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
@@ -172,6 +183,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           error={Boolean(touched.name && errors.name)}
                           helperText={touched.name && errors.name}
                         />
+                        {JSON.stringify(customer)}
                       </Stack>
                     </Grid>
                   </Grid>
@@ -205,7 +217,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
           </Form>
         </LocalizationProvider>
       </FormikProvider>
-      {!isCreating && <AlertCustomerDelete title={customer.name} open={openAlert} handleClose={handleAlertClose} />}
+      {!isCreating && <AlertCustomerDelete id={customer.id} open={openAlert} handleClose={handleAlertClose} onReload={onReload} />}
     </>
   );
 };
