@@ -8,10 +8,10 @@ export default async function handler(request: NextApiRequest, response: NextApi
     console.log(`DELETE FROM Position WHERE id = ${Number(id)};`);
     await sql`DELETE FROM Position WHERE id = ${Number(id)};`;
 
-    const { rows } = await sql`SELECT * FROM Position;`;
-    return response.status(200).json({ rows });
+    const data = await sql`SELECT * FROM position;`;
+    return response.status(200).json({ data });
   } catch (error) {
-    console.log(error);
-    return response.status(500).json(error);
+    console.error('エラーが発生しました:', error);
+    return response.status(500).json({ error: 'データを取得できませんでした。' });
   }
 }
