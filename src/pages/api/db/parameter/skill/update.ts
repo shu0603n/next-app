@@ -5,9 +5,10 @@ export default async function handler(request: NextApiRequest, response: NextApi
   try {
     const id = request.query.id as string;
     const name = request.query.name as string;
-    if (!id || !name) throw new Error('パラメーターが不足しています');
-    console.log(`UPDATE skill SET name = '${name}' WHERE id = ${id};`);
-    const result = await sql`UPDATE skill SET name = ${name.toString()} WHERE id = ${Number(id)};`;
+    const technic_id = request.query.technic_id as string;
+    if (!id || !name || !technic_id) throw new Error('パラメーターが不足しています');
+    console.log(`UPDATE skill SET name = '${name}', technic_id = '${technic_id}' WHERE id = ${id};`);
+    const result = await sql`UPDATE skill SET name = ${name.toString()}, technic_id = ${technic_id.toString()} WHERE id = ${Number(id)};`;
     console.log(result);
     if (result.rowCount === 0) {
       throw new Error('対象のIDが存在しませんでした');

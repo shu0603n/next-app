@@ -50,21 +50,6 @@ const other: NavItemType = {
       type: 'item',
       url: '/employee',
       icon: icons.ChromeOutlined
-    },
-    {
-      id: 'parameter',
-      title: <FormattedMessage id="parameter" />,
-      type: 'collapse',
-      icon: icons.MenuUnfoldOutlined,
-      children: [
-        {
-          id: 'position',
-          title: <FormattedMessage id="position" />,
-          type: 'item',
-          url: '/parameter/position',
-          icon: icons.ChromeOutlined
-        }
-      ]
     }
   ]
 };

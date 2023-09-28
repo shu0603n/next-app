@@ -1,7 +1,20 @@
-import { useState } from 'react';
-
+import { useEffect, useState } from 'react';
+import { useTheme } from '@mui/material/styles';
 // material-ui
-import { Button, DialogActions, DialogContent, DialogTitle, Divider, Grid, InputLabel, Stack, TextField, Tooltip } from '@mui/material';
+import {
+  Button,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Autocomplete,
+  Divider,
+  FormHelperText,
+  Grid,
+  InputLabel,
+  Stack,
+  TextField,
+  Tooltip
+} from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
@@ -25,16 +38,45 @@ import { dbResponse } from 'types/dbResponse';
 const getInitialValues = (customer: FormikValues | null) => {
   const newCustomer = {
     id: '',
-    name: ''
+    name: '',
+    technic_id: '',
+    technic_name: ''
   };
 
   if (customer) {
     newCustomer.id = customer.id;
     newCustomer.name = customer.name;
+    newCustomer.technic_id = customer.technic_id;
+    newCustomer.technic_name = customer.technic_name;
     return _.merge({}, newCustomer, customer);
   }
 
   return newCustomer;
+};
+
+async function fetchTableData() {
+  try {
+    const response = await fetch('/api/db/parameter/technic/select');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+
+const defaultRes: dbResponse = {
+  data: {
+    command: '',
+    fields: [],
+    rowAsArray: false,
+    rowCount: 0,
+    rows: [],
+    viaNeonFetch: false
+  }
 };
 
 // ==============================|| 顧客の追加/編集 ||============================== //
@@ -46,8 +88,24 @@ export interface Props {
 }
 
 const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
+  const theme = useTheme();
   const isCreating = !customer;
 
+  const [tableData, setTableData] = useState<dbResponse>(defaultRes); // データを保持する状態変数
+
+  useEffect(() => {
+    // ページがロードされたときにデータを取得
+    fetchTableData()
+      .then((data) => {
+        setTableData(data); // データを状態に設定
+      })
+      .catch((error) => {
+        // エラーハンドリング
+        console.error('Error:', error);
+      });
+  }, []); // 空の依存リストを指定することで、一度だけ実行される
+
+  console.log(tableData);
   const CustomerSchema = Yup.object().shape({
     name: Yup.string().max(255).required('パラメーターは必須です')
   });
@@ -65,7 +123,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     onSubmit: (values, { setSubmitting }) => {
       try {
         if (customer) {
-          fetch(`/api/db/parameter/position/update?id=${values.id}&name=${values.name}`)
+          fetch(`/api/db/parameter/position/update?id=${values.id}&name=${values.name}&technic_id=${values.technic_id}`)
             .then((response) => {
               if (!response.ok) {
                 throw new Error('更新に失敗しました。');
@@ -102,7 +160,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               );
             });
         } else {
-          fetch(`/api/db/parameter/position/insert?name=${values.name}`)
+          fetch(`/api/db/parameter/position/insert?name=${values.name}&technic_id=${values.technic_id}`)
             .then((response) => {
               if (!response.ok) {
                 throw new Error('更新に失敗しました。');
@@ -186,6 +244,35 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                           error={Boolean(touched.name && errors.name)}
                           helperText={touched.name && errors.name}
                         />
+                      </Stack>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="name">技術区分</InputLabel>
+                        <Autocomplete
+                          id="technic_name"
+                          // value={customer.technic_name}
+                          {...getFieldProps('technic_name')}
+                          onChange={(event: any, newValue: string | null) => {
+                            const technic = tableData.data.rows.find((technic: any) => technic.name === 'test');
+                            customer.setFieldValue('technic_id', technic.id);
+                            customer.setFieldValue('technic_name', technic.name);
+                          }}
+                          options={tableData.data.rows.map((technic: any) => technic.name)}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="技術区分を選択してください"
+                              sx={{ '& .MuiAutocomplete-input.Mui-disabled': { WebkitTextFillColor: theme.palette.text.primary } }}
+                            />
+                          )}
+                        />
+                        {touched.technic_name && errors.technic_name && (
+                          <FormHelperText error id="helper-text-technic_name">
+                            {errors.technic_name}
+                          </FormHelperText>
+                        )}
                       </Stack>
                     </Grid>
                   </Grid>
