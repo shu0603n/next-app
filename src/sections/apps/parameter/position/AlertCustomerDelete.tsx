@@ -7,17 +7,63 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/reducers/snackbar';
+import { dbResponse } from 'types/dbResponse';
 
 // types
 interface Props {
-  title: string;
+  id: string;
   open: boolean;
   handleClose: (status: boolean) => void;
+  onReload: (data: dbResponse) => void;
 }
 
 // ==============================|| 顧客 - 削除 ||============================== //
 
-export default function AlertCustomerDelete({ title, open, handleClose }: Props) {
+export default function AlertCustomerDelete({ id, open, handleClose, onReload }: Props) {
+  const handleClick = (isDelete: boolean) => {
+    if (isDelete) {
+      fetch(`/api/db/parameter/position/delete?id=${id}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('データの削除に失敗しました。');
+          }
+          return response.json();
+        })
+        .then((data) => {
+          onReload(data);
+          dispatch(
+            openSnackbar({
+              open: true,
+              message: 'パラメーターが正常に削除されました。',
+              variant: 'alert',
+              alert: {
+                color: 'success'
+              },
+              close: false
+            })
+          );
+        })
+        .catch((error) => {
+          console.error('エラー:', error);
+          dispatch(
+            openSnackbar({
+              open: true,
+              message: 'データの削除に失敗しました。',
+              variant: 'alert',
+              alert: {
+                color: 'error'
+              },
+              close: false
+            })
+          );
+        });
+    }
+
+    handleClose(isDelete);
+  };
+
   return (
     <Dialog
       open={open}
@@ -40,7 +86,7 @@ export default function AlertCustomerDelete({ title, open, handleClose }: Props)
             <Typography align="center">
               {'ID:('}
               <Typography variant="subtitle1" component="span">
-                {title}
+                {id}
                 {') '}
               </Typography>
               を削除すると、関連するデータも削除されます。
@@ -48,10 +94,10 @@ export default function AlertCustomerDelete({ title, open, handleClose }: Props)
           </Stack>
 
           <Stack direction="row" spacing={2} sx={{ width: 1 }}>
-            <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
+            <Button fullWidth onClick={() => handleClick(false)} color="secondary" variant="outlined">
               キャンセル
             </Button>
-            <Button fullWidth color="error" variant="contained" onClick={() => handleClose(true)} autoFocus>
+            <Button fullWidth color="error" variant="contained" onClick={() => handleClick(true)} autoFocus>
               削除
             </Button>
           </Stack>
