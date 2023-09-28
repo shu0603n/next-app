@@ -38,35 +38,6 @@ const other: NavItemType = {
   type: 'group',
   children: [
     {
-      id: 'top',
-      title: <FormattedMessage id="top" />,
-      type: 'item',
-      url: '/top',
-      icon: icons.ChromeOutlined
-    },
-    {
-      id: 'employee',
-      title: <FormattedMessage id="employee" />,
-      type: 'item',
-      url: '/employee',
-      icon: icons.ChromeOutlined
-    },
-    {
-      id: 'parameter',
-      title: <FormattedMessage id="parameter" />,
-      type: 'collapse',
-      icon: icons.MenuUnfoldOutlined,
-      children: [
-        {
-          id: 'position',
-          title: <FormattedMessage id="position" />,
-          type: 'item',
-          url: '/parameter/position',
-          icon: icons.ChromeOutlined
-        }
-      ]
-    },
-    {
       id: 'sample-page',
       title: <FormattedMessage id="sample-page" />,
       type: 'item',
