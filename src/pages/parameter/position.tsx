@@ -16,8 +16,7 @@ import {
   Column,
   HeaderGroup,
   Row,
-  Cell,
-  HeaderProps
+  Cell
 } from 'react-table';
 
 // project import
@@ -27,23 +26,16 @@ import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import IconButton from 'components/@extended/IconButton';
 import { PopupTransition } from 'components/@extended/Transitions';
-import {
-  CSVExport,
-  HeaderSort,
-  IndeterminateCheckbox,
-  SortingSelect,
-  TablePagination,
-  TableRowSelection
-} from 'components/third-party/ReactTable';
+import { CSVExport, HeaderSort, SortingSelect, TablePagination, TableRowSelection } from 'components/third-party/ReactTable';
 
 import AddCustomer from 'sections/apps/parameter/position/AddCustomer';
 import AlertCustomerDelete from 'sections/apps/parameter/position/AlertCustomerDelete';
 
-import makeData from 'data/react-table';
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { PlusOutlined, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
+import { dbResponse } from 'types/dbResponse';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -93,15 +85,6 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
     usePagination,
     useRowSelect
   );
-
-  // useEffect(() => {
-  //   if (matchDownSM) {
-  //     setHiddenColumns(['age', 'contact', 'visits', 'email', 'status', 'avatar']);
-  //   } else {
-  //     setHiddenColumns(['avatar', 'email']);
-  //   }
-  //   // eslint-disable-next-line
-  // }, [matchDownSM]);
 
   return (
     <>
@@ -190,17 +173,6 @@ async function fetchTableData() {
     throw error;
   }
 }
-type dbResponse = {
-  data: sqlResult;
-};
-type sqlResult = {
-  command: string;
-  fields: Array<any>;
-  rowAsArray: boolean;
-  rowCount: number;
-  rows: Array<any>;
-  viaNeonFetch: boolean;
-};
 
 const defaultRes: dbResponse = {
   data: {
@@ -230,13 +202,9 @@ const CustomerPositionPage = () => {
         console.error('Error:', error);
       });
   }, []); // 空の依存リストを指定することで、一度だけ実行される
-  console.log(tableData);
 
   const theme = useTheme();
 
-  const data = useMemo(() => makeData(5), []);
-  console.log('makeData>>>>>');
-  console.log(data);
   const [open, setOpen] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
   const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
@@ -253,14 +221,6 @@ const CustomerPositionPage = () => {
 
   const columns = useMemo(
     () => [
-      {
-        Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
-          <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
-        ),
-        accessor: 'selection',
-        Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
-        disableSortBy: true
-      },
       {
         Header: 'ID',
         accessor: 'id'
@@ -320,8 +280,7 @@ const CustomerPositionPage = () => {
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
           />
         </ScrollX>
-        <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} />
-        {/* 顧客追加ダイアログ */}
+        <AlertCustomerDelete id={customerDeleteId} open={open} handleClose={handleClose} onReload={setTableData} />
         <Dialog
           maxWidth="sm"
           TransitionComponent={PopupTransition}
@@ -332,7 +291,7 @@ const CustomerPositionPage = () => {
           sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
           aria-describedby="alert-dialog-slide-description"
         >
-          <AddCustomer customer={customer} onCancel={handleAdd} />
+          <AddCustomer customer={customer} onCancel={handleAdd} onReload={setTableData} />
         </Dialog>
       </MainCard>
     </Page>
