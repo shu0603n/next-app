@@ -179,7 +179,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
 
 async function fetchTableData() {
   try {
-    const response = await fetch('/api/getTable?tableName=position');
+    const response = await fetch('/api/db/parameter/position/select');
     if (!response.ok) {
       throw new Error('API request failed');
     }
