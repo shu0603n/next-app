@@ -163,12 +163,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="id">ID</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="id"
-                          {...getFieldProps('id')}
-                          //  disabled
-                        />
+                        <TextField fullWidth id="id" {...getFieldProps('id')} value={customer !== null ? customer.id : ''} disabled />
                         {JSON.stringify(customer)}
                       </Stack>
                     </Grid>
