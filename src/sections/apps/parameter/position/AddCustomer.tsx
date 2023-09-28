@@ -23,10 +23,8 @@ import { DeleteFilled } from '@ant-design/icons';
 // 定数
 const getInitialValues = (customer: FormikValues | null) => {
   const newCustomer = {
-    name: '',
-    email: '',
-    location: '',
-    orderStatus: ''
+    id: '',
+    name: ''
   };
 
   if (customer) {
@@ -63,30 +61,77 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
       try {
+        console.log(values.name);
         if (customer) {
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: 'パラメーターが正常に更新されました。',
-              variant: 'alert',
-              alert: {
-                color: 'success'
-              },
-              close: false
+          fetch(`/api/db/parameter/position/update?id=${values.id}&name=${values.name}`)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error('データの更新に失敗しました。');
+              }
+              return response.json();
             })
-          );
+            .then((data) => {
+              dispatch(
+                openSnackbar({
+                  open: true,
+                  message: 'パラメーターが正常に更新されました。',
+                  variant: 'alert',
+                  alert: {
+                    color: 'success'
+                  },
+                  close: false
+                })
+              );
+            })
+            .catch((error) => {
+              console.error('エラー:', error);
+              dispatch(
+                openSnackbar({
+                  open: true,
+                  message: 'データの更新に失敗しました。',
+                  variant: 'alert',
+                  alert: {
+                    color: 'error'
+                  },
+                  close: false
+                })
+              );
+            });
         } else {
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: 'パラメーターが正常に追加されました。',
-              variant: 'alert',
-              alert: {
-                color: 'success'
-              },
-              close: false
+          fetch(`/api/db/parameter/position/insert?name=${values.name}`)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error('データの追追加に失敗しました。');
+              }
+              return response.json();
             })
-          );
+            .then((data) => {
+              dispatch(
+                openSnackbar({
+                  open: true,
+                  message: 'パラメーターが正常に追加されました。',
+                  variant: 'alert',
+                  alert: {
+                    color: 'success'
+                  },
+                  close: false
+                })
+              );
+            })
+            .catch((error) => {
+              console.error('エラー:', error);
+              dispatch(
+                openSnackbar({
+                  open: true,
+                  message: 'データの追加に失敗しました。',
+                  variant: 'alert',
+                  alert: {
+                    color: 'error'
+                  },
+                  close: false
+                })
+              );
+            });
         }
 
         setSubmitting(false);
@@ -113,7 +158,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="id">ID</InputLabel>
-                        <TextField fullWidth id="id" placeholder="パラメーターを入力してください" {...getFieldProps('id')} />
+                        <TextField fullWidth id="id" {...getFieldProps('id')} />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
