@@ -60,7 +60,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    // setHiddenColumns,
+    setHiddenColumns,
     allColumns,
     rows,
     page,
@@ -76,7 +76,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['technic_id'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -85,6 +85,15 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
     usePagination,
     useRowSelect
   );
+
+  useEffect(() => {
+    if (matchDownSM) {
+      setHiddenColumns(['technic_id']);
+    } else {
+      setHiddenColumns(['technic_id']);
+    }
+    // eslint-disable-next-line
+  }, [matchDownSM]);
 
   return (
     <>
@@ -255,8 +264,12 @@ const CustomerSkillPage = () => {
         accessor: 'name'
       },
       {
-        Header: '技術区分',
+        Header: '技術ID',
         accessor: 'technic_id'
+      },
+      {
+        Header: '技術区分',
+        accessor: 'technic_name'
       },
       {
         Header: 'アクション',
