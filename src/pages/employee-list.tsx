@@ -5,7 +5,6 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { Button, Chip, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
 
 // third-party
-import { PatternFormat } from 'react-number-format';
 import {
   useFilters,
   useExpanded,
