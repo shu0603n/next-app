@@ -123,7 +123,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     onSubmit: (values, { setSubmitting }) => {
       try {
         if (customer) {
-          fetch(`/api/db/parameter/position/update?id=${values.id}&name=${values.name}&technic_id=${values.technic_id}`)
+          fetch(`/api/db/parameter/skill/update?id=${values.id}&name=${values.name}&technic_id=${values.technic_id}`)
             .then((response) => {
               if (!response.ok) {
                 throw new Error('更新に失敗しました。');
@@ -160,7 +160,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               );
             });
         } else {
-          fetch(`/api/db/parameter/position/insert?name=${values.name}&technic_id=${values.technic_id}`)
+          fetch(`/api/db/parameter/skill/insert?name=${values.name}&technic_id=${values.technic_id}`)
             .then((response) => {
               if (!response.ok) {
                 throw new Error('更新に失敗しました。');
