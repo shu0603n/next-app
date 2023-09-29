@@ -39,7 +39,6 @@ import {
 
 import CustomerView from 'sections/apps/customer/CustomerView';
 
-import makeData from 'data/react-table';
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
