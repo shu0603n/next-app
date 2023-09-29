@@ -134,8 +134,10 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
         <Table {...getTableProps()}>
           <TableHead>
             {headerGroups.map((headerGroup: HeaderGroup<{}>) => (
+              // eslint-disable-next-line react/jsx-key
               <TableRow {...headerGroup.getHeaderGroupProps()} sx={{ '& > th:first-of-type': { width: '58px' } }}>
                 {headerGroup.headers.map((column: HeaderGroup) => (
+                  // eslint-disable-next-line react/jsx-key
                   <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])}>
                     <HeaderSort column={column} />
                   </TableCell>
@@ -158,6 +160,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                     sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                   >
                     {row.cells.map((cell: Cell) => (
+                      // eslint-disable-next-line react/jsx-key
                       <TableCell {...cell.getCellProps([{ className: cell.column.className }])}>{cell.render('Cell')}</TableCell>
                     ))}
                   </TableRow>
@@ -178,16 +181,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 }
 
 // ==============================|| CUSTOMER - LIST ||============================== //
-type SkillTableCoulums = {
-  id: 1;
-  cliant: string;
-  people_number: number;
-  contact: string;
-  project_title: string;
-  avatar: number;
-  skills: string[];
-  process_list: string[];
-};
+
 const SkillTable = (skill: any) => {
   const theme = useTheme();
 
