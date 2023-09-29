@@ -105,7 +105,6 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
       });
   }, []); // 空の依存リストを指定することで、一度だけ実行される
 
-  console.log(tableData);
   const CustomerSchema = Yup.object().shape({
     name: Yup.string().max(255).required('パラメーターは必須です')
   });
@@ -113,6 +112,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   const [openAlert, setOpenAlert] = useState(false);
 
   const handleAlertClose = () => {
+    resetValues();
     setOpenAlert(!openAlert);
     onCancel();
   };
@@ -196,7 +196,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               );
             });
         }
-
+        resetValues();
         setSubmitting(false);
         onCancel();
       } catch (error) {
@@ -206,6 +206,13 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   });
 
   const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
+
+  const resetValues = () => {
+    setFieldValue('id', '');
+    setFieldValue('name', '');
+    setFieldValue('technic_id', '');
+    setFieldValue('technic_name', '');
+  };
 
   return (
     <>
