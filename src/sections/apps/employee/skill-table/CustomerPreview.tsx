@@ -96,7 +96,7 @@ export default function CustomerPreview({ customer, open, onClose }: { customer:
                 }
               >
                 <ListItemAvatar sx={{ mr: 0.75 }}>
-                  <Avatar alt={customer.fatherName} size="lg" src={`/assets/images/users/avatar-${data.avatar}.png`} />
+                  <Avatar alt={customer.fatherName} size="lg" src={`/assets/images/users/avatar-${6}.png`} />
                 </ListItemAvatar>
                 <ListItemText
                   primary={<Typography variant="h5">{customer.fatherName}</Typography>}
