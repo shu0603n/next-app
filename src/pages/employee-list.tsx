@@ -189,47 +189,19 @@ const CustomerEmployeeListPage = () => {
   const data = [
     {
       id: 1,
-      sei: '田中',
-      mei: '太郎',
-      sei_k: 'タナカ',
-      mei_k: 'タロウ',
+      name: '田中 太郎',
+      name_k: 'タナカ タロウ',
       gender: '男性',
-      birthdate: '1980-01-15',
-      job_category_id: 1,
-      client_id: 101,
-      project_id: 201,
-      address: '東京都渋谷区',
-      joining_date: '2005-03-20',
-      retirement_date: '2035-04-30',
-      phone_number: '123-4567-8901',
-      email: 'tanaka.taro@example.com',
-      employee_skills_id: 301,
-      postal_code: '12345678',
-      remarks: '備考1',
-      position_id: 1,
-      employment_id: 1
+      job_category_name: '4',
+      employment_name: '1'
     },
     {
-      id: 1,
-      sei: '田中',
-      mei: '太郎',
-      sei_k: 'タナカ',
-      mei_k: 'タロウ',
+      id: 2,
+      name: '田中 太郎',
+      name_k: 'タナカ タロウ',
       gender: '男性',
-      birthdate: '1980-01-15',
-      job_category_id: 1,
-      client_id: 101,
-      project_id: 201,
-      address: '東京都渋谷区',
-      joining_date: '2005-03-20',
-      retirement_date: '2035-04-30',
-      phone_number: '123-4567-8901',
-      email: 'tanaka.taro@example.com',
-      employee_skills_id: 301,
-      postal_code: '12345678',
-      remarks: '備考1',
-      position_id: 1,
-      employment_id: 1
+      job_category_name: '4',
+      employment_name: '1'
     }
   ];
   console.log(data);
@@ -291,84 +263,15 @@ const CustomerEmployeeListPage = () => {
         disableSortBy: true
       },
       {
-        Header: 'birthdate',
-        accessor: 'birthdate',
+        Header: 'job_category_name',
+        accessor: 'job_category_name',
         disableSortBy: true
       },
       {
-        Header: 'job_category_id',
-        accessor: 'job_category_id',
+        Header: 'employment_name',
+        accessor: 'employment_name',
         disableSortBy: true
       },
-      {
-        Header: 'client_id',
-        accessor: 'client_id',
-        disableSortBy: true
-      },
-      {
-        Header: 'project_id',
-        accessor: 'project_id',
-        disableSortBy: true
-      },
-      {
-        Header: 'address',
-        accessor: 'address',
-        disableSortBy: true
-      },
-      {
-        Header: 'joining_date',
-        accessor: 'joining_date',
-        disableSortBy: true
-      },
-      {
-        Header: 'retirement_date',
-        accessor: 'retirement_date',
-        disableSortBy: true
-      },
-      {
-        Header: 'phone_number',
-        accessor: 'phone_number',
-        Cell: ({ value }: { value: number }) => <PatternFormat displayType="text" format="+1 ###-####-####" mask="_" defaultValue={value} />
-      },
-      {
-        Header: 'email',
-        accessor: 'email',
-        disableSortBy: true
-      },
-      {
-        Header: 'employee_skills_id',
-        accessor: 'employee_skills_id',
-        disableSortBy: true
-      },
-      {
-        Header: 'postal_code',
-        accessor: 'postal_code',
-        disableSortBy: true
-      },
-      {
-        Header: 'remarks',
-        accessor: 'remarks',
-        disableSortBy: true
-      },
-      {
-        Header: 'position_id',
-        accessor: 'position_id',
-        disableSortBy: true
-      },
-      {
-        Header: 'employment_id',
-        accessor: 'employment_id',
-        disableSortBy: true
-      },
-      // {
-      //   Header: 'Age',
-      //   accessor: 'age',
-      //   className: 'cell-right'
-      // },
-      // {
-      //   Header: 'Country',
-      //   accessor: 'country'
-      // },
       {
         Header: 'Status',
         accessor: 'status',
