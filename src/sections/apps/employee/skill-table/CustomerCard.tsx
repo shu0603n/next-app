@@ -90,7 +90,7 @@ const CustomerCard = ({ customer }: { customer: UserCardProps }) => {
                 }
               >
                 <ListItemAvatar>
-                  <Avatar alt={customer.fatherName} src={`/assets/images/users/avatar-${data.avatar}.png`} />
+                  <Avatar alt={customer.fatherName} src={`/assets/images/users/avatar-${6}.png`} />
                 </ListItemAvatar>
                 <ListItemText
                   primary={<Typography variant="subtitle1">{customer.fatherName}</Typography>}
