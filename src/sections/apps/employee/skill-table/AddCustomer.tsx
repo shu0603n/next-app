@@ -468,6 +468,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                               }
 
                               return (
+                                // eslint-disable-next-line react/jsx-key
                                 <Chip
                                   {...getTagProps({ index })}
                                   variant="combined"
@@ -566,6 +567,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                               }
 
                               return (
+                                // eslint-disable-next-line react/jsx-key
                                 <Chip
                                   {...getTagProps({ index })}
                                   variant="combined"
