@@ -65,7 +65,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     onSubmit: (values, { setSubmitting }) => {
       try {
         if (customer) {
-          fetch(`/api/db/parameter/position/update?id=${values.id}&name=${values.name}`)
+          fetch(`/api/db/parameter/contract/update?id=${values.id}&name=${values.name}`)
             .then((response) => {
               if (!response.ok) {
                 throw new Error('更新に失敗しました。');
@@ -102,7 +102,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               );
             });
         } else {
-          fetch(`/api/db/parameter/position/insert?name=${values.name}`)
+          fetch(`/api/db/parameter/contract/insert?name=${values.name}`)
             .then((response) => {
               if (!response.ok) {
                 throw new Error('更新に失敗しました。');
