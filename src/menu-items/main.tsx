@@ -50,6 +50,19 @@ const other: NavItemType = {
       type: 'item',
       url: '/employee',
       icon: icons.ChromeOutlined
+    },
+    {
+      id: 'employee-list',
+      title: <FormattedMessage id="employee-list" />,
+      type: 'item',
+      url: '/employee-list',
+      icon: icons.ChromeOutlined
+    },
+    {
+      id: 'account-profile',
+      title: <FormattedMessage id="account-profile" />,
+      type: 'item',
+      url: '/employee/basic'
     }
   ]
 };
