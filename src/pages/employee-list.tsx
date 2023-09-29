@@ -327,7 +327,7 @@ const CustomerEmployeeListPage = () => {
         <ScrollX>
           <ReactTable
             columns={columns}
-            data={data}
+            data={data as []}
             handleAdd={handleAdd}
             renderRowSubComponent={renderRowSubComponent}
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
