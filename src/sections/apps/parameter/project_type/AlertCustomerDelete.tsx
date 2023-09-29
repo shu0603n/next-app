@@ -24,7 +24,7 @@ interface Props {
 export default function AlertCustomerDelete({ id, open, handleClose, onReload }: Props) {
   const handleClick = (isDelete: boolean) => {
     if (isDelete) {
-      fetch(`/api/db/parameter/position/delete?id=${id}`)
+      fetch(`/api/db/parameter/project_type/delete?id=${id}`)
         .then((response) => {
           if (!response.ok) {
             throw new Error('データの削除に失敗しました。');
