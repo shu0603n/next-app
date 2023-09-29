@@ -205,7 +205,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     }
   });
 
-  const { errors, touched, handleSubmit, isSubmitting, getFieldProps } = formik;
+  const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
 
   return (
     <>
@@ -255,9 +255,9 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                           // value={customer.technic_name}
                           {...getFieldProps('technic_name')}
                           onChange={(event: any, newValue: string | null) => {
-                            const technic = tableData.data.rows.find((technic: any) => technic.name === 'test');
-                            customer.setFieldValue('technic_id', technic.id);
-                            customer.setFieldValue('technic_name', technic.name);
+                            const technic = tableData.data.rows.find((technic: any) => technic.name === newValue);
+                            setFieldValue('technic_id', technic.id);
+                            setFieldValue('technic_name', technic.name);
                           }}
                           options={tableData.data.rows.map((technic: any) => technic.name)}
                           renderInput={(params) => (
