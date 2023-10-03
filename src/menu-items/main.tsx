@@ -52,17 +52,11 @@ const other: NavItemType = {
       icon: icons.ChromeOutlined
     },
     {
-      id: 'employee-list',
-      title: <FormattedMessage id="employee-list" />,
+      id: 'employee-detail',
+      title: <FormattedMessage id="employee-detail" />,
       type: 'item',
-      url: '/employee-list',
+      url: '/employee/basic',
       icon: icons.ChromeOutlined
-    },
-    {
-      id: 'account-profile',
-      title: <FormattedMessage id="account-profile" />,
-      type: 'item',
-      url: '/employee/basic'
     }
   ]
 };
