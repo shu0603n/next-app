@@ -16,8 +16,7 @@ import {
   Column,
   HeaderGroup,
   Row,
-  Cell,
-  HeaderProps
+  Cell
 } from 'react-table';
 
 // project import
@@ -27,14 +26,7 @@ import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import Avatar from 'components/@extended/Avatar';
 import IconButton from 'components/@extended/IconButton';
-import {
-  CSVExport,
-  HeaderSort,
-  IndeterminateCheckbox,
-  SortingSelect,
-  TablePagination,
-  TableRowSelection
-} from 'components/third-party/ReactTable';
+import { CSVExport, HeaderSort, SortingSelect, TablePagination } from 'components/third-party/ReactTable';
 
 import CustomerView from 'sections/apps/customer/CustomerView';
 
@@ -73,7 +65,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     page,
     gotoPage,
     setPageSize,
-    state: { globalFilter, selectedRowIds, pageIndex, pageSize, expanded },
+    state: { globalFilter, pageIndex, pageSize, expanded },
     preGlobalFilteredRows,
     setGlobalFilter,
     setSortBy,
@@ -95,16 +87,15 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 
   useEffect(() => {
     if (matchDownSM) {
-      setHiddenColumns(['age', 'contact', 'visits', 'email', 'status', 'avatar']);
+      setHiddenColumns(['avatar', 'name_k', 'gender', 'employment_name', 'job_category_name']);
     } else {
-      setHiddenColumns(['avatar', 'email']);
+      setHiddenColumns(['avatar', 'name_k']);
     }
     // eslint-disable-next-line
   }, [matchDownSM]);
 
   return (
     <>
-      <TableRowSelection selected={Object.keys(selectedRowIds).length} />
       <Stack spacing={3}>
         <Stack
           direction={matchDownSM ? 'column' : 'row'}
@@ -230,15 +221,15 @@ const CustomerEmployeePage = () => {
 
   const columns = useMemo(
     () => [
-      {
-        title: 'Row Selection',
-        Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
-          <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
-        ),
-        accessor: 'selection',
-        Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
-        disableSortBy: true
-      },
+      // {
+      //   title: 'Row Selection',
+      //   Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
+      //     <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
+      //   ),
+      //   accessor: 'selection',
+      //   Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
+      //   disableSortBy: true
+      // },
       {
         Header: 'ID',
         accessor: 'id',
@@ -253,10 +244,10 @@ const CustomerEmployeePage = () => {
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Avatar alt="Avatar 1" size="sm" src={`/assets/images/users/avatar-${!values.avatar ? 1 : values.avatar}.png`} />
               <Stack spacing={0}>
-                <Typography variant="subtitle1">{values.fatherName}</Typography>
                 <Typography variant="caption" color="textSecondary">
-                  {values.email}
+                  {values.name_k}
                 </Typography>
+                <Typography variant="subtitle1">{values.name}</Typography>
               </Stack>
             </Stack>
           );

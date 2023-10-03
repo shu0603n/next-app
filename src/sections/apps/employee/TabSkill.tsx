@@ -1,5 +1,5 @@
 // material-ui
-import { Button, Grid, Stack } from '@mui/material';
+import { Grid } from '@mui/material';
 import SkillTable from './skill-table/SkillTable';
 
 // アセット
@@ -49,12 +49,6 @@ const TabRole = () => {
     <Grid container spacing={3}>
       <Grid item xs={12}>
         <SkillTable skill={skill} />
-      </Grid>
-      <Grid item xs={12}>
-        <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
-          <Button color="error">キャンセル</Button>
-          <Button variant="contained">プロフィールを更新</Button>
-        </Stack>
       </Grid>
     </Grid>
   );
