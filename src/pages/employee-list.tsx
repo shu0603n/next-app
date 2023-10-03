@@ -42,6 +42,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone } from '@ant-design/icons';
+import { dbResponse } from 'types/dbResponse';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -178,32 +179,47 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 }
 
 // ==============================|| CUSTOMER - LIST ||============================== //
-
+async function fetchTableData() {
+  try {
+    const response = await fetch('/api/db/employee/select');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+const defaultRes: dbResponse = {
+  data: {
+    command: '',
+    fields: [],
+    rowAsArray: false,
+    rowCount: 0,
+    rows: [],
+    viaNeonFetch: false
+  }
+};
 const CustomerEmployeeListPage = () => {
   const theme = useTheme();
 
-  // const data = useMemo(() => makeData(200), []);
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const data = [
-    {
-      id: 1,
-      name: '田中 太郎',
-      name_k: 'タナカ タロウ',
-      gender: '男性',
-      job_category_name: '4',
-      employment_name: '1'
-    },
-    {
-      id: 2,
-      name: '田中 太郎',
-      name_k: 'タナカ タロウ',
-      gender: '男性',
-      job_category_name: '4',
-      employment_name: '1'
-    }
-  ];
-  console.log(data);
+  const [tableData, setTableData] = useState<dbResponse>(defaultRes); // データを保持する状態変数
+
+  useEffect(() => {
+    // ページがロードされたときにデータを取得
+    fetchTableData()
+      .then((data) => {
+        setTableData(data); // データを状態に設定
+      })
+      .catch((error) => {
+        // エラーハンドリング
+        console.error('Error:', error);
+      });
+  }, []); // 空の依存リストを指定することで、一度だけ実行される
+
   const [customer, setCustomer] = useState<any>(null);
   const [add, setAdd] = useState<boolean>(false);
 
@@ -319,7 +335,10 @@ const CustomerEmployeeListPage = () => {
     [theme]
   );
 
-  const renderRowSubComponent = useCallback(({ row }: { row: Row<{}> }) => <CustomerView data={data[Number(row.id)]} />, [data]);
+  const renderRowSubComponent = useCallback(
+    ({ row }: { row: Row<{}> }) => <CustomerView data={tableData.data.rows[Number(row.id)]} />,
+    [tableData.data.rows]
+  );
 
   return (
     <Page title="Customer List">
@@ -327,7 +346,7 @@ const CustomerEmployeeListPage = () => {
         <ScrollX>
           <ReactTable
             columns={columns}
-            data={data as []}
+            data={tableData.data.rows as []}
             handleAdd={handleAdd}
             renderRowSubComponent={renderRowSubComponent}
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
