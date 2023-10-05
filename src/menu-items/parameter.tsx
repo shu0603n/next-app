@@ -98,6 +98,12 @@ const parameter: NavItemType = {
           title: <FormattedMessage id="working" />,
           type: 'item',
           url: '/parameter/working'
+        },
+        {
+          id: 'employment',
+          title: <FormattedMessage id="employment" />,
+          type: 'item',
+          url: '/parameter/employment'
         }
       ]
     }

@@ -11,6 +11,7 @@
   "project_type": "業務区分",
   "technic": "技術区分",
   "working": "勤務区分",
+  "employment": "雇用区分",
   "accordion": "Accordion",
   "account-profile": "Account Profile",
   "action-bar": "Action Bar",

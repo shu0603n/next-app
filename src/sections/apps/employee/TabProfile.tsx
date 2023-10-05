@@ -24,6 +24,7 @@ import Avatar from 'components/@extended/Avatar';
 import { AimOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { Fragment, useEffect, useState } from 'react';
 import { PatternFormat } from 'react-number-format';
+import { EmployeeType } from 'types/employee/employee';
 
 // ==============================|| ACCOUNT PROFILE - BASIC ||============================== //
 
@@ -49,33 +50,10 @@ async function fetchTableData() {
   }
 }
 
-type dataType = {
-  id: number;
-  sei: string;
-  sei_k: string;
-  mei: string;
-  mei_k: string;
-  gender: string;
-  phone_number: string;
-  email: string;
-  address: string;
-  birthday: string;
-  joining_date: string;
-  retirement_date: string;
-  client_id: number;
-  employee_skills_id: number;
-  employment_id: number;
-  job_category_id: number;
-  position_id: number;
-  postal_code: string;
-  project_id: number;
-  remarks: string;
-};
-
 const TabProfile = () => {
   const matchDownMD = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
-  const [data, setData] = useState<dataType>();
+  const [data, setData] = useState<EmployeeType>();
 
   useEffect(() => {
     // ページがロードされたときにデータを取得

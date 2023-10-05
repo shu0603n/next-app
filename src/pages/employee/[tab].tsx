@@ -39,13 +39,13 @@ const EmployeeDetail = () => {
       <MainCard border={false} boxShadow>
         <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
           <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto" aria-label="account profile tab">
-            <Tab label="Profile" icon={<UserOutlined />} value="basic" iconPosition="start" />
-            <Tab label="Personal" icon={<FileTextOutlined />} value="personal" iconPosition="start" />
-            <Tab label="skill" icon={<FileTextOutlined />} value="skill" iconPosition="start" />
-            <Tab label="My Account" icon={<ContainerOutlined />} value="my-account" iconPosition="start" />
-            <Tab label="Change Password" icon={<LockOutlined />} value="password" iconPosition="start" />
-            <Tab label="Role" icon={<TeamOutlined />} value="role" iconPosition="start" />
-            <Tab label="Settings" icon={<SettingOutlined />} value="settings" iconPosition="start" />
+            <Tab label="プロフィール" icon={<UserOutlined />} value="basic" iconPosition="start" />
+            <Tab label="詳細情報" icon={<FileTextOutlined />} value="personal" iconPosition="start" />
+            <Tab label="スキル一覧" icon={<FileTextOutlined />} value="skill" iconPosition="start" />
+            <Tab label="アカウント情報" icon={<ContainerOutlined />} value="my-account" iconPosition="start" />
+            <Tab label="パスワード変更" icon={<LockOutlined />} value="password" iconPosition="start" />
+            <Tab label="権限" icon={<TeamOutlined />} value="role" iconPosition="start" />
+            <Tab label="設定" icon={<SettingOutlined />} value="settings" iconPosition="start" />
           </Tabs>
         </Box>
         <Box sx={{ mt: 2.5 }}>
