@@ -35,6 +35,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone } from '@ant-design/icons';
 import { dbResponse } from 'types/dbResponse';
+import { useRouter } from 'next/router';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -219,17 +220,14 @@ const CustomerEmployeePage = () => {
     if (customer && !add) setCustomer(null);
   };
 
+  const router = useRouter();
+
+  const handleChange = (newValue: string) => {
+    router.push(`/employee/basic?id=${newValue}`);
+  };
+
   const columns = useMemo(
     () => [
-      // {
-      //   title: 'Row Selection',
-      //   Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
-      //     <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
-      //   ),
-      //   accessor: 'selection',
-      //   Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
-      //   disableSortBy: true
-      // },
       {
         Header: 'ID',
         accessor: 'id',
@@ -309,9 +307,7 @@ const CustomerEmployeePage = () => {
                 <IconButton
                   color="secondary"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    console.log(row.values);
-                    // e.stopPropagation();
-                    // row.toggleRowExpanded();
+                    handleChange(row.values.id);
                   }}
                 >
                   {collapseIcon}
