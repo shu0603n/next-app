@@ -10,6 +10,7 @@ import { SkillTableType } from 'types/employee/skill-table';
 
 async function fetchSkillList(id: number) {
   try {
+    console.log(id);
     const response = await fetch(`/api/db/employee/skill/skills/select?id=${id}`);
     if (!response.ok) {
       throw new Error('API request failed');
@@ -38,7 +39,7 @@ async function fetchTableData() {
           return { ...row, skill: skills.data.rows ?? [] };
         } catch (error) {
           console.error('Error fetching skills:', error);
-          return { ...row, skill: [] };
+          return { ...row, skill: undefined };
         }
       })
     );

@@ -2,10 +2,11 @@ export type SkillTableType = {
   id: number;
   employee_id: number;
   skills_used_id: number;
-  experience_years: string;
+  start_date: string;
+  end_date: string;
   project_title: string;
-  job_description: string;
-  people_number: string;
+  description: string;
+  people_number: number;
   client_id: number;
   process_list_id: number;
   client_name: string;
@@ -13,7 +14,6 @@ export type SkillTableType = {
 };
 export type skill = {
   id: number;
-  skill_id: number;
-  skills_name: string;
+  name: number;
   technic_name: string;
 };

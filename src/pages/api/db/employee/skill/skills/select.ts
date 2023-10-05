@@ -6,17 +6,17 @@ export default async function handler(request: NextApiRequest, response: NextApi
     const id = request.query.id as string;
     const data = await sql`
     SELECT 
-        used.*,
-        skill.name AS skills_name,
+        skill.id,
+        skill.name,
         technic.name AS technic_name 
     FROM 
-        skills_used AS used
+        skills_used AS skills_used
     INNER JOIN 
-        skill ON used.skill_id = skill.id
+        skill ON skills_used.skill_id = skill.id
     INNER JOIN 
         technic ON skill.technic_id = technic.id
     WHERE 
-        used.skill_id = ${id};
+        skills_used.employee_skills_id = ${id};
     `;
     return response.status(200).json({ data });
   } catch (error) {

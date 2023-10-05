@@ -43,7 +43,7 @@ const CustomerView = ({ data }: Props) => {
                         <Grid item xs={12} md={6}>
                           <Stack spacing={0.5}>
                             <Typography color="secondary">業務内容</Typography>
-                            <Typography>{data.job_description}</Typography>
+                            <Typography>{data.description}</Typography>
                           </Stack>
                         </Grid>
                       </Grid>
@@ -55,28 +55,28 @@ const CustomerView = ({ data }: Props) => {
                     <Grid item xs={12}>
                       <Stack direction="row" justifyContent="space-around" alignItems="center">
                         <Stack spacing={0.5} alignItems="center">
-                          <Typography variant="h5">{data.people_number}ヵ月</Typography>
                           <Typography color="secondary">期間</Typography>
+                          <Typography variant="h5">{data.people_number}ヵ月</Typography>
                         </Stack>
                         <Divider orientation="vertical" flexItem />
                         <Stack spacing={0.5} alignItems="center">
-                          <Typography variant="h5">{data.people_number}</Typography>
                           <Typography color="secondary">役割</Typography>
+                          <Typography variant="h5">{data.people_number}</Typography>
                         </Stack>
                         <Divider orientation="vertical" flexItem />
                         <Stack spacing={0.5} alignItems="center">
-                          <Typography variant="h5">{data.people_number}</Typography>
                           <Typography color="secondary">人数</Typography>
+                          <Typography variant="h5">{data.people_number}人</Typography>
                         </Stack>
                       </Stack>
                     </Grid>
                   </Grid>
                 </MainCard>
-                {data.skill && (
+                {data.skill && data.skill.length > 0 && (
                   <MainCard title="使用スキル">
                     {data.skill?.map((item: skill) => {
                       // eslint-disable-next-line react/jsx-key
-                      return <Typography color="secondary">{`${item.skills_name} (${item.technic_name})`}</Typography>;
+                      return <Typography color="secondary">{`${item.name} (${item.technic_name})`}</Typography>;
                     })}
                   </MainCard>
                 )}

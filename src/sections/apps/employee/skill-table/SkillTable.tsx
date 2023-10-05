@@ -213,8 +213,7 @@ const SkillTable = ({ data }: SkillTableProps) => {
       },
       {
         Header: '開始日',
-        accessor: 'id',
-        className: 'cell-center'
+        accessor: 'start_date'
       },
       {
         Header: 'プロジェクト名',
@@ -228,6 +227,7 @@ const SkillTable = ({ data }: SkillTableProps) => {
         Header: '人数',
         accessor: 'people_number'
       },
+
       // {
       //   Header: '役割',
       //   accessor: 'contact'
