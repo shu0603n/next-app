@@ -38,18 +38,18 @@ import AddCustomer from 'sections/apps/employee/skill-table/AddCustomer';
 import CustomerView from 'sections/apps/employee/skill-table/CustomerView';
 import AlertCustomerDelete from 'sections/apps/employee/skill-table/AlertCustomerDelete';
 
-import makeData from 'data/react-table';
+// import makeData from 'data/react-table';
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-// import { MockEmployeeSkillAll } from 'mock/employee/employee_skill_history';
+import { SkillTableType } from 'types/employee/skill-table';
 
 // ==============================|| REACT TABLE - EDITABLE ROW ||============================== //
 
 interface Props {
   columns: Column[];
-  data: [];
+  data: SkillTableType[];
   handleAdd: () => void;
   renderRowSubComponent: FC<any>;
   getHeaderProps: (column: HeaderGroup) => {};
@@ -60,7 +60,6 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  console.log(filterTypes);
   const sortBy = { id: 'project_title', desc: false };
 
   const {
@@ -181,20 +180,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 }
 
 // ==============================|| CUSTOMER - LIST ||============================== //
-
-const SkillTable = (skill: any) => {
+const SkillTable = ({ data }: SkillTableType) => {
   const theme = useTheme();
-
-  const data = useMemo(() => makeData(0), []);
-  // const mock = [
-  //   {
-  //     experienct_years: 8, //経験年数
-  //     project: 'test', //プロジェクト名
-  //     people_number: 3, //プロジェクト規模
-  //     contact: 'PG',
-  //     process_list: ['a', 's'] //工程ID
-  //   }
-  // ];
 
   const [open, setOpen] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
@@ -231,31 +218,26 @@ const SkillTable = (skill: any) => {
         accessor: 'project_title'
       },
       {
-        Header: 'アイコン',
-        accessor: 'avatar',
-        disableSortBy: true
-      },
-      {
         Header: '企業名',
-        accessor: 'cliant'
+        accessor: 'client_name'
       },
       {
         Header: '人数',
         accessor: 'people_number'
       },
-      {
-        Header: '役割',
-        accessor: 'contact'
-      },
-      {
-        Header: 'スキル',
-        accessor: 'skills',
-        className: 'cell-right'
-      },
-      {
-        Header: '担当工程',
-        accessor: 'process_list'
-      },
+      // {
+      //   Header: '役割',
+      //   accessor: 'contact'
+      // },
+      // {
+      //   Header: 'スキル',
+      //   accessor: 'skills',
+      //   className: 'cell-right'
+      // },
+      // {
+      //   Header: '担当工程',
+      //   accessor: 'process_list'
+      // },
 
       {
         Header: 'アクション',
@@ -314,10 +296,6 @@ const SkillTable = (skill: any) => {
   );
 
   const renderRowSubComponent = useCallback(({ row }: { row: Row<{}> }) => <CustomerView data={data[Number(row.id)]} />, [data]);
-  // if (loading) {
-  //   // ローディング中の場合、ローディングスピナーやメッセージを表示
-  //   return <div>Loading...</div>; // あるいは適切なローディングコンポーネントを使用
-  // }
   return (
     <MainCard content={false}>
       <ScrollX>
