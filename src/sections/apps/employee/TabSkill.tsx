@@ -68,7 +68,7 @@ const TabRole = () => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
-        {data.length > 0 && <SkillTable data={data} />}
+        <SkillTable data={data} />
       </Grid>
     </Grid>
   );
