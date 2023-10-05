@@ -84,7 +84,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', 'cliant'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['cliant'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -96,8 +96,9 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 
   useEffect(() => {
     if (matchDownSM) {
+      setHiddenColumns(['start_date', 'client_name', 'people_number']);
     } else {
-      setHiddenColumns(['avatar', 'cliant']);
+      setHiddenColumns(['people_number']);
     }
     // eslint-disable-next-line
   }, [matchDownSM]);

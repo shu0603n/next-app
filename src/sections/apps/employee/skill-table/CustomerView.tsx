@@ -22,7 +22,7 @@ const CustomerView = ({ data }: Props) => {
       <TableCell colSpan={8} sx={{ p: 2.5, overflow: 'hidden' }}>
         <Transitions type="slide" direction="down" in={true}>
           <Grid container spacing={2.5} sx={{ pl: { xs: 0, sm: 5, md: 6, lg: 10, xl: 12 } }}>
-            <Grid item xs={12} sm={7} md={8} lg={8} xl={9}>
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
               <Stack spacing={2.5}>
                 <MainCard title="プロジェクト詳細">
                   <List sx={{ py: 0 }}>

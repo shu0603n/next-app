@@ -72,33 +72,10 @@ type dataType = {
   remarks: string;
 };
 
-const defaultData: dataType = {
-  id: 0,
-  sei: '',
-  sei_k: '',
-  mei: '',
-  mei_k: '',
-  gender: '',
-  phone_number: '',
-  email: '',
-  address: '',
-  birthday: '',
-  joining_date: '',
-  retirement_date: '',
-  client_id: 0,
-  employee_skills_id: 0,
-  employment_id: 0,
-  job_category_id: 0,
-  position_id: 0,
-  postal_code: '',
-  project_id: 0,
-  remarks: ''
-};
-
 const TabProfile = () => {
   const matchDownMD = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
-  const [data, setData] = useState<dataType>(defaultData);
+  const [data, setData] = useState<dataType>();
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
@@ -152,183 +129,187 @@ const TabProfile = () => {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} sm={5} md={4} xl={3}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <MainCard>
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <Stack direction="row" justifyContent="flex-end">
-                    <Chip label={data.client_id} size="small" color="primary" />
-                  </Stack>
-                  <Stack spacing={2.5} alignItems="center">
-                    <Avatar alt="Avatar 1" size="xl" src="/assets/images/users/default.png" />
-                    <Stack spacing={0.5} alignItems="center">
-                      <Typography variant="h5">{`${data.sei} ${data.mei}`}</Typography>
-                      <Typography color="secondary">{data.position_id}</Typography>
-                    </Stack>
-                  </Stack>
-                </Grid>
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
-                <Grid item xs={12}>
-                  <Stack direction="row" justifyContent="space-around" alignItems="center">
-                    <Stack spacing={0.5} alignItems="center">
-                      <Typography variant="h5">{calculateAge(data.birthday)}</Typography>
-                      <Typography color="secondary">年齢</Typography>
-                    </Stack>
-                    <Divider orientation="vertical" flexItem />
-                    <Stack spacing={0.5} alignItems="center">
-                      <Typography variant="h5">{calculateAge(data.joining_date)}</Typography>
-                      <Typography color="secondary">勤続年数</Typography>
-                    </Stack>
-                    <Divider orientation="vertical" flexItem />
-                    <Stack spacing={0.5} alignItems="center">
-                      <Typography variant="h5">{calculateAge(data.joining_date)}</Typography>
-                      <Typography color="secondary">勤続年数</Typography>
-                    </Stack>
-                  </Stack>
-                </Grid>
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
-                <Grid item xs={12}>
-                  <List component="nav" aria-label="main mailbox folders" sx={{ py: 0, '& .MuiListItem-root': { p: 0, py: 1 } }}>
-                    <ListItem>
-                      <ListItemIcon>
-                        <MailOutlined />
-                      </ListItemIcon>
-                      <ListItemSecondaryAction>
-                        <Typography align="right">{data.email}</Typography>
-                      </ListItemSecondaryAction>
+      {data && (
+        <>
+          <Grid item xs={12} sm={5} md={4} xl={3}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <MainCard>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <Stack direction="row" justifyContent="flex-end">
+                        <Chip label={data.client_id} size="small" color="primary" />
+                      </Stack>
+                      <Stack spacing={2.5} alignItems="center">
+                        <Avatar alt="Avatar 1" size="xl" src="/assets/images/users/default.png" />
+                        <Stack spacing={0.5} alignItems="center">
+                          <Typography variant="h5">{`${data.sei} ${data.mei}`}</Typography>
+                          <Typography color="secondary">{data.position_id}</Typography>
+                        </Stack>
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Divider />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack direction="row" justifyContent="space-around" alignItems="center">
+                        <Stack spacing={0.5} alignItems="center">
+                          <Typography variant="h5">{calculateAge(data.birthday)}</Typography>
+                          <Typography color="secondary">年齢</Typography>
+                        </Stack>
+                        <Divider orientation="vertical" flexItem />
+                        <Stack spacing={0.5} alignItems="center">
+                          <Typography variant="h5">{calculateAge(data.joining_date)}</Typography>
+                          <Typography color="secondary">勤続年数</Typography>
+                        </Stack>
+                        <Divider orientation="vertical" flexItem />
+                        <Stack spacing={0.5} alignItems="center">
+                          <Typography variant="h5">{calculateAge(data.joining_date)}</Typography>
+                          <Typography color="secondary">勤続年数</Typography>
+                        </Stack>
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Divider />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <List component="nav" aria-label="main mailbox folders" sx={{ py: 0, '& .MuiListItem-root': { p: 0, py: 1 } }}>
+                        <ListItem>
+                          <ListItemIcon>
+                            <MailOutlined />
+                          </ListItemIcon>
+                          <ListItemSecondaryAction>
+                            <Typography align="right">{data.email}</Typography>
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                        <ListItem>
+                          <ListItemIcon>
+                            <PhoneOutlined />
+                          </ListItemIcon>
+                          <ListItemSecondaryAction>
+                            <Typography align="right">
+                              <PatternFormat value={data.phone_number} displayType="text" type="text" format="###-####-####" />
+                            </Typography>
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                        <ListItem>
+                          <ListItemIcon>
+                            <AimOutlined />
+                          </ListItemIcon>
+                          <ListItemSecondaryAction>
+                            <Typography align="right">{data.address}</Typography>
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                      </List>
+                    </Grid>
+                  </Grid>
+                </MainCard>
+              </Grid>
+              <Grid item xs={12}>
+                <MainCard title="Skills">
+                  <Grid container spacing={1.25}>
+                    {skill.map((val) => (
+                      // eslint-disable-next-line react/jsx-key
+                      <Fragment>
+                        <Grid item xs={6}>
+                          <Typography color="secondary">{val.skill_name}</Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          {/* <LinearWithLabelYear value={val.experienct_years} /> */}
+                        </Grid>
+                      </Fragment>
+                    ))}
+                  </Grid>
+                </MainCard>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs={12} sm={7} md={8} xl={9}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <MainCard title="個人情報">
+                  <List sx={{ py: 0 }}>
+                    <ListItem divider={!matchDownMD}>
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">氏名</Typography>
+                            <Typography>{`${data.sei} ${data.mei}`}</Typography>
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">フリガナ</Typography>
+                            <Typography>{`${data.sei_k} ${data.mei_k}`}</Typography>
+                          </Stack>
+                        </Grid>
+                      </Grid>
+                    </ListItem>
+                    <ListItem divider={!matchDownMD}>
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">性別</Typography>
+                            <Typography>{data.gender}</Typography>
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">生年月日</Typography>
+                            <Typography>{data.birthday}</Typography>
+                          </Stack>
+                        </Grid>
+                      </Grid>
+                    </ListItem>
+                    <ListItem divider={!matchDownMD}>
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">電話番号</Typography>
+                            <Typography>
+                              <PatternFormat value={data.phone_number} displayType="text" type="text" format="###-####-####" />
+                            </Typography>
+                          </Stack>
+                        </Grid>
+
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">メールアドレス</Typography>
+                            <Typography>{data.email}</Typography>
+                          </Stack>
+                        </Grid>
+                      </Grid>
+                    </ListItem>
+                    <ListItem divider={!matchDownMD}>
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">郵便番号</Typography>
+                            <Typography>
+                              <PatternFormat value={data.postal_code} displayType="text" type="text" format="###-####" />
+                            </Typography>
+                          </Stack>
+                        </Grid>
+                      </Grid>
                     </ListItem>
                     <ListItem>
-                      <ListItemIcon>
-                        <PhoneOutlined />
-                      </ListItemIcon>
-                      <ListItemSecondaryAction>
-                        <Typography align="right">
-                          <PatternFormat value={data.phone_number} displayType="text" type="text" format="###-####-####" />
-                        </Typography>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                    <ListItem>
-                      <ListItemIcon>
-                        <AimOutlined />
-                      </ListItemIcon>
-                      <ListItemSecondaryAction>
-                        <Typography align="right">{data.address}</Typography>
-                      </ListItemSecondaryAction>
+                      <Stack spacing={0.5}>
+                        <Typography color="secondary">住所</Typography>
+                        <Typography>{data.address}</Typography>
+                      </Stack>
                     </ListItem>
                   </List>
-                </Grid>
+                </MainCard>
               </Grid>
-            </MainCard>
-          </Grid>
-          <Grid item xs={12}>
-            <MainCard title="Skills">
-              <Grid container spacing={1.25}>
-                {skill.map((val) => (
-                  // eslint-disable-next-line react/jsx-key
-                  <Fragment>
-                    <Grid item xs={6}>
-                      <Typography color="secondary">{val.skill_name}</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      {/* <LinearWithLabelYear value={val.experienct_years} /> */}
-                    </Grid>
-                  </Fragment>
-                ))}
+              <Grid item xs={12}>
+                <MainCard title="備考">
+                  <Typography color="secondary">{data.remarks}</Typography>
+                </MainCard>
               </Grid>
-            </MainCard>
+            </Grid>
           </Grid>
-        </Grid>
-      </Grid>
-      <Grid item xs={12} sm={7} md={8} xl={9}>
-        <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <MainCard title="個人情報">
-              <List sx={{ py: 0 }}>
-                <ListItem divider={!matchDownMD}>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                      <Stack spacing={0.5}>
-                        <Typography color="secondary">氏名</Typography>
-                        <Typography>{`${data.sei} ${data.mei}`}</Typography>
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Stack spacing={0.5}>
-                        <Typography color="secondary">フリガナ</Typography>
-                        <Typography>{`${data.sei_k} ${data.mei_k}`}</Typography>
-                      </Stack>
-                    </Grid>
-                  </Grid>
-                </ListItem>
-                <ListItem divider={!matchDownMD}>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                      <Stack spacing={0.5}>
-                        <Typography color="secondary">性別</Typography>
-                        <Typography>{data.gender}</Typography>
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                      <Stack spacing={0.5}>
-                        <Typography color="secondary">生年月日</Typography>
-                        <Typography>{data.birthday}</Typography>
-                      </Stack>
-                    </Grid>
-                  </Grid>
-                </ListItem>
-                <ListItem divider={!matchDownMD}>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                      <Stack spacing={0.5}>
-                        <Typography color="secondary">電話番号</Typography>
-                        <Typography>
-                          <PatternFormat value={data.phone_number} displayType="text" type="text" format="###-####-####" />
-                        </Typography>
-                      </Stack>
-                    </Grid>
-
-                    <Grid item xs={12} md={6}>
-                      <Stack spacing={0.5}>
-                        <Typography color="secondary">メールアドレス</Typography>
-                        <Typography>{data.email}</Typography>
-                      </Stack>
-                    </Grid>
-                  </Grid>
-                </ListItem>
-                <ListItem divider={!matchDownMD}>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12} md={6}>
-                      <Stack spacing={0.5}>
-                        <Typography color="secondary">郵便番号</Typography>
-                        <Typography>
-                          <PatternFormat value={data.postal_code} displayType="text" type="text" format="###-####" />
-                        </Typography>
-                      </Stack>
-                    </Grid>
-                  </Grid>
-                </ListItem>
-                <ListItem>
-                  <Stack spacing={0.5}>
-                    <Typography color="secondary">住所</Typography>
-                    <Typography>{data.address}</Typography>
-                  </Stack>
-                </ListItem>
-              </List>
-            </MainCard>
-          </Grid>
-          <Grid item xs={12}>
-            <MainCard title="備考">
-              <Typography color="secondary">{data.remarks}</Typography>
-            </MainCard>
-          </Grid>
-        </Grid>
-      </Grid>
+        </>
+      )}
     </Grid>
   );
 };
