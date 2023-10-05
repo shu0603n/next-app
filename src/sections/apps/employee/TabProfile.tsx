@@ -22,7 +22,7 @@ import Avatar from 'components/@extended/Avatar';
 
 // assets
 import { AimOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
-import { Fragment } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { PatternFormat } from 'react-number-format';
 
 // ==============================|| ACCOUNT PROFILE - BASIC ||============================== //
@@ -35,30 +35,83 @@ const calculateAge = (birthDate: string): number => {
   const roundedAge: number = Math.floor(ageInYears);
   return roundedAge;
 };
+async function fetchTableData() {
+  try {
+    const response = await fetch(`/api/db/employee/basic/select?id=${2}`);
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+
+type dataType = {
+  id: number;
+  sei: string;
+  sei_k: string;
+  mei: string;
+  mei_k: string;
+  gender: string;
+  phone_number: string;
+  email: string;
+  address: string;
+  birthday: string;
+  joining_date: string;
+  retirement_date: string;
+  client_id: number;
+  employee_skills_id: number;
+  employment_id: number;
+  job_category_id: number;
+  position_id: number;
+  postal_code: string;
+  project_id: number;
+  remarks: string;
+};
+
+const defaultData: dataType = {
+  id: 0,
+  sei: '',
+  sei_k: '',
+  mei: '',
+  mei_k: '',
+  gender: '',
+  phone_number: '',
+  email: '',
+  address: '',
+  birthday: '',
+  joining_date: '',
+  retirement_date: '',
+  client_id: 0,
+  employee_skills_id: 0,
+  employment_id: 0,
+  job_category_id: 0,
+  position_id: 0,
+  postal_code: '',
+  project_id: 0,
+  remarks: ''
+};
 
 const TabProfile = () => {
   const matchDownMD = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
-  const data = {
-    employee_id: 1,
-    last_name: '田中',
-    first_name: '太郎',
-    last_name_k: 'タナカ',
-    first_name_k: 'タロウ',
-    gender: '男',
-    birthday: '1994/06/03',
-    job_category_name: 'システムエンジニア',
-    client_name: '株式会社TEST',
-    project_name: '顧客管理システムの作成',
-    postal_code: '0010001',
-    address: '北海道札幌市中央区1丁目1-1',
-    joining_date: '2019/4/1',
-    retirement_date: '',
-    phone_number: '08011112222',
-    email_address: 'test@test.co.jp',
-    remarks: '手足に不自由有。',
-    employment_name: '0',
-    position_id: '3'
-  };
+
+  const [data, setData] = useState<dataType>(defaultData);
+
+  useEffect(() => {
+    // ページがロードされたときにデータを取得
+    fetchTableData()
+      .then((data) => {
+        setData(data.data.rows[0]);
+      })
+      .catch((error) => {
+        // エラーハンドリング
+        console.error('Error:', error);
+      });
+  }, []); // 空の依存リストを指定することで、一度だけ実行される
+
   const skill = [
     {
       experienct_years: 15,
@@ -106,12 +159,12 @@ const TabProfile = () => {
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <Stack direction="row" justifyContent="flex-end">
-                    <Chip label={data.employment_name} size="small" color="primary" />
+                    <Chip label={data.client_id} size="small" color="primary" />
                   </Stack>
                   <Stack spacing={2.5} alignItems="center">
                     <Avatar alt="Avatar 1" size="xl" src="/assets/images/users/default.png" />
                     <Stack spacing={0.5} alignItems="center">
-                      <Typography variant="h5">{`${data.last_name} ${data.first_name}`}</Typography>
+                      <Typography variant="h5">{`${data.sei} ${data.mei}`}</Typography>
                       <Typography color="secondary">{data.position_id}</Typography>
                     </Stack>
                   </Stack>
@@ -132,8 +185,8 @@ const TabProfile = () => {
                     </Stack>
                     <Divider orientation="vertical" flexItem />
                     <Stack spacing={0.5} alignItems="center">
-                      <Typography variant="h5">{'id'}</Typography>
-                      <Typography color="secondary">ID</Typography>
+                      <Typography variant="h5">{calculateAge(data.joining_date)}</Typography>
+                      <Typography color="secondary">勤続年数</Typography>
                     </Stack>
                   </Stack>
                 </Grid>
@@ -147,7 +200,7 @@ const TabProfile = () => {
                         <MailOutlined />
                       </ListItemIcon>
                       <ListItemSecondaryAction>
-                        <Typography align="right">{data.email_address}</Typography>
+                        <Typography align="right">{data.email}</Typography>
                       </ListItemSecondaryAction>
                     </ListItem>
                     <ListItem>
@@ -202,13 +255,13 @@ const TabProfile = () => {
                     <Grid item xs={12} md={6}>
                       <Stack spacing={0.5}>
                         <Typography color="secondary">氏名</Typography>
-                        <Typography>{`${data.first_name} ${data.last_name}`}</Typography>
+                        <Typography>{`${data.sei} ${data.mei}`}</Typography>
                       </Stack>
                     </Grid>
                     <Grid item xs={12} md={6}>
                       <Stack spacing={0.5}>
                         <Typography color="secondary">フリガナ</Typography>
-                        <Typography>{`${data.first_name_k} ${data.last_name_k}`}</Typography>
+                        <Typography>{`${data.sei_k} ${data.mei_k}`}</Typography>
                       </Stack>
                     </Grid>
                   </Grid>
@@ -243,7 +296,7 @@ const TabProfile = () => {
                     <Grid item xs={12} md={6}>
                       <Stack spacing={0.5}>
                         <Typography color="secondary">メールアドレス</Typography>
-                        <Typography>{data.email_address}</Typography>
+                        <Typography>{data.email}</Typography>
                       </Stack>
                     </Grid>
                   </Grid>
