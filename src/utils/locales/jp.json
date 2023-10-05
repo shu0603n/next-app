@@ -1,6 +1,9 @@
 {
+  "main": "メイン",
   "top": "トップ",
-  "employee": "社員情報",
+  "employee": "社員一覧",
+  "client": "企業一覧",
+  "project": "案件一覧",
   "parameter": "パラメーター",
   "position": "役職",
   "accordion": "Accordion",

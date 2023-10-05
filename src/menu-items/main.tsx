@@ -34,7 +34,7 @@ const icons = {
 
 const other: NavItemType = {
   id: 'main',
-  title: <FormattedMessage id="others" />,
+  title: <FormattedMessage id="main" />,
   type: 'group',
   children: [
     {
@@ -52,10 +52,17 @@ const other: NavItemType = {
       icon: icons.ChromeOutlined
     },
     {
-      id: 'employee-detail',
-      title: <FormattedMessage id="employee-detail" />,
+      id: 'client',
+      title: <FormattedMessage id="client" />,
       type: 'item',
-      url: '/employee/basic',
+      url: '/client',
+      icon: icons.ChromeOutlined
+    },
+    {
+      id: 'project',
+      title: <FormattedMessage id="project" />,
+      type: 'item',
+      url: '/project',
       icon: icons.ChromeOutlined
     }
   ]

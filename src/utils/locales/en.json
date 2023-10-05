@@ -1,7 +1,10 @@
 {
+  "main": "メイン",
   "top": "トップ",
-  "employee": "社員情報",
-  "employee-detail": "社員情報詳細",
+  "employee": "社員一覧",
+  "client": "企業一覧",
+  "project": "案件一覧",
+  "employee-detail": "社員情報",
   "parameter": "パラメーター",
   "position": "役職区分",
   "skill": "スキル区分",
