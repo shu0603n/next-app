@@ -10,8 +10,10 @@ import Transitions from 'components/@extended/Transitions';
 import { SkillTableType, skill } from 'types/employee/skill-table';
 
 // ==============================|| 顧客 - 表示 ||============================== //
-
-const CustomerView = ({ data }: SkillTableType) => {
+interface Props {
+  data: SkillTableType;
+}
+const CustomerView = ({ data }: Props) => {
   const theme = useTheme();
   const matchDownMD = useMediaQuery(theme.breakpoints.down('md'));
 
