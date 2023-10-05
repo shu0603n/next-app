@@ -179,8 +179,11 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   );
 }
 
+interface SkillTableProps {
+  data: SkillTableType[];
+}
 // ==============================|| CUSTOMER - LIST ||============================== //
-const SkillTable = ({ data }: SkillTableType) => {
+const SkillTable = ({ data }: SkillTableProps) => {
   const theme = useTheme();
 
   const [open, setOpen] = useState<boolean>(false);
