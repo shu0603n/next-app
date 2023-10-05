@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // material-ui
 import { Theme } from '@mui/material/styles';
@@ -41,12 +41,51 @@ import { UserCardProps } from 'types/user-profile';
 // アセット
 import { DeleteOutlined, DownloadOutlined, EditOutlined } from '@ant-design/icons';
 import ListCard from 'sections/apps/customer/exportpdf/ListCard';
+import { dbResponse } from 'types/dbResponse';
 
 // ==============================|| 顧客 - カードプレビュー ||============================== //
+async function fetchTableData() {
+  try {
+    const response = await fetch('/api/db/parameter/job_category/select');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+const defaultRes: dbResponse = {
+  data: {
+    command: '',
+    fields: [],
+    rowAsArray: false,
+    rowCount: 0,
+    rows: [],
+    viaNeonFetch: false
+  }
+};
 
 export default function CustomerPreview({ customer, open, onClose }: { customer: UserCardProps; open: boolean; onClose: () => void }) {
   const matchDownMD = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
   const [openAlert, setOpenAlert] = useState(false);
+  const [tableData, setTableData] = useState<dbResponse>(defaultRes); // データを保持する状態変数
+
+  useEffect(() => {
+    // ページがロードされたときにデータを取得
+    fetchTableData()
+      .then((data) => {
+        setTableData(data); // データを状態に設定
+      })
+      .catch((error) => {
+        // エラーハンドリング
+        console.error('Error:', error);
+      });
+  }, []); // 空の依存リストを指定することで、一度だけ実行される
+
+  console.log(tableData);
 
   const [add, setAdd] = useState<boolean>(false);
   const handleAdd = () => {
