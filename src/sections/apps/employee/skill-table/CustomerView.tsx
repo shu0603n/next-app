@@ -1,35 +1,17 @@
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import {
-  useMediaQuery,
-  Grid,
-  Chip,
-  Divider,
-  Link,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemSecondaryAction,
-  Stack,
-  TableCell,
-  TableRow,
-  Typography
-} from '@mui/material';
-
-// third-party
-import { PatternFormat } from 'react-number-format';
+import { useMediaQuery, Grid, Divider, List, ListItem, Stack, TableCell, TableRow, Typography } from '@mui/material';
 
 // プロジェクトのインポート
 import MainCard from 'components/MainCard';
-import Avatar from 'components/@extended/Avatar';
 import Transitions from 'components/@extended/Transitions';
 
 // アセット
-import { EnvironmentOutlined, LinkOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
+import { SkillTableType, skill } from 'types/employee/skill-table';
 
 // ==============================|| 顧客 - 表示 ||============================== //
 
-const CustomerView = ({ data }: any) => {
+const CustomerView = ({ data }: SkillTableType) => {
   const theme = useTheme();
   const matchDownMD = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -38,147 +20,64 @@ const CustomerView = ({ data }: any) => {
       <TableCell colSpan={8} sx={{ p: 2.5, overflow: 'hidden' }}>
         <Transitions type="slide" direction="down" in={true}>
           <Grid container spacing={2.5} sx={{ pl: { xs: 0, sm: 5, md: 6, lg: 10, xl: 12 } }}>
-            <Grid item xs={12} sm={5} md={4} lg={4} xl={3}>
-              <MainCard>
-                <Chip
-                  label={data.status}
-                  size="small"
-                  color="primary"
-                  sx={{
-                    position: 'absolute',
-                    right: 10,
-                    top: 10,
-                    fontSize: '0.675rem'
-                  }}
-                />
-                <Grid container spacing={3}>
-                  <Grid item xs={12}>
-                    <Stack spacing={2.5} alignItems="center">
-                      <Avatar alt="Avatar 1" size="xl" src={`/assets/images/users/avatar-${data.avatar}.png`} />
-                      <Stack spacing={0.5} alignItems="center">
-                        <Typography variant="h5">{data.fatherName}</Typography>
-                        <Typography color="secondary">{data.role}</Typography>
-                      </Stack>
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Divider />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Stack direction="row" justifyContent="space-around" alignItems="center">
-                      <Stack spacing={0.5} alignItems="center">
-                        <Typography variant="h5">{data.age}</Typography>
-                        <Typography color="secondary">年齢</Typography>
-                      </Stack>
-                      <Divider orientation="vertical" flexItem />
-                      <Stack spacing={0.5} alignItems="center">
-                        <Typography variant="h5">{data.progress}%</Typography>
-                        <Typography color="secondary">進捗</Typography>
-                      </Stack>
-                      <Divider orientation="vertical" flexItem />
-                      <Stack spacing={0.5} alignItems="center">
-                        <Typography variant="h5">{data.visits}</Typography>
-                        <Typography color="secondary">訪問回数</Typography>
-                      </Stack>
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Divider />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <List component="nav" aria-label="main mailbox folders" sx={{ py: 0 }}>
-                      <ListItem>
-                        <ListItemIcon>
-                          <MailOutlined />
-                        </ListItemIcon>
-                        <ListItemSecondaryAction>
-                          <Typography align="right">{data.email}</Typography>
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                      <ListItem>
-                        <ListItemIcon>
-                          <PhoneOutlined />
-                        </ListItemIcon>
-                        <ListItemSecondaryAction>
-                          <Typography align="right">
-                            <PatternFormat displayType="text" format="+1 (###) ###-####" mask="_" defaultValue={data.contact} />
-                          </Typography>
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                      <ListItem>
-                        <ListItemIcon>
-                          <EnvironmentOutlined />
-                        </ListItemIcon>
-                        <ListItemSecondaryAction>
-                          <Typography align="right">{data.country}</Typography>
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                      <ListItem>
-                        <ListItemIcon>
-                          <LinkOutlined />
-                        </ListItemIcon>
-                        <ListItemSecondaryAction>
-                          <Link align="right" href="https://google.com" target="_blank">
-                            https://anshan.dh.url
-                          </Link>
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                    </List>
-                  </Grid>
-                </Grid>
-              </MainCard>
-            </Grid>
             <Grid item xs={12} sm={7} md={8} lg={8} xl={9}>
               <Stack spacing={2.5}>
-                <MainCard title="個人情報">
+                <MainCard title="プロジェクト詳細">
                   <List sx={{ py: 0 }}>
                     <ListItem divider={!matchDownMD}>
                       <Grid container spacing={3}>
                         <Grid item xs={12} md={6}>
                           <Stack spacing={0.5}>
-                            <Typography color="secondary">氏名</Typography>
-                            <Typography>{data.fatherName}</Typography>
+                            <Typography color="secondary">プロジェクト名</Typography>
+                            <Typography>{data.project_title}</Typography>
                           </Stack>
                         </Grid>
                         <Grid item xs={12} md={6}>
                           <Stack spacing={0.5}>
-                            <Typography color="secondary">フリガナ</Typography>
-                            <Typography>
-                              Mr. {data.firstName} {data.lastName}
-                            </Typography>
+                            <Typography color="secondary">会社名</Typography>
+                            <Typography>{data.client_name}</Typography>
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">業務内容</Typography>
+                            <Typography>{data.job_description}</Typography>
                           </Stack>
                         </Grid>
                       </Grid>
-                    </ListItem>
-                    <ListItem divider={!matchDownMD}>
-                      <Grid container spacing={3}>
-                        <Grid item xs={12} md={6}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">職種</Typography>
-                            <Typography>{data.country}</Typography>
-                          </Stack>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">郵便番号</Typography>
-                            <Typography>
-                              <PatternFormat displayType="text" format="### ###" mask="_" defaultValue={data.contact} />
-                            </Typography>
-                          </Stack>
-                        </Grid>
-                      </Grid>
-                    </ListItem>
-                    <ListItem>
-                      <Stack spacing={0.5}>
-                        <Typography color="secondary">住所</Typography>
-                        <Typography>{data.address}</Typography>
-                      </Stack>
                     </ListItem>
                   </List>
                 </MainCard>
-                <MainCard title="自己紹介">
-                  <Typography color="secondary">こんにちは {data.fatherName}です。</Typography>
+                <MainCard>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <Stack direction="row" justifyContent="space-around" alignItems="center">
+                        <Stack spacing={0.5} alignItems="center">
+                          <Typography variant="h5">{data.people_number}ヵ月</Typography>
+                          <Typography color="secondary">期間</Typography>
+                        </Stack>
+                        <Divider orientation="vertical" flexItem />
+                        <Stack spacing={0.5} alignItems="center">
+                          <Typography variant="h5">{data.people_number}</Typography>
+                          <Typography color="secondary">役割</Typography>
+                        </Stack>
+                        <Divider orientation="vertical" flexItem />
+                        <Stack spacing={0.5} alignItems="center">
+                          <Typography variant="h5">{data.people_number}</Typography>
+                          <Typography color="secondary">人数</Typography>
+                        </Stack>
+                      </Stack>
+                    </Grid>
+                  </Grid>
                 </MainCard>
+                {data.skill.length > 0 && (
+                  <MainCard title="使用スキル">
+                    {data.skill?.map((item: skill) => {
+                      // eslint-disable-next-line react/jsx-key
+                      return <Typography color="secondary">{`${item.skills_name} (${item.technic_name})`}</Typography>;
+                    })}
+                  </MainCard>
+                )}
               </Stack>
             </Grid>
           </Grid>
