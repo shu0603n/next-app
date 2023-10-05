@@ -72,7 +72,7 @@ const CustomerView = ({ data }: Props) => {
                     </Grid>
                   </Grid>
                 </MainCard>
-                {data.skill.length > 0 && (
+                {data.skill && (
                   <MainCard title="使用スキル">
                     {data.skill?.map((item: skill) => {
                       // eslint-disable-next-line react/jsx-key
