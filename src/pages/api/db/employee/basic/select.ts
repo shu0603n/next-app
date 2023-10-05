@@ -15,7 +15,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
         Employment ON emp.Employment_id = Employment.id
     INNER JOIN 
         Position ON emp.Position_id = Position.id
-    WHERE id = ${id};
+    WHERE emp.id = ${id};
     `;
     return response.status(200).json({ data });
   } catch (error) {
