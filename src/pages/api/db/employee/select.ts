@@ -12,9 +12,9 @@ export default async function handler(request: NextApiRequest, response: NextApi
         Job_category.name AS job_category_name,
         Employment.name AS employment_name
     FROM employee AS emp
-    INNER JOIN job_category 
+    LEFT JOIN job_category 
         ON emp.job_category_id = job_category.id
-    INNER JOIN employment
+    LEFT JOIN employment
         ON emp.employment_id = employment.id;
     `;
     return response.status(200).json({ data });
