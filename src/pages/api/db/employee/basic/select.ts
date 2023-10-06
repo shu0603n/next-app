@@ -11,9 +11,9 @@ export default async function handler(request: NextApiRequest, response: NextApi
         Position.name AS Position_name
     FROM 
         employee AS emp
-    INNER JOIN 
+    LEFT JOIN 
         Employment ON emp.Employment_id = Employment.id
-    INNER JOIN 
+    LEFT JOIN 
         Position ON emp.Position_id = Position.id
     WHERE emp.id = ${id};
     `;
