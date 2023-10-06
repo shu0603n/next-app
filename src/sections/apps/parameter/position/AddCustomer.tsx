@@ -73,7 +73,6 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               return response.json();
             })
             .then((data) => {
-              console.log(data);
               onReload(data);
               dispatch(
                 openSnackbar({
