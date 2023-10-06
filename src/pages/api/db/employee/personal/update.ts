@@ -3,6 +3,9 @@ import { NextApiResponse, NextApiRequest } from 'next';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
+    const toNull = (str: string) => {
+      return str === null || str === '' ? null : str;
+    };
     const {
       id,
       sei,
@@ -19,7 +22,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
       joining_date,
       retirement_date,
       employment_id,
-      position_id
+      position_id,
+      job_category_id
     } = request.body;
 
     if (!id || !sei || !mei) {
@@ -29,21 +33,22 @@ export default async function handler(request: NextApiRequest, response: NextApi
     const result = await sql`
       UPDATE employee
       SET
-        sei = ${sei},
-        mei = ${mei},
-        sei_k = ${sei_k},
-        mei_k = ${mei_k},
-        gender = ${gender},
-        birthday = ${birthday},
-        remarks = ${remarks},
-        phone_number = ${phone_number},
-        email = ${email},
-        postal_code = ${postal_code},
-        address = ${address},
-        joining_date = ${joining_date},
-        retirement_date = ${retirement_date},
+        sei = ${toNull(sei)},
+        mei = ${toNull(mei)},
+        sei_k = ${toNull(sei_k)},
+        mei_k = ${toNull(mei_k)},
+        gender = ${toNull(gender)},
+        birthday = ${toNull(birthday)},
+        remarks = ${toNull(remarks)},
+        phone_number = ${toNull(phone_number)},
+        email = ${toNull(email)},
+        postal_code = ${toNull(postal_code)},
+        address = ${toNull(address)},
+        joining_date = ${toNull(joining_date)},
+        retirement_date = ${toNull(retirement_date)},
         employment_id = ${Number(employment_id)},
-        position_id = ${Number(position_id)}
+        position_id = ${Number(position_id)},
+        job_category_id = ${Number(job_category_id)}
       WHERE
         id = ${Number(id)}
     `;
