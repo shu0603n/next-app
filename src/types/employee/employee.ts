@@ -14,8 +14,10 @@ export type EmployeeType = {
   client_id: number;
   employee_skills_id: number;
   employment_id: number;
+  employment_name: string;
   job_category_id: number;
   position_id: number;
+  position_name: string;
   postal_code: string;
   project_id: number;
   remarks: string;
