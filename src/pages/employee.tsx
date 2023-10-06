@@ -2,7 +2,22 @@ import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent, Re
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
-import { Button, Chip, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
+import {
+  Button,
+  Chip,
+  Dialog,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tooltip,
+  Typography,
+  useMediaQuery
+} from '@mui/material';
+
+import { PopupTransition } from 'components/@extended/Transitions';
 
 // third-party
 import {
@@ -28,12 +43,14 @@ import Avatar from 'components/@extended/Avatar';
 import IconButton from 'components/@extended/IconButton';
 import { CSVExport, HeaderSort, SortingSelect, TablePagination } from 'components/third-party/ReactTable';
 
-import CustomerView from 'sections/apps/customer/CustomerView';
+import AddCustomer from 'sections/apps/employee/AddCustomer';
+import CustomerView from 'sections/apps/employee/CustomerView';
+import AlertCustomerDelete from 'sections/apps/employee/AlertCustomerDelete';
 
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
-import { CloseOutlined, PlusOutlined, EyeTwoTone } from '@ant-design/icons';
+import { CloseOutlined, PlusOutlined, EyeTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import { dbResponse } from 'types/dbResponse';
 import { useRouter } from 'next/router';
 
@@ -212,7 +229,9 @@ const CustomerEmployeePage = () => {
       });
   }, []); // 空の依存リストを指定することで、一度だけ実行される
 
+  const [open, setOpen] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
+  const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
 
   const handleAdd = () => {
@@ -220,6 +239,9 @@ const CustomerEmployeePage = () => {
     if (customer && !add) setCustomer(null);
   };
 
+  const handleClose = () => {
+    setOpen(!open);
+  };
   const router = useRouter();
 
   const handleChange = (newValue: string) => {
@@ -313,6 +335,18 @@ const CustomerEmployeePage = () => {
                   {collapseIcon}
                 </IconButton>
               </Tooltip>
+              <Tooltip title="Delete">
+                <IconButton
+                  color="error"
+                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                    e.stopPropagation();
+                    handleClose();
+                    setCustomerDeleteId(row.values.id);
+                  }}
+                >
+                  <DeleteTwoTone twoToneColor={theme.palette.error.main} />
+                </IconButton>
+              </Tooltip>
             </Stack>
           );
         }
@@ -339,6 +373,20 @@ const CustomerEmployeePage = () => {
             getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
           />
         </ScrollX>
+        <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} />
+        {/* add customer dialog */}
+        <Dialog
+          maxWidth="sm"
+          TransitionComponent={PopupTransition}
+          keepMounted
+          fullWidth
+          onClose={handleAdd}
+          open={add}
+          sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
+          aria-describedby="alert-dialog-slide-description"
+        >
+          <AddCustomer customer={customer} onCancel={handleAdd} />
+        </Dialog>
       </MainCard>
     </Page>
   );
