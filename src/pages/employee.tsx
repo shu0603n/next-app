@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, FC, Fragment, MouseEvent, ReactElement } from 'react';
+import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement } from 'react';
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
@@ -44,27 +44,25 @@ import IconButton from 'components/@extended/IconButton';
 import { CSVExport, HeaderSort, SortingSelect, TablePagination } from 'components/third-party/ReactTable';
 
 import AddCustomer from 'sections/apps/employee/AddCustomer';
-import CustomerView from 'sections/apps/employee/CustomerView';
 import AlertCustomerDelete from 'sections/apps/employee/AlertCustomerDelete';
 
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { dbResponse } from 'types/dbResponse';
 import { useRouter } from 'next/router';
+import { EmployeeType } from 'types/employee/employee';
 
 // ==============================|| REACT TABLE ||============================== //
 
 interface Props {
   columns: Column[];
-  data: [];
+  data: Array<EmployeeType>;
   handleAdd: () => void;
-  renderRowSubComponent: FC<any>;
   getHeaderProps: (column: HeaderGroup) => {};
 }
 
-function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps }: Props) {
+function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -78,12 +76,11 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     prepareRow,
     setHiddenColumns,
     allColumns,
-    visibleColumns,
     rows,
     page,
     gotoPage,
     setPageSize,
-    state: { globalFilter, pageIndex, pageSize, expanded },
+    state: { globalFilter, pageIndex, pageSize },
     preGlobalFilteredRows,
     setGlobalFilter,
     setSortBy,
@@ -154,7 +151,6 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
           <TableBody {...getTableBodyProps()}>
             {page.map((row: Row, i: number) => {
               prepareRow(row);
-              const rowProps = row.getRowProps();
 
               return (
                 <Fragment key={i}>
@@ -171,7 +167,6 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
                       </TableCell>
                     ))}
                   </TableRow>
-                  {row.isExpanded && renderRowSubComponent({ row, rowProps, visibleColumns, expanded })}
                 </Fragment>
               );
             })}
@@ -201,27 +196,18 @@ async function fetchTableData() {
     throw error;
   }
 }
-const defaultRes: dbResponse = {
-  data: {
-    command: '',
-    fields: [],
-    rowAsArray: false,
-    rowCount: 0,
-    rows: [],
-    viaNeonFetch: false
-  }
-};
+
 const CustomerEmployeePage = () => {
   const theme = useTheme();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const [tableData, setTableData] = useState<dbResponse>(defaultRes); // データを保持する状態変数
+  const [tableData, setTableData] = useState<Array<EmployeeType>>(); // データを保持する状態変数
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
     fetchTableData()
       .then((data) => {
-        setTableData(data); // データを状態に設定
+        setTableData(data.data.rows); // データを状態に設定
       })
       .catch((error) => {
         // エラーハンドリング
@@ -245,7 +231,7 @@ const CustomerEmployeePage = () => {
   const router = useRouter();
 
   const handleChange = (newValue: string) => {
-    router.push(`/employee/basic?id=${newValue}`);
+    router.push(`/employee/${newValue}/basic`);
   };
 
   const columns = useMemo(
@@ -356,23 +342,20 @@ const CustomerEmployeePage = () => {
     [theme]
   );
 
-  const renderRowSubComponent = useCallback(
-    ({ row }: { row: Row<{}> }) => <CustomerView data={tableData.data.rows[Number(row.id)]} />,
-    [tableData.data.rows]
-  );
-
   return (
     <Page title="Customer List">
       <MainCard content={false}>
-        <ScrollX>
-          <ReactTable
-            columns={columns}
-            data={tableData.data.rows as []}
-            handleAdd={handleAdd}
-            renderRowSubComponent={renderRowSubComponent}
-            getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
-          />
-        </ScrollX>
+        {tableData && (
+          <ScrollX>
+            <ReactTable
+              columns={columns}
+              data={tableData}
+              handleAdd={handleAdd}
+              getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+            />
+          </ScrollX>
+        )}
+
         <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} />
         {/* add customer dialog */}
         <Dialog
@@ -385,7 +368,7 @@ const CustomerEmployeePage = () => {
           sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
           aria-describedby="alert-dialog-slide-description"
         >
-          <AddCustomer customer={customer} onCancel={handleAdd} />
+          <AddCustomer customer={customer} onCancel={handleAdd} onReload={() => setTableData} />
         </Dialog>
       </MainCard>
     </Page>
