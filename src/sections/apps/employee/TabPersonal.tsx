@@ -2,13 +2,28 @@ import { useEffect, useState, ChangeEvent } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Box, Button, FormLabel, Grid, InputLabel, MenuItem, Select, SelectChangeEvent, Stack, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Chip,
+  Button,
+  FormLabel,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Stack,
+  TextField,
+  Typography
+} from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import ja from 'date-fns/locale/ja';
 // third-party
 import { PatternFormat } from 'react-number-format';
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/reducers/snackbar';
 
 // project import
 import Avatar from 'components/@extended/Avatar';
@@ -89,7 +104,7 @@ const TabPersonal = () => {
 
   const [birthday, setBirthday] = useState<Date | null>();
   const [joiningDate, setJoiningDate] = useState<Date | null>();
-  const [returementDate, setReturementDate] = useState<Date | null>();
+  const [retirementDate, setRetirementDate] = useState<Date | null>();
   const [gender, setGender] = useState<string>();
   const [position, setPosition] = useState<string>();
   const [employment, setEmployment] = useState<string>();
@@ -102,7 +117,7 @@ const TabPersonal = () => {
         setData(row);
         setBirthday(new Date(row.birthday));
         setJoiningDate(new Date(row.joining_date));
-        setReturementDate(new Date(row.retirement_date));
+        setRetirementDate(new Date(row.retirement_date));
         setGender(row.gender);
         setEmployment(row.employment_id);
         setPosition(row.position_id);
@@ -143,6 +158,92 @@ const TabPersonal = () => {
   const handleChangeEmployment = (event: SelectChangeEvent<string>) => {
     setEmployment(event.target.value);
   };
+  const handleUpdateButtonClick = (id: number) => {
+    dispatch(
+      openSnackbar({
+        open: true,
+        message: '更新処理中…',
+        variant: 'alert',
+        alert: {
+          color: 'secondary'
+        },
+        close: false
+      })
+    );
+    // 更新ボタンがクリックされたときの処理
+    const seiInputElement = document.getElementById('sei') as HTMLInputElement | null;
+    const firstNameInputElement = document.getElementById('mei') as HTMLInputElement | null;
+    const seiKInputElement = document.getElementById('sei_k') as HTMLInputElement | null;
+    const firstNameKInputElement = document.getElementById('mei_k') as HTMLInputElement | null;
+    const remarksInputElement = document.getElementById('personal-remarks') as HTMLInputElement | null;
+    const phoneNumberInputElement = document.getElementById('phone_number') as HTMLInputElement | null;
+    const emailInputElement = document.getElementById('personal-email') as HTMLInputElement | null;
+    const postalCodeInputElement = document.getElementById('postal_code') as HTMLInputElement | null;
+    const addressInputElement = document.getElementById('personal-address') as HTMLInputElement | null;
+
+    const updatedData = {
+      id: id,
+      sei: seiInputElement ? seiInputElement.value : '', // nullの場合は空文字列をセット
+      mei: firstNameInputElement ? firstNameInputElement.value : '',
+      sei_k: seiKInputElement ? seiKInputElement.value : '',
+      mei_k: firstNameKInputElement ? firstNameKInputElement.value : '',
+      gender: gender || '', // genderがundefinedの場合に備えて空文字列をセット
+      birthday: birthday || null, // birthdayがnullの場合も考慮
+      remarks: remarksInputElement ? remarksInputElement.value : '',
+      phone_number: phoneNumberInputElement ? phoneNumberInputElement.value.replaceAll('-', '') : '',
+      email: emailInputElement ? emailInputElement.value : '',
+      postal_code: postalCodeInputElement ? postalCodeInputElement.value.replaceAll('-', '') : '',
+      address: addressInputElement ? addressInputElement.value : '',
+      joining_date: joiningDate || null, // joiningDateがnullの場合も考慮
+      retirement_date: retirementDate || null, // retirementDateがnullの場合も考慮
+      employment_id: employment || '', // employmentがundefinedの場合に備えて空文字列をセット
+      position_id: position || '' // positionがundefinedの場合に備えて空文字列をセット
+    };
+
+    // 2. APIにデータを送信
+    fetch(`/api/db/employee/personal/update`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedData)
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('API request failed');
+        }
+        return response.json();
+      })
+      .then((responseData) => {
+        const row = responseData.data.rows[0];
+        setData(row);
+        dispatch(
+          openSnackbar({
+            open: true,
+            message: '正常に更新されました。',
+            variant: 'alert',
+            alert: {
+              color: 'success'
+            },
+            close: false
+          })
+        );
+      })
+      .catch((error) => {
+        console.error('Error updating data:', error);
+        dispatch(
+          openSnackbar({
+            open: true,
+            message: 'データの更新に失敗しました。',
+            variant: 'alert',
+            alert: {
+              color: 'error'
+            },
+            close: false
+          })
+        );
+      });
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
@@ -151,6 +252,11 @@ const TabPersonal = () => {
           <Grid item xs={12} sm={6}>
             <MainCard title="基本情報">
               <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <Stack direction="row" justifyContent="flex-start">
+                    <Chip id="id" label={`社員ID:${data.id}`} size="small" color="secondary" />
+                  </Stack>
+                </Grid>
                 <Grid item xs={12}>
                   <Stack spacing={2.5} alignItems="center" sx={{ m: 3 }}>
                     <FormLabel
@@ -198,26 +304,26 @@ const TabPersonal = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Stack spacing={1.25}>
-                    <InputLabel htmlFor="personal-last_name">性</InputLabel>
-                    <TextField fullWidth defaultValue={data.sei} id="sei" placeholder="last_name" autoFocus />
+                    <InputLabel htmlFor="personal-sei">性</InputLabel>
+                    <TextField fullWidth defaultValue={data.sei} id="sei" placeholder="sei" autoFocus />
                   </Stack>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Stack spacing={1.25}>
-                    <InputLabel htmlFor="personal-first_name">名</InputLabel>
-                    <TextField fullWidth defaultValue={data.mei} id="first_name" placeholder="first_name" />
+                    <InputLabel htmlFor="personal-mei">名</InputLabel>
+                    <TextField fullWidth defaultValue={data.mei} id="mei" placeholder="mei" />
                   </Stack>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Stack spacing={1.25}>
-                    <InputLabel htmlFor="personal-last_name_k">性（カナ）</InputLabel>
-                    <TextField fullWidth defaultValue={data.sei_k} id="last_name_k" placeholder="last_name_k" />
+                    <InputLabel htmlFor="personal-sei_k">性（カナ）</InputLabel>
+                    <TextField fullWidth defaultValue={data.sei_k} id="sei_k" placeholder="sei_k" />
                   </Stack>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Stack spacing={1.25}>
-                    <InputLabel htmlFor="personal-first_name_k">名（カナ）</InputLabel>
-                    <TextField fullWidth defaultValue={data.mei_k} id="first_name_k" placeholder="first_name_k" />
+                    <InputLabel htmlFor="personal-mei_k">名（カナ）</InputLabel>
+                    <TextField fullWidth defaultValue={data.mei_k} id="mei_k" placeholder="mei_k" />
                   </Stack>
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -254,6 +360,7 @@ const TabPersonal = () => {
                         <InputLabel htmlFor="personal-phone_number">携帯電話</InputLabel>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
                           <PatternFormat
+                            id="phone_number"
                             format="###-####-####"
                             mask="_"
                             fullWidth
@@ -276,6 +383,7 @@ const TabPersonal = () => {
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="personal-postal_code">郵便番号</InputLabel>
                         <PatternFormat
+                          id="postal_code"
                           format="###-####"
                           mask="_"
                           fullWidth
@@ -308,7 +416,7 @@ const TabPersonal = () => {
                     <Grid item xs={12} sm={6}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="personal-location">退職日</InputLabel>
-                        <DatePicker value={returementDate} onChange={(newValue) => setReturementDate(newValue)} format="yyyy/MM/dd" />
+                        <DatePicker value={retirementDate} onChange={(newValue) => setRetirementDate(newValue)} format="yyyy/MM/dd" />
                       </Stack>
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -325,10 +433,6 @@ const TabPersonal = () => {
                             // eslint-disable-next-line react/jsx-key
                             return <MenuItem value={`${item.id}`}>{item.name}</MenuItem>;
                           })}
-                          {/* <MenuItem value="0">正社員</MenuItem>
-                          <MenuItem value="1">契約社員</MenuItem>
-                          <MenuItem value="2">派遣社員</MenuItem>
-                          <MenuItem value="3">アルバイト</MenuItem> */}
                         </Select>
                       </Stack>
                     </Grid>
@@ -361,7 +465,9 @@ const TabPersonal = () => {
               <Button variant="outlined" color="secondary">
                 キャンセル
               </Button>
-              <Button variant="contained">更新</Button>
+              <Button variant="contained" onClick={() => handleUpdateButtonClick(data.id)}>
+                更新
+              </Button>
             </Stack>
           </Grid>
         </Grid>
