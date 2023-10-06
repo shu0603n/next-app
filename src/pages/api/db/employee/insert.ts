@@ -21,7 +21,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
       joining_date,
       retirement_date,
       employment_id,
-      position_id
+      position_id,
+      job_category_id
     } = request.body;
 
     if (!sei || !mei) {
@@ -44,7 +45,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
       joining_date,
       retirement_date,
       employment_id,
-      position_id
+      position_id,
+      job_category_id
     )
     VALUES (
       ${toNull(sei)},
@@ -61,7 +63,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
       ${toNull(joining_date)},
       ${toNull(retirement_date)},
       ${toNull(employment_id)},
-      ${toNull(position_id)}
+      ${toNull(position_id)},
+      ${toNull(job_category_id)}
     );
   `;
 
