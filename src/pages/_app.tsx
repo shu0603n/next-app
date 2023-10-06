@@ -1,4 +1,4 @@
-import { useEffect, useState, ReactElement, ReactNode } from 'react';
+import { ReactElement, ReactNode } from 'react';
 
 // scroll bar
 import 'simplebar/dist/simplebar.css';
@@ -29,7 +29,6 @@ import Notistack from 'components/third-party/Notistack';
 
 import { ConfigProvider } from 'contexts/ConfigContext';
 import { store, persister } from 'store';
-// import { fetchMenu } from 'store/reducers/menu';
 
 // types
 type LayoutProps = NextPage & {
@@ -45,12 +44,6 @@ interface Props {
 
 export default function App({ Component, pageProps }: AppProps & Props) {
   const getLayout = Component.getLayout ?? ((page: any) => page);
-
-  // useEffect(() => {
-  //   dispatch(fetchMenu()).then(() => {
-  //     setLoading(false);
-  //   });
-  // }, []);
 
   return (
     <ReduxProvider store={store}>
