@@ -59,19 +59,26 @@ import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
 import { CloseOutlined } from '@ant-design/icons';
-
 // 定数
 const getInitialValues = (customer: FormikValues | null) => {
   const newCustomer = {
-    name: '',
-    email: '',
-    location: '',
-    orderStatus: ''
+    project_title: '',
+    description: '',
+    people_number: '',
+    start_date: new Date(),
+    end_date: new Date(),
+    skills: [],
+    process: [],
+    client: '',
+    role: ''
   };
 
   if (customer) {
-    newCustomer.name = customer.fatherName;
-    newCustomer.location = customer.address;
+    newCustomer.project_title = customer.project_title;
+    newCustomer.description = customer.description;
+    newCustomer.people_number = customer.people_number;
+    // newCustomer.start_date = startDate;
+    // newCustomer.end_date = endDate;
     return _.merge({}, newCustomer, customer);
   }
 
@@ -137,41 +144,42 @@ export interface Props {
 }
 
 const AddCustomer = ({ customer, onCancel }: Props) => {
-  const [birthday, setBirthday] = useState<Date | null>(new Date('2019/4/1'));
+  const [startDate, setStartDate] = useState<Date | null>();
+  const [endDate, setEndDate] = useState<Date | null>();
   const theme = useTheme();
   const isCreating = !customer;
 
   const CustomerSchema = Yup.object().shape({
-    name: Yup.string().max(255).required('名前は必須です'),
-    orderStatus: Yup.string().required('ステータスは必須です'),
-    location: Yup.string().max(500),
-    role: Yup.string()
-      .trim()
-      .required('役割の選択は必須です')
-      .matches(/^[a-z\d\-/#_\s]+$/i, 'アルファベットと数字しか許可されていません')
-      .max(50, '役割は最大50文字までです'),
-    skills: Yup.array()
-      .of(
-        Yup.string()
-          .trim()
-          .required('タグに先頭の空白があります')
-          .matches(/^[a-z\d\-/#.&_\s]+$/i, 'アルファベットと数字しか許可されていません')
-          .max(50, 'スキルタグは最大50文字までです')
-      )
-      .required('スキルの選択は必須です')
-      // .min(3, 'スキルタグは少なくとも3つ必要です')
-      .max(15, '最大で15個のスキルを選択してください'),
-    process: Yup.array()
-      .of(
-        Yup.string()
-          .trim()
-          .required('タグに先頭の空白があります')
-          .matches(/^[a-z\d\-/#.&_\s]+$/i, 'アルファベットと数字しか許可されていません')
-          .max(50, '担当工程タグは最大50文字までです')
-      )
-      .required('担当工程の選択は必須です')
-      // .min(3, 'スキルタグは少なくとも3つ必要です')
-      .max(15, '最大で15個の担当工程を選択してください')
+    project_title: Yup.string().max(255).required('プロジェクト名は必須です')
+    // orderStatus: Yup.string().required('ステータスは必須です'),
+    // location: Yup.string().max(500),
+    // role: Yup.string()
+    //   .trim()
+    //   .required('役割の選択は必須です')
+    //   .matches(/^[a-z\d\-/#_\s]+$/i, 'アルファベットと数字しか許可されていません')
+    //   .max(50, '役割は最大50文字までです'),
+    // skills: Yup.array()
+    //   .of(
+    //     Yup.string()
+    //       .trim()
+    //       .required('タグに先頭の空白があります')
+    //       .matches(/^[a-z\d\-/#.&_\s]+$/i, 'アルファベットと数字しか許可されていません')
+    //       .max(50, 'スキルタグは最大50文字までです')
+    //   )
+    //   .required('スキルの選択は必須です')
+    //   // .min(3, 'スキルタグは少なくとも3つ必要です')
+    //   .max(15, '最大で15個のスキルを選択してください'),
+    // process: Yup.array()
+    //   .of(
+    //     Yup.string()
+    //       .trim()
+    //       .required('タグに先頭の空白があります')
+    //       .matches(/^[a-z\d\-/#.&_\s]+$/i, 'アルファベットと数字しか許可されていません')
+    //       .max(50, '担当工程タグは最大50文字までです')
+    //   )
+    //   .required('担当工程の選択は必須です')
+    //   // .min(3, 'スキルタグは少なくとも3つ必要です')
+    //   .max(15, '最大で15個の担当工程を選択してください')
   });
 
   const [openAlert, setOpenAlert] = useState(false);
@@ -181,17 +189,23 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     onCancel();
   };
 
-  const formik2 = useFormik({
+  const formik = useFormik({
     initialValues: getInitialValues(customer!),
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
+      console.log('!!!');
+      console.log(values);
       try {
         // const newCustomer = {
-        //   name: values.name,
-        //   email: values.email,
-        //   location: values.location,
-        //   orderStatus: values.orderStatus
+        //   project_title: values.project_title,
+        //   description: values.description,
+        //   people_number: values.people_number,
+        //   start_date: startDate,
+        //   end_date: endDate,
+        //   skills: [],
+        //   process: []
         // };
+        alert(values);
 
         if (customer) {
           // dispatch(updateCustomer(customer.id, newCustomer)); - update
@@ -229,30 +243,8 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     }
   });
 
-  const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik2;
+  const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
   const dispatch = useDispatch();
-
-  const formik = useFormik({
-    initialValues: {
-      role: '',
-      skills: [],
-      process: []
-    },
-    validationSchema: CustomerSchema,
-    onSubmit: (values) => {
-      dispatch(
-        openSnackbar({
-          open: true,
-          message: 'Autocomplete - Submit Success',
-          variant: 'alert',
-          alert: {
-            color: 'success'
-          },
-          close: false
-        })
-      );
-    }
-  });
 
   let TagsError: boolean | string | undefined = false;
   if (formik.touched.skills && typeof formik.errors.skills) {
@@ -282,7 +274,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
 
   return (
     <>
-      <FormikProvider value={formik2}>
+      <FormikProvider value={formik}>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <DialogTitle>{customer ? 'スキル情報の編集' : '新しいスキルの追加'}</DialogTitle>
@@ -329,65 +321,65 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-name">開始日</InputLabel>
-                        <DatePicker value={birthday} onChange={(newValue) => setBirthday(newValue)} format="yyyy/MM/dd" />
+                        <DatePicker value={startDate} onChange={(newValue) => setStartDate(newValue)} format="yyyy/MM/dd" />
                       </Stack>
                     </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-name">終了日</InputLabel>
-                        <DatePicker value={birthday} onChange={(newValue) => setBirthday(newValue)} format="yyyy/MM/dd" />
+                        <DatePicker value={endDate} onChange={(newValue) => setEndDate(newValue)} format="yyyy/MM/dd" />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-name">名前</InputLabel>
+                        <InputLabel htmlFor="customer-client">企業名</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-name"
-                          placeholder="顧客の名前を入力"
-                          {...getFieldProps('name')}
-                          error={Boolean(touched.name && errors.name)}
-                          helperText={touched.name && errors.name}
+                          id="customer-client"
+                          placeholder="企業名を入力"
+                          {...getFieldProps('client')}
+                          error={Boolean(touched.client && errors.client)}
+                          helperText={touched.client && errors.client}
                         />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-location">業務内容</InputLabel>
+                        <InputLabel htmlFor="customer-description">業務内容</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-location"
+                          id="customer-description"
                           multiline
                           rows={20}
                           placeholder={message}
-                          {...getFieldProps('location')}
-                          error={Boolean(touched.location && errors.location)}
-                          helperText={touched.location && errors.location}
+                          {...getFieldProps('description')}
+                          error={Boolean(touched.description && errors.description)}
+                          helperText={touched.description && errors.description}
                         />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-email">人数</InputLabel>
+                        <InputLabel htmlFor="customer-people_number">人数</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-email"
+                          id="customer-people_number"
                           placeholder="人数を入力"
-                          {...getFieldProps('email')}
-                          error={Boolean(touched.email && errors.email)}
-                          helperText={touched.email && errors.email}
+                          {...getFieldProps('people_number')}
+                          error={Boolean(touched.people_number && errors.people_number)}
+                          helperText={touched.people_number && errors.people_number}
                         />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-orderStatus">役割</InputLabel>
+                        <InputLabel htmlFor="customer-role">役割</InputLabel>
                         <FormControl fullWidth>
                           <Select
                             id="column-hiding"
                             displayEmpty
-                            {...getFieldProps('orderStatus')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('orderStatus', event.target.value as string)}
+                            {...getFieldProps('role')}
+                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('role', event.target.value as string)}
                             input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
                             renderValue={(selected) => {
                               if (!selected) {
@@ -404,9 +396,9 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                             ))}
                           </Select>
                         </FormControl>
-                        {touched.orderStatus && errors.orderStatus && (
+                        {touched.role && errors.role && (
                           <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.orderStatus}
+                            {errors.role}
                           </FormHelperText>
                         )}
                       </Stack>
@@ -429,9 +421,9 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           onChange={(event, newValue) => {
                             const jobExist = skills.includes(newValue[newValue.length - 1]);
                             if (!jobExist) {
-                              formik.setFieldValue('skills', newValue);
+                              setFieldValue('skills', newValue);
                             } else {
-                              formik.setFieldValue('skills', newValue);
+                              setFieldValue('skills', newValue);
                             }
                           }}
                           filterOptions={(options, params) => {
@@ -502,7 +494,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                               <Chip
                                 key={index}
                                 variant="outlined"
-                                onClick={() => formik.setFieldValue('skills', [...formik.values.skills, option])}
+                                onClick={() => setFieldValue('skills', [...formik.values.skills, option])}
                                 label={<Typography variant="caption">{option}</Typography>}
                                 size="small"
                               />
@@ -528,9 +520,9 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           onChange={(event, newValue) => {
                             const jobExist = process.includes(newValue[newValue.length - 1]);
                             if (!jobExist) {
-                              formik.setFieldValue('process', newValue);
+                              setFieldValue('process', newValue);
                             } else {
-                              formik.setFieldValue('process', newValue);
+                              setFieldValue('process', newValue);
                             }
                           }}
                           filterOptions={(options, params) => {
@@ -602,7 +594,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                               <Chip
                                 key={index}
                                 variant="outlined"
-                                onClick={() => formik.setFieldValue('process', [...formik.values.process, option])}
+                                onClick={() => setFieldValue('process', [...formik.values.process, option])}
                                 label={<Typography variant="caption">{option}</Typography>}
                                 size="small"
                               />
@@ -629,7 +621,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
               <Grid container justifyContent="space-between" alignItems="center">
                 <Grid item>
                   {!isCreating && (
-                    <Tooltip title="顧客の削除" placement="top">
+                    <Tooltip title="スキルの削除" placement="top">
                       <IconButton onClick={() => setOpenAlert(true)} size="large" color="error">
                         <DeleteFilled />
                       </IconButton>
