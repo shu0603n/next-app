@@ -21,7 +21,6 @@ import { PersistGate } from 'redux-persist/integration/react';
 // project import
 import ThemeCustomization from 'themes';
 
-import Loader from 'components/Loader';
 import Locales from 'components/Locales';
 import ScrollTop from 'components/ScrollTop';
 import RTLLayout from 'components/RTLLayout';
@@ -29,8 +28,8 @@ import Snackbar from 'components/@extended/Snackbar';
 import Notistack from 'components/third-party/Notistack';
 
 import { ConfigProvider } from 'contexts/ConfigContext';
-import { store, persister, dispatch } from 'store';
-import { fetchMenu } from 'store/reducers/menu';
+import { store, persister } from 'store';
+// import { fetchMenu } from 'store/reducers/menu';
 
 // types
 type LayoutProps = NextPage & {
@@ -47,15 +46,11 @@ interface Props {
 export default function App({ Component, pageProps }: AppProps & Props) {
   const getLayout = Component.getLayout ?? ((page: any) => page);
 
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    dispatch(fetchMenu()).then(() => {
-      setLoading(false);
-    });
-  }, []);
-
-  if (loading) return <Loader />;
+  // useEffect(() => {
+  //   dispatch(fetchMenu()).then(() => {
+  //     setLoading(false);
+  //   });
+  // }, []);
 
   return (
     <ReduxProvider store={store}>
