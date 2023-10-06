@@ -1,4 +1,5 @@
 // material-ui
+import { useRouter } from 'next/router';
 import { Grid } from '@mui/material';
 import SkillTable from './skill-table/SkillTable';
 import { useState, useEffect } from 'react';
@@ -23,9 +24,9 @@ async function fetchSkillList(id: number) {
   }
 }
 
-async function fetchTableData() {
+async function fetchTableData(id: string) {
   try {
-    const response = await fetch(`/api/db/employee/skill/select?id=${1}`);
+    const response = await fetch(`/api/db/employee/skill/select?id=${id}`);
     if (!response.ok) {
       throw new Error('API request failed');
     }
@@ -53,10 +54,12 @@ async function fetchTableData() {
 
 const TabRole = () => {
   const [data, setData] = useState<SkillTableType[]>([]); // デフォルト値を空の配列に設定
+  const router = useRouter();
+  const id = router.query.id as string;
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
-    fetchTableData()
+    fetchTableData(id)
       .then((fetchedData) => {
         setData(fetchedData.data.rows);
       })
@@ -64,6 +67,7 @@ const TabRole = () => {
         // エラーハンドリング
         console.error('Error:', error);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
