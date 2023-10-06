@@ -10,7 +10,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
 
     const data = await sql`SELECT skill.*, technic.name AS technic_name 
     FROM skill 
-    INNER JOIN technic ON skill.technic_id = technic.id;`;
+    LEFT JOIN technic ON skill.technic_id = technic.id;`;
     console.log(data);
     return response.status(200).json({ data });
   } catch (error) {
