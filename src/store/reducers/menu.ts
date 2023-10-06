@@ -1,7 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-
-// project import
-import axios from 'utils/axios';
+import { createSlice } from '@reduxjs/toolkit';
 
 // types
 import { MenuProps } from 'types/menu';
@@ -19,10 +16,10 @@ const initialState: MenuProps = {
 
 // ==============================|| SLICE - MENU ||============================== //
 
-export const fetchMenu = createAsyncThunk('', async () => {
-  const response = await axios.get('/api/menu/dashboard');
-  return response.data;
-});
+// export const fetchMenu = createAsyncThunk('', async () => {
+//   const response = await axios.get('/api/menu/dashboard');
+//   return response.data;
+// });
 
 const menu = createSlice({
   name: 'menu',
@@ -51,13 +48,13 @@ const menu = createSlice({
     hasError(state, action) {
       state.error = action.payload;
     }
-  },
-
-  extraReducers(builder) {
-    builder.addCase(fetchMenu.fulfilled, (state, action) => {
-      state.menu = action.payload.dashboard;
-    });
   }
+
+  // extraReducers(builder) {
+  //   builder.addCase(fetchMenu.fulfilled, (state, action) => {
+  //     state.menu = action.payload.dashboard;
+  //   });
+  // }
 });
 
 export default menu.reducer;
