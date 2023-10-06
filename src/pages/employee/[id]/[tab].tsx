@@ -25,13 +25,13 @@ import { ContainerOutlined, FileTextOutlined, LockOutlined, SettingOutlined, Tea
 
 const EmployeeDetail = () => {
   const router = useRouter();
-  const { tab } = router.query;
+  const { id, tab } = router.query;
 
   const [value, setValue] = useState(tab);
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
-    router.push(`/employee/${newValue}`);
+    router.push(`/employee/${id}/${newValue}`);
   };
 
   return (
