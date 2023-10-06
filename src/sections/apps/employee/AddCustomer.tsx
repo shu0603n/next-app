@@ -48,6 +48,7 @@ import { ThemeMode } from 'types/config';
 
 // assets
 import { CameraOutlined, DeleteFilled } from '@ant-design/icons';
+import { EmployeeType } from 'types/employee/employee';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
@@ -67,7 +68,8 @@ const getInitialValues = (customer: FormikValues | null) => {
     joining_date: null,
     retirement_date: null,
     employment_id: '',
-    position_id: ''
+    position_id: '',
+    job_category_id: ''
   };
 
   if (customer) {
@@ -87,6 +89,8 @@ const getInitialValues = (customer: FormikValues | null) => {
     newCustomer.retirement_date = customer.retirement_date;
     newCustomer.employment_id = customer.employment_id;
     newCustomer.position_id = customer.position_id;
+    newCustomer.job_category_id = customer.job_category_id;
+
     return _.merge({}, newCustomer, customer);
   }
 
@@ -94,16 +98,58 @@ const getInitialValues = (customer: FormikValues | null) => {
 };
 
 const genderList = ['男', '女'];
-const allStatus = ['1', '2', '3'];
-
+async function fetchPositionData() {
+  try {
+    const response = await fetch('/api/db/parameter/position/select');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+async function fetchEmploymentData() {
+  try {
+    const response = await fetch('/api/db/parameter/employment/select');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+async function fetchJobCategoryData() {
+  try {
+    const response = await fetch('/api/db/parameter/job_category/select');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+type Parameter = {
+  id: number;
+  name: string;
+};
 // ==============================|| CUSTOMER ADD / EDIT ||============================== //
 
 export interface Props {
   customer?: any;
   onCancel: () => void;
+  onReload: (data: EmployeeType) => void;
 }
 
-const AddCustomer = ({ customer, onCancel }: Props) => {
+const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   const theme = useTheme();
   const isCreating = !customer;
 
@@ -112,6 +158,36 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     `/assets/images/users/avatar-${isCreating && !customer?.avatar ? 1 : customer.avatar}.png`
   );
 
+  const [positionData, setPositionData] = useState<Array<Parameter>>();
+  const [employmentData, setEmploymentData] = useState<Array<Parameter>>();
+  const [jobCategoryData, setJobCategoryData] = useState<Array<Parameter>>();
+
+  useEffect(() => {
+    // ページがロードされたときにデータを取得
+    fetchPositionData()
+      .then((data) => {
+        setPositionData(data.data.rows);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+
+    fetchEmploymentData()
+      .then((data) => {
+        setEmploymentData(data.data.rows);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+
+    fetchJobCategoryData()
+      .then((data) => {
+        setJobCategoryData(data.data.rows);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  }, []); // 空の依存リストを指定することで、一度だけ実行される
   useEffect(() => {
     if (selectedImage) {
       setAvatar(URL.createObjectURL(selectedImage));
@@ -152,7 +228,6 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             close: false
           })
         );
-        alert(JSON.stringify(values));
         fetch(`/api/db/employee/insert`, {
           method: 'POST',
           headers: {
@@ -164,6 +239,10 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             if (!response.ok) {
               throw new Error('API request failed');
             }
+            return response.json();
+          })
+          .then((responseData) => {
+            onReload(responseData.data.rows);
             dispatch(
               openSnackbar({
                 open: true,
@@ -441,9 +520,9 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                               return <Typography variant="subtitle2">{selected}</Typography>;
                             }}
                           >
-                            {allStatus.map((column: any) => (
-                              <MenuItem key={column} value={column}>
-                                <ListItemText primary={column} />
+                            {employmentData?.map((item: Parameter) => (
+                              <MenuItem key={item.id} value={item.id}>
+                                <ListItemText primary={item.name} />
                               </MenuItem>
                             ))}
                           </Select>
@@ -473,9 +552,9 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                               return <Typography variant="subtitle2">{selected}</Typography>;
                             }}
                           >
-                            {allStatus.map((column: any) => (
-                              <MenuItem key={column} value={column}>
-                                <ListItemText primary={column} />
+                            {positionData?.map((item: Parameter) => (
+                              <MenuItem key={item.id} value={item.id}>
+                                <ListItemText primary={item.name} />
                               </MenuItem>
                             ))}
                           </Select>
@@ -483,6 +562,38 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                         {touched.position_id && errors.position_id && (
                           <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
                             {errors.position_id}
+                          </FormHelperText>
+                        )}
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="customer-job_category_id">職種区分</InputLabel>
+                        <FormControl fullWidth>
+                          <Select
+                            id="column-hiding"
+                            displayEmpty
+                            {...getFieldProps('job_category_id')}
+                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('job_category_id', event.target.value as string)}
+                            input={<OutlinedInput id="select-column-hiding" placeholder="Sort by" />}
+                            renderValue={(selected) => {
+                              if (!selected) {
+                                return <Typography variant="subtitle1">選択してください</Typography>;
+                              }
+
+                              return <Typography variant="subtitle2">{selected}</Typography>;
+                            }}
+                          >
+                            {jobCategoryData?.map((item: Parameter) => (
+                              <MenuItem key={item.id} value={item.id}>
+                                <ListItemText primary={item.name} />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {touched.job_category_id && errors.job_category_id && (
+                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
+                            {errors.job_category_id}
                           </FormHelperText>
                         )}
                       </Stack>
