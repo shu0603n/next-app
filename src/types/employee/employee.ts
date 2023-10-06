@@ -16,6 +16,7 @@ export type EmployeeType = {
   employment_id: number;
   employment_name: string;
   job_category_id: number;
+  job_category_name: string;
   position_id: number;
   position_name: string;
   postal_code: string;
