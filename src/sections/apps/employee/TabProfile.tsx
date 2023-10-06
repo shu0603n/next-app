@@ -1,5 +1,6 @@
 // material-ui
 import { Theme } from '@mui/material/styles';
+import { useRouter } from 'next/router';
 import {
   useMediaQuery,
   Chip,
@@ -36,9 +37,9 @@ const calculateAge = (birthDate: string): number => {
   const roundedAge: number = Math.floor(ageInYears);
   return roundedAge;
 };
-async function fetchTableData() {
+async function fetchTableData(id: string) {
   try {
-    const response = await fetch(`/api/db/employee/basic/select?id=${2}`);
+    const response = await fetch(`/api/db/employee/basic/select?id=${id}`);
     if (!response.ok) {
       throw new Error('API request failed');
     }
@@ -51,13 +52,16 @@ async function fetchTableData() {
 }
 
 const TabProfile = () => {
+  const router = useRouter();
+  const id = router.query.id as string;
+
   const matchDownMD = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
   const [data, setData] = useState<EmployeeType>();
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
-    fetchTableData()
+    fetchTableData(id)
       .then((data) => {
         setData(data.data.rows[0]);
       })
