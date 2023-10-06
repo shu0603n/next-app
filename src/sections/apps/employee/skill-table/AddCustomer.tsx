@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
 import {
   Box,
   Button,
@@ -11,7 +10,6 @@ import {
   Divider,
   FormControl,
   FormControlLabel,
-  FormLabel,
   Grid,
   FormHelperText,
   InputLabel,
@@ -39,27 +37,18 @@ import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
 import AlertCustomerDelete from './AlertCustomerDelete';
 import IconButton from 'components/@extended/IconButton';
 
-import { useDispatch } from 'store';
+import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 
 // assets
-import { CameraOutlined, DeleteFilled } from '@ant-design/icons';
-
-// types
-import { ThemeMode } from 'types/config';
-
-// --------------------------------------------------------
+import { DeleteFilled } from '@ant-design/icons';
 
 // material-ui
 import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
-// third-party
-
-// project imports
-
 // assets
 import { CloseOutlined } from '@ant-design/icons';
-// 定数
+// constant
 const getInitialValues = (customer: FormikValues | null) => {
   const newCustomer = {
     project_title: '',
@@ -146,7 +135,6 @@ export interface Props {
 const AddCustomer = ({ customer, onCancel }: Props) => {
   const [startDate, setStartDate] = useState<Date | null>();
   const [endDate, setEndDate] = useState<Date | null>();
-  const theme = useTheme();
   const isCreating = !customer;
 
   const CustomerSchema = Yup.object().shape({
@@ -193,22 +181,12 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     initialValues: getInitialValues(customer!),
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
-      console.log('!!!');
+      console.log('フォームが送信されました！');
       console.log(values);
       try {
-        // const newCustomer = {
-        //   project_title: values.project_title,
-        //   description: values.description,
-        //   people_number: values.people_number,
-        //   start_date: startDate,
-        //   end_date: endDate,
-        //   skills: [],
-        //   process: []
-        // };
         alert(values);
 
         if (customer) {
-          // dispatch(updateCustomer(customer.id, newCustomer)); - update
           dispatch(
             openSnackbar({
               open: true,
@@ -221,7 +199,6 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             })
           );
         } else {
-          // dispatch(createCustomer(newCustomer)); - add
           dispatch(
             openSnackbar({
               open: true,
@@ -244,8 +221,6 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
   });
 
   const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
-  const dispatch = useDispatch();
-
   let TagsError: boolean | string | undefined = false;
   if (formik.touched.skills && typeof formik.errors.skills) {
     if (formik.touched.skills && typeof formik.errors.skills === 'string') {
@@ -281,41 +256,6 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             <Divider />
             <DialogContent sx={{ p: 2.5 }}>
               <Grid container spacing={3}>
-                <Grid item xs={12} md={3}>
-                  <Stack direction="row" justifyContent="center" sx={{ mt: 3 }}>
-                    <FormLabel
-                      htmlFor="change-avtar"
-                      sx={{
-                        position: 'relative',
-                        borderRadius: '50%',
-                        overflow: 'hidden',
-                        '&:hover .MuiBox-root': { opacity: 1 },
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          backgroundColor: theme.palette.mode === ThemeMode.DARK ? 'rgba(255, 255, 255, .75)' : 'rgba(0,0,0,.65)',
-                          width: '100%',
-                          height: '100%',
-                          opacity: 0,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <Stack spacing={0.5} alignItems="center">
-                          <CameraOutlined style={{ color: theme.palette.secondary.lighter, fontSize: '2rem' }} />
-                          <Typography sx={{ color: 'secondary.lighter' }}>アップロード</Typography>
-                        </Stack>
-                      </Box>
-                    </FormLabel>
-                    <TextField type="file" id="change-avtar" placeholder="Outlined" variant="outlined" sx={{ display: 'none' }} />
-                  </Stack>
-                </Grid>
                 <Grid item xs={12} md={8}>
                   <Grid container spacing={3}>
                     <Grid item xs={6}>
