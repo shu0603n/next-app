@@ -1,5 +1,5 @@
 import { useEffect, useState, ChangeEvent } from 'react';
-
+import { useRouter } from 'next/router';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import {
@@ -49,9 +49,9 @@ const MenuProps = {
 
 // ==============================|| ACCOUNT PROFILE - PERSONAL ||============================== //
 
-async function fetchTableData() {
+async function fetchTableData(id: string) {
   try {
-    const response = await fetch(`/api/db/employee/basic/select?id=${2}`);
+    const response = await fetch(`/api/db/employee/basic/select?id=${id}`);
     if (!response.ok) {
       throw new Error('API request failed');
     }
@@ -89,8 +89,24 @@ async function fetchEmploymentData() {
   }
 }
 
+async function fetchJobCategory() {
+  try {
+    const response = await fetch('/api/db/parameter/job_category/select');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+
 const TabPersonal = () => {
   const theme = useTheme();
+  const router = useRouter();
+  const id = router.query.id as string;
   type Parameter = {
     id: number;
     name: string;
@@ -101,6 +117,7 @@ const TabPersonal = () => {
   const [data, setData] = useState<EmployeeType>();
   const [positionData, setPositionData] = useState<Array<Parameter>>();
   const [employmentData, setEmploymentData] = useState<Array<Parameter>>();
+  const [jobCategoryData, setJobCategoryData] = useState<Array<Parameter>>();
 
   const [birthday, setBirthday] = useState<Date | null>();
   const [joiningDate, setJoiningDate] = useState<Date | null>();
@@ -108,10 +125,11 @@ const TabPersonal = () => {
   const [gender, setGender] = useState<string>();
   const [position, setPosition] = useState<string>();
   const [employment, setEmployment] = useState<string>();
+  const [jobCategory, setJobCategory] = useState<string>();
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
-    fetchTableData()
+    fetchTableData(id)
       .then((data) => {
         const row = data.data.rows[0];
         setData(row);
@@ -121,6 +139,7 @@ const TabPersonal = () => {
         setGender(row.gender);
         setEmployment(row.employment_id);
         setPosition(row.position_id);
+        setJobCategory(row.job_category_id);
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -141,6 +160,15 @@ const TabPersonal = () => {
       .catch((error) => {
         console.error('Error:', error);
       });
+
+    fetchJobCategory()
+      .then((data) => {
+        setJobCategoryData(data.data.rows);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 空の依存リストを指定することで、一度だけ実行される
 
   useEffect(() => {
@@ -157,6 +185,9 @@ const TabPersonal = () => {
   };
   const handleChangeEmployment = (event: SelectChangeEvent<string>) => {
     setEmployment(event.target.value);
+  };
+  const handleChangeJobCategory = (event: SelectChangeEvent<string>) => {
+    setJobCategory(event.target.value);
   };
   const handleUpdateButtonClick = (id: number) => {
     dispatch(
@@ -183,21 +214,22 @@ const TabPersonal = () => {
 
     const updatedData = {
       id: id,
-      sei: seiInputElement ? seiInputElement.value : '', // nullの場合は空文字列をセット
-      mei: firstNameInputElement ? firstNameInputElement.value : '',
-      sei_k: seiKInputElement ? seiKInputElement.value : '',
-      mei_k: firstNameKInputElement ? firstNameKInputElement.value : '',
-      gender: gender || '', // genderがundefinedの場合に備えて空文字列をセット
+      sei: seiInputElement ? seiInputElement.value : null, // nullの場合は空文字列をセット
+      mei: firstNameInputElement ? firstNameInputElement.value : null,
+      sei_k: seiKInputElement ? seiKInputElement.value : null,
+      mei_k: firstNameKInputElement ? firstNameKInputElement.value : null,
+      gender: gender || null, // genderがundefinedの場合に備えて空文字列をセット
       birthday: birthday || null, // birthdayがnullの場合も考慮
-      remarks: remarksInputElement ? remarksInputElement.value : '',
-      phone_number: phoneNumberInputElement ? phoneNumberInputElement.value.replaceAll('-', '') : '',
-      email: emailInputElement ? emailInputElement.value : '',
-      postal_code: postalCodeInputElement ? postalCodeInputElement.value.replaceAll('-', '') : '',
-      address: addressInputElement ? addressInputElement.value : '',
+      remarks: remarksInputElement ? remarksInputElement.value : null,
+      phone_number: phoneNumberInputElement ? phoneNumberInputElement.value.replaceAll('-', '') : null,
+      email: emailInputElement ? emailInputElement.value : null,
+      postal_code: postalCodeInputElement ? postalCodeInputElement.value.replaceAll('-', '') : null,
+      address: addressInputElement ? addressInputElement.value : null,
       joining_date: joiningDate || null, // joiningDateがnullの場合も考慮
       retirement_date: retirementDate || null, // retirementDateがnullの場合も考慮
-      employment_id: employment || '', // employmentがundefinedの場合に備えて空文字列をセット
-      position_id: position || '' // positionがundefinedの場合に備えて空文字列をセット
+      employment_id: employment || null, // employmentがundefinedの場合に備えて空文字列をセット
+      position_id: position || null, // positionがundefinedの場合に備えて空文字列をセット
+      job_category_id: jobCategory || null
     };
 
     // 2. APIにデータを送信
@@ -448,6 +480,24 @@ const TabPersonal = () => {
                         >
                           <MenuItem value="0">なし</MenuItem>
                           {positionData?.map((item) => {
+                            // eslint-disable-next-line react/jsx-key
+                            return <MenuItem value={`${item.id}`}>{item.name}</MenuItem>;
+                          })}
+                        </Select>
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="personal-job_category">職種</InputLabel>
+                        <Select
+                          fullWidth
+                          id="personal-job_category"
+                          value={jobCategory}
+                          onChange={handleChangeJobCategory}
+                          MenuProps={MenuProps}
+                        >
+                          <MenuItem value="0">なし</MenuItem>
+                          {jobCategoryData?.map((item) => {
                             // eslint-disable-next-line react/jsx-key
                             return <MenuItem value={`${item.id}`}>{item.name}</MenuItem>;
                           })}
