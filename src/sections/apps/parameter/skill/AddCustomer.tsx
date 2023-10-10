@@ -13,7 +13,8 @@ import {
   InputLabel,
   Stack,
   TextField,
-  Tooltip
+  Tooltip,
+  Switch
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -40,7 +41,8 @@ const getInitialValues = (customer: FormikValues | null) => {
     id: '',
     name: '',
     technic_id: '',
-    technic_name: ''
+    technic_name: '',
+    candidate_flag: false
   };
 
   if (customer) {
@@ -48,6 +50,7 @@ const getInitialValues = (customer: FormikValues | null) => {
     newCustomer.name = customer.name;
     newCustomer.technic_id = customer.technic_id;
     newCustomer.technic_name = customer.technic_name;
+    newCustomer.candidate_flag = customer.candidate_flag;
     return _.merge({}, newCustomer, customer);
   }
 
@@ -92,7 +95,19 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   const isCreating = !customer;
 
   const [tableData, setTableData] = useState<dbResponse>(defaultRes); // データを保持する状態変数
+  const [checked, setChecked] = useState(['candidate_flag']);
+  const handleToggle = (value: string) => () => {
+    const currentIndex = checked.indexOf(value);
+    const newChecked = [...checked];
 
+    if (currentIndex === -1) {
+      newChecked.push(value);
+    } else {
+      newChecked.splice(currentIndex, 1);
+    }
+
+    setChecked(newChecked);
+  };
   useEffect(() => {
     // ページがロードされたときにデータを取得
     fetchTableData()
@@ -278,6 +293,25 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                         {touched.technic_name && errors.technic_name && (
                           <FormHelperText error id="helper-text-technic_name">
                             {errors.technic_name}
+                          </FormHelperText>
+                        )}
+                      </Stack>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="name">候補に表示する</InputLabel>
+                        <Switch
+                          edge="end"
+                          onChange={handleToggle('candidate_flag')}
+                          checked={checked.indexOf('candidate_flag') !== -1}
+                          inputProps={{
+                            'aria-labelledby': 'switch-list-label-candidate_flag'
+                          }}
+                        />
+                        {touched.candidate_flag && errors.candidate_flag && (
+                          <FormHelperText error id="helper-text-candidate_flag">
+                            {errors.candidate_flag}
                           </FormHelperText>
                         )}
                       </Stack>
