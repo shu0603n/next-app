@@ -230,10 +230,10 @@ const CustomerEmployeePage = () => {
   const router = useRouter();
 
   const handleChangeDetail = (newValue: string) => {
-    router.push(`/employee/${newValue}/basic`);
+    router.push(`/employee/detail/${newValue}/basic`);
   };
   const handleChangeDetailSkill = (newValue: string) => {
-    router.push(`/skill-sheet/${newValue}`);
+    router.push(`/employee/skill-sheet/${newValue}`);
   };
 
   const columns = useMemo(
