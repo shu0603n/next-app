@@ -1,4 +1,4 @@
-CustomerCard.tsximport { useState } from 'react';
+import { useState } from 'react';
 
 // material-ui
 import { Box, Chip, Dialog, Divider, Grid, List, ListItem, ListItemText, Stack, Typography } from '@mui/material';
