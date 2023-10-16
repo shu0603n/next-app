@@ -47,9 +47,8 @@ import AddCustomer from 'sections/apps/employee/AddCustomer';
 import AlertCustomerDelete from 'sections/apps/employee/AlertCustomerDelete';
 
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
-
 // assets
-import { CloseOutlined, PlusOutlined, EyeTwoTone, DeleteTwoTone } from '@ant-design/icons';
+import { CloseOutlined, PlusOutlined, EyeTwoTone, DeleteTwoTone, FileTextOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import { EmployeeType } from 'types/employee/employee';
 
@@ -331,7 +330,7 @@ const CustomerEmployeePage = () => {
                     handleChange2(row.values.id);
                   }}
                 >
-                  {collapseIcon}
+                  <FileTextOutlined twoToneColor={theme.palette.secondary.main} />
                 </IconButton>
               </Tooltip>
               <Tooltip title="削除">
