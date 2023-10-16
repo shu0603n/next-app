@@ -17,13 +17,11 @@ import { PDFDownloadLink } from '@react-pdf/renderer';
 // project import
 import Layout from 'layout';
 import Page from 'components/Page';
-import Loader from 'components/Loader';
 import MainCard from 'components/MainCard';
 import LogoSection from 'components/logo';
 import ExportPDFView from 'sections/apps/invoice/export-pdf';
 
-import { dispatch, useSelector } from 'store';
-import { getInvoiceSingleList } from 'store/reducers/invoice';
+import { useSelector } from 'store';
 
 // assets
 import { DownloadOutlined, EditOutlined, PrinterFilled } from '@ant-design/icons';
@@ -36,12 +34,6 @@ const SkillSheet = () => {
   const { id } = router.query;
 
   const { list } = useSelector((state) => state.invoice);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    dispatch(getInvoiceSingleList(Number(id))).then(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
 
   const today = new Date().toLocaleDateString('ja-JP', {
     year: 'numeric',
@@ -277,8 +269,6 @@ const SkillSheet = () => {
     });
     setUserCard(newData);
   }, [globalFilter, data]);
-
-  if (loading) return <Loader />;
 
   return (
     <Page title="SkillSheet">
