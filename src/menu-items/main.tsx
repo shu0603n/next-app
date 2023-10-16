@@ -2,32 +2,17 @@
 import { FormattedMessage } from 'react-intl';
 
 // assets
-import {
-  BorderOutlined,
-  BoxPlotOutlined,
-  ChromeOutlined,
-  DeploymentUnitOutlined,
-  GatewayOutlined,
-  MenuUnfoldOutlined,
-  QuestionOutlined,
-  SmileOutlined,
-  StopOutlined
-} from '@ant-design/icons';
+import { HomeOutlined, ProjectOutlined, ApartmentOutlined, SolutionOutlined } from '@ant-design/icons';
 
 // type
 import { NavItemType } from 'types/menu';
 
 // icons
 const icons = {
-  BorderOutlined,
-  BoxPlotOutlined,
-  ChromeOutlined,
-  DeploymentUnitOutlined,
-  GatewayOutlined,
-  MenuUnfoldOutlined,
-  QuestionOutlined,
-  StopOutlined,
-  SmileOutlined
+  HomeOutlined,
+  ProjectOutlined,
+  ApartmentOutlined,
+  SolutionOutlined
 };
 
 // ==============================|| MENU ITEMS - SUPPORT ||============================== //
@@ -42,28 +27,28 @@ const other: NavItemType = {
       title: <FormattedMessage id="top" />,
       type: 'item',
       url: '/top',
-      icon: icons.ChromeOutlined
-    },
-    {
-      id: 'employee',
-      title: <FormattedMessage id="employee" />,
-      type: 'item',
-      url: '/employee',
-      icon: icons.ChromeOutlined
+      icon: icons.HomeOutlined
     },
     {
       id: 'client',
       title: <FormattedMessage id="client" />,
       type: 'item',
       url: '/client',
-      icon: icons.ChromeOutlined
+      icon: icons.ApartmentOutlined
+    },
+    {
+      id: 'employee',
+      title: <FormattedMessage id="employee" />,
+      type: 'item',
+      url: '/employee',
+      icon: icons.SolutionOutlined
     },
     {
       id: 'project',
       title: <FormattedMessage id="project" />,
       type: 'item',
       url: '/project',
-      icon: icons.ChromeOutlined
+      icon: icons.ProjectOutlined
     }
   ]
 };
