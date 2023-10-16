@@ -229,11 +229,12 @@ const CustomerEmployeePage = () => {
   };
   const router = useRouter();
 
-  const handleChange = (newValue: string) => {
+  const handleChangeDetail = (newValue: string) => {
     router.push(`/employee/${newValue}/basic`);
   };
-  const handleChange2 = (newValue: string) => {
-    router.push(`/skill-sheet/${newValue}`);
+  const handleChangeDetailSkill = (newValue: string) => {
+    // router.push(`/skill-sheet/${newValue}`);
+    router.push(`/employee/${newValue}/basic`);
   };
 
   const columns = useMemo(
@@ -317,7 +318,7 @@ const CustomerEmployeePage = () => {
                 <IconButton
                   color="secondary"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    handleChange(row.values.id);
+                    handleChangeDetail(row.values.id);
                   }}
                 >
                   {collapseIcon}
@@ -327,7 +328,7 @@ const CustomerEmployeePage = () => {
                 <IconButton
                   color="secondary"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    handleChange2(row.values.id);
+                    handleChangeDetailSkill(row.values.id);
                   }}
                 >
                   <FileTextOutlined twoToneColor={theme.palette.secondary.main} />
