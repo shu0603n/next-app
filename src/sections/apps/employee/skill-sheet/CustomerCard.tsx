@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 
 // material-ui
 import { Box, Chip, Dialog, Divider, Grid, List, ListItem, ListItemText, Stack, Typography } from '@mui/material';
@@ -45,8 +45,12 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
               <ListItemText
                 primary={
                   <>
-                    {customer.start_date && <Typography variant="subtitle1">{`(${customer.start_date}~${customer.end_date})`}</Typography>}
-                    <Typography variant="subtitle1">{customer.title}</Typography>
+                    <Typography variant="h4" component="span">
+                      <Typography variant="h3" component="span" color="primary">
+                        {customer.title}
+                      </Typography>
+                      {customer.start_date && `(${customer.start_date}~${customer.end_date})`}
+                    </Typography>
                   </>
                 }
                 secondary={
@@ -60,48 +64,68 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
           <Grid item xs={12}>
             <Divider />
           </Grid>
-          <Grid item xs={12}>
-            <Typography> {customer.description}</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Box>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  listStyle: 'none',
-                  p: 0.5,
-                  m: 0
-                }}
-                component="ul"
-              >
-                {customer.skills.map((skill: string, index: number) => (
-                  <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                    <Chip color="secondary" variant="outlined" size="small" label={skill} />
-                  </ListItem>
+          <Grid item xs={12} md={6}>
+            <Grid item xs={12}>
+              <Typography variant="h5" component="span">
+                業務内容
+              </Typography>
+              <Typography>
+                {customer.description.split('\r\n').map((val, index) => (
+                  <Fragment key={index}>
+                    {val}
+                    <br />
+                  </Fragment>
                 ))}
-              </Box>
-            </Box>
+              </Typography>
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <Box>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  listStyle: 'none',
-                  p: 0.5,
-                  m: 0
-                }}
-                component="ul"
-              >
-                {customer.process.map((skill: string, index: number) => (
-                  <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                    <Chip color="secondary" variant="outlined" size="small" label={skill} />
-                  </ListItem>
-                ))}
+          <Grid item xs={12} md={6}>
+            <Grid item xs={12}>
+              <Typography variant="h5" component="span">
+                使用スキル
+              </Typography>
+              <Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    listStyle: 'none',
+                    p: 0.5,
+                    m: 0
+                  }}
+                  component="ul"
+                >
+                  {customer.skills.map((skill: string, index: number) => (
+                    <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
+                      <Chip color="secondary" variant="outlined" size="small" label={skill} />
+                    </ListItem>
+                  ))}
+                </Box>
               </Box>
-            </Box>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="h5" component="span">
+                担当工程
+              </Typography>
+              <Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    listStyle: 'none',
+                    p: 0.5,
+                    m: 0
+                  }}
+                  component="ul"
+                >
+                  {customer.process.map((skill: string, index: number) => (
+                    <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
+                      <Chip color="secondary" variant="outlined" size="small" label={skill} />
+                    </ListItem>
+                  ))}
+                </Box>
+              </Box>
+            </Grid>
           </Grid>
         </Grid>
         <Stack
