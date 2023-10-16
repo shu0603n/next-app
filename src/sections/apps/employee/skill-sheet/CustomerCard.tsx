@@ -17,7 +17,7 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // ==============================|| CUSTOMER - CARD ||============================== //
 
-type PojectCard = {
+type ProjectCard = {
   id: number;
   start_date: string;
   end_date: string;
@@ -30,7 +30,7 @@ type PojectCard = {
   time: string;
 };
 
-const CustomerCard = ({ customer }: { customer: PojectCard }) => {
+const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
   const [add, setAdd] = useState<boolean>(false);
   const handleAdd = () => {
     setAdd(!add);
