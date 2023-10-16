@@ -31,7 +31,7 @@ const EmployeeDetail = () => {
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
-    router.push(`/employee/${id}/${newValue}`);
+    router.push(`/employee/detail/${id}/${newValue}`);
   };
 
   return (
