@@ -26,11 +26,11 @@ import { dispatch, useSelector } from 'store';
 import { getInvoiceSingleList } from 'store/reducers/invoice';
 
 // assets
-import { DownloadOutlined, EditOutlined, PrinterFilled, ShareAltOutlined } from '@ant-design/icons';
+import { DownloadOutlined, EditOutlined, PrinterFilled } from '@ant-design/icons';
 
 // ==============================|| INVOICE - DETAILS ||============================== //
 
-const Details = () => {
+const SkillSheet = () => {
   const theme = useTheme();
   const router = useRouter();
   const { id } = router.query;
@@ -51,7 +51,7 @@ const Details = () => {
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
 
-  type PojectCard = {
+  type ProjectCard = {
     id: number;
     start_date: string;
     end_date: string;
@@ -65,7 +65,7 @@ const Details = () => {
   };
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const data: Array<PojectCard> = [
+  const data: Array<ProjectCard> = [
     {
       id: 1,
       title: '法人電話営業',
@@ -261,7 +261,7 @@ const Details = () => {
   ];
   const [sortBy] = useState('Default');
   const [globalFilter] = useState('');
-  const [userCard, setUserCard] = useState<Array<PojectCard>>([]);
+  const [userCard, setUserCard] = useState<Array<ProjectCard>>([]);
   const PER_PAGE = 6;
 
   const _DATA = usePagination(userCard, PER_PAGE);
@@ -281,13 +281,13 @@ const Details = () => {
   if (loading) return <Loader />;
 
   return (
-    <Page title="Invoice Details">
+    <Page title="SkillSheet">
       <MainCard content={false}>
         <Stack spacing={2.5}>
           <Box sx={{ p: 2.5, pb: 0 }}>
             <MainCard content={false} sx={{ p: 1.25, bgcolor: 'primary.lighter', borderColor: theme.palette.primary[100] }}>
               <Stack direction="row" justifyContent="flex-end" spacing={1}>
-                <IconButton onClick={() => router.push(`/apps/invoice/edit/${id}`)}>
+                <IconButton onClick={() => router.push(`/employee/detail/${id}/skill`)}>
                   <EditOutlined style={{ color: theme.palette.grey[900] }} />
                 </IconButton>
                 <PDFDownloadLink document={<ExportPDFView list={list} />} fileName={`${list?.invoice_id}-${list?.customer_name}.pdf`}>
@@ -303,9 +303,6 @@ const Details = () => {
                   )}
                   content={() => componentRef.current}
                 />
-                <IconButton>
-                  <ShareAltOutlined style={{ color: theme.palette.grey[900] }} />
-                </IconButton>
               </Stack>
             </MainCard>
           </Box>
@@ -355,7 +352,7 @@ const Details = () => {
                         if (sortBy === 'Status') return a.status.localeCompare(b.status);
                         return a;
                       })
-                      .map((user: PojectCard, index: number) => (
+                      .map((user: ProjectCard, index: number) => (
                         <Slide key={index} direction="up" in={true} timeout={50}>
                           <Grid item xs={12}>
                             <CustomerCard customer={user} />
@@ -385,8 +382,8 @@ const Details = () => {
   );
 };
 
-Details.getLayout = function getLayout(page: ReactElement) {
+SkillSheet.getLayout = function getLayout(page: ReactElement) {
   return <Layout>{page}</Layout>;
 };
 
-export default Details;
+export default SkillSheet;
