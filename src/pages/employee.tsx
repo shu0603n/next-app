@@ -233,6 +233,9 @@ const CustomerEmployeePage = () => {
   const handleChange = (newValue: string) => {
     router.push(`/employee/${newValue}/basic`);
   };
+  const handleChange2 = (newValue: string) => {
+    router.push(`/skill-sheet/${newValue}`);
+  };
 
   const columns = useMemo(
     () => [
@@ -311,7 +314,7 @@ const CustomerEmployeePage = () => {
           );
           return (
             <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
-              <Tooltip title="View">
+              <Tooltip title="詳細">
                 <IconButton
                   color="secondary"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
@@ -321,7 +324,17 @@ const CustomerEmployeePage = () => {
                   {collapseIcon}
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Delete">
+              <Tooltip title="スキルシート">
+                <IconButton
+                  color="secondary"
+                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                    handleChange2(row.values.id);
+                  }}
+                >
+                  {collapseIcon}
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="削除">
                 <IconButton
                   color="error"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
