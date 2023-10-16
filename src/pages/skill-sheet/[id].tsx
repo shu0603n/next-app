@@ -2,7 +2,6 @@ import { ReactElement, useEffect, useState, useRef } from 'react';
 // next
 import { useRouter } from 'next/router';
 
-import { UserCardProps } from 'types/user-profile';
 import usePagination from 'hooks/usePagination';
 import CustomerCard from 'sections/apps/employee/skill-sheet/CustomerCard';
 import EmptyUserCard from 'components/cards/skeleton/EmptyUserCard';
@@ -52,8 +51,21 @@ const Details = () => {
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
 
+  type PojectCard = {
+    id: number;
+    start_date: string;
+    end_date: string;
+    people: number;
+    client: string;
+    title: string;
+    description: string;
+    skills: string[];
+    process: string[];
+    time: string;
+  };
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const data = [
+  const data: Array<PojectCard> = [
     {
       id: 1,
       title: '法人電話営業',
@@ -66,7 +78,7 @@ const Details = () => {
       ・8人規模のチームの教育`,
       skills: ['Windows 7'],
       process: ['企画設計', '運用・保守'],
-      time: ['※1 day ago']
+      time: ''
     },
     {
       id: 2,
@@ -79,7 +91,7 @@ const Details = () => {
       ・顧客のインフラ環境構築、整備`,
       skills: ['Windows 7', 'Windows 10', 'VBA(Excel)'],
       process: ['企画設計', '運用・保守', 'その他'],
-      time: []
+      time: ''
     },
     {
       id: 3,
@@ -114,7 +126,7 @@ const Details = () => {
         'Oracle Database'
       ],
       process: ['企画設計', '要件定義', '基本設計', '詳細設計', 'プログラミング', 'テスト・評価', '運用・保守'],
-      time: []
+      time: ''
     },
     {
       id: 4,
@@ -138,7 +150,7 @@ const Details = () => {
       予約管理については、Googleカレンダー上の予定をシステムに反映させるためGoogleAPIを利用。`,
       skills: ['Python', 'HTML', 'JavaScript', 'jQuery', 'Flask', 'Vue.JS', 'Visual Studio Code', 'Windows 11', 'PostgreSQL'],
       process: ['企画設計', '要件定義', '基本設計', '詳細設計', 'プログラミング', 'テスト・評価', '運用・保守'],
-      time: []
+      time: ''
     },
     {
       id: 5,
@@ -156,7 +168,7 @@ const Details = () => {
       ⇒マイグレーション計画から総合テストまで。`,
       skills: ['Java', 'JavaScript', 'PL/SQL', 'SQL', 'Windows 10', 'Oracle Database', 'ストアドプロシ－ジャ', 'PostgreSQL'],
       process: ['調査・分析', '要件定義', '基本設計', '詳細設計', 'プログラミング', 'テスト・評価', '運用・保守', 'その他'],
-      time: []
+      time: ''
     },
     {
       id: 6,
@@ -188,7 +200,7 @@ const Details = () => {
       　 ソース内から指定パターンで置換を行うツールの作成。`,
       skills: ['Python', 'JavaScript', 'VBA(Excel)', 'Vue.js', 'Flask', 'Bat', 'selenium', 'Windows 11', 'PostgreSQL'],
       process: ['調査・分析', '基本設計', '詳細設計', 'プログラミング'],
-      time: []
+      time: ''
     },
     {
       id: 7,
@@ -226,7 +238,7 @@ const Details = () => {
         'PostgreSQL'
       ],
       process: ['調査・分析', '基本設計', 'プログラミング', 'テスト・評価'],
-      time: []
+      time: ''
     },
     {
       id: 8,
@@ -244,12 +256,12 @@ const Details = () => {
       ・Figmaを元にスタイル適用し、レスポンシブ対応の追加`,
       skills: ['TypeScripte', 'React', 'CSS', 'Figma', 'Windows 10', 'Ubuntu'],
       process: ['調査・分析', '基本設計', 'プログラミング', 'テスト・評価'],
-      time: []
+      time: ''
     }
   ];
   const [sortBy] = useState('Default');
   const [globalFilter] = useState('');
-  const [userCard, setUserCard] = useState([]);
+  const [userCard, setUserCard] = useState<Array<PojectCard>>([]);
   const PER_PAGE = 6;
 
   const _DATA = usePagination(userCard, PER_PAGE);
@@ -345,7 +357,7 @@ const Details = () => {
                         if (sortBy === 'Status') return a.status.localeCompare(b.status);
                         return a;
                       })
-                      .map((user: UserCardProps, index: number) => (
+                      .map((user: PojectCard, index: number) => (
                         <Slide key={index} direction="up" in={true} timeout={50}>
                           <Grid item xs={12}>
                             <CustomerCard customer={user} />
