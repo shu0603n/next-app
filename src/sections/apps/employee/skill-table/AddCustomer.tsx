@@ -256,7 +256,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             <Divider />
             <DialogContent sx={{ p: 2.5 }}>
               <Grid container spacing={3}>
-                <Grid item xs={12} md={8}>
+                <Grid item xs={12}>
                   <Grid container spacing={3}>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
