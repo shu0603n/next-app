@@ -13,9 +13,9 @@ import MainCard from 'components/MainCard';
 import TabProfile from 'sections/apps/employee/TabProfile';
 import TabPersonal from 'sections/apps/employee/TabPersonal';
 import TabSkill from 'sections/apps/employee/TabSkill';
+import TabInvoice from 'sections/apps/employee/TabInvoice';
 import TabAccount from 'sections/apps/employee/TabAccount';
 import TabPassword from 'sections/apps/employee/TabPassword';
-import TabRole from 'sections/apps/employee/TabRole';
 import TabSettings from 'sections/apps/employee/TabSettings';
 
 // assets
@@ -42,9 +42,9 @@ const EmployeeDetail = () => {
             <Tab label="プロフィール" icon={<UserOutlined />} value="basic" iconPosition="start" />
             <Tab label="詳細情報" icon={<FileTextOutlined />} value="personal" iconPosition="start" />
             <Tab label="スキル一覧" icon={<FileTextOutlined />} value="skill" iconPosition="start" />
+            <Tab label="請求一覧" icon={<FileTextOutlined />} value="invoice" iconPosition="start" />
             <Tab label="アカウント情報" icon={<ContainerOutlined />} value="my-account" iconPosition="start" />
             <Tab label="パスワード変更" icon={<LockOutlined />} value="password" iconPosition="start" />
-            <Tab label="権限" icon={<TeamOutlined />} value="role" iconPosition="start" />
             <Tab label="設定" icon={<SettingOutlined />} value="settings" iconPosition="start" />
           </Tabs>
         </Box>
@@ -52,9 +52,9 @@ const EmployeeDetail = () => {
           {tab === 'basic' && <TabProfile />}
           {tab === 'personal' && <TabPersonal />}
           {tab === 'skill' && <TabSkill />}
+          {tab === 'invoice' && <TabInvoice />}
           {tab === 'my-account' && <TabAccount />}
           {tab === 'password' && <TabPassword />}
-          {tab === 'role' && <TabRole />}
           {tab === 'settings' && <TabSettings />}
         </Box>
       </MainCard>
