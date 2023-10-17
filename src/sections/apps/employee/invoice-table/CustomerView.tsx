@@ -7,11 +7,11 @@ import MainCard from 'components/MainCard';
 import Transitions from 'components/@extended/Transitions';
 
 // アセット
-import { SkillTableType, skill } from 'types/employee/skill-table';
+import { InvoiceTableType } from 'types/employee/invoice-table';
 
 // ==============================|| 顧客 - 表示 ||============================== //
 interface Props {
-  data: SkillTableType;
+  data: InvoiceTableType;
 }
 const CustomerView = ({ data }: Props) => {
   const theme = useTheme();
@@ -30,20 +30,26 @@ const CustomerView = ({ data }: Props) => {
                       <Grid container spacing={3}>
                         <Grid item xs={12} md={6}>
                           <Stack spacing={0.5}>
+                            <Typography color="secondary">請求日</Typography>
+                            <Typography>{data.invoice_date}</Typography>
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">契約期間</Typography>
+                            <Typography>{`${data.start_date}～${data.end_date}`}</Typography>
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                          <Stack spacing={0.5}>
                             <Typography color="secondary">プロジェクト名</Typography>
-                            <Typography>{data.project_title}</Typography>
+                            <Typography>{data.project_name}</Typography>
                           </Stack>
                         </Grid>
                         <Grid item xs={12} md={6}>
                           <Stack spacing={0.5}>
                             <Typography color="secondary">会社名</Typography>
                             <Typography>{data.client_name}</Typography>
-                          </Stack>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">業務内容</Typography>
-                            <Typography>{data.description}</Typography>
                           </Stack>
                         </Grid>
                       </Grid>
@@ -55,31 +61,28 @@ const CustomerView = ({ data }: Props) => {
                     <Grid item xs={12}>
                       <Stack direction="row" justifyContent="space-around" alignItems="center">
                         <Stack spacing={0.5} alignItems="center">
-                          <Typography color="secondary">期間</Typography>
-                          <Typography variant="h5">{data.people_number}ヵ月</Typography>
+                          <Typography color="secondary">契約単価</Typography>
+                          <Typography variant="h5">{data.contract_price}円</Typography>
                         </Stack>
                         <Divider orientation="vertical" flexItem />
                         <Stack spacing={0.5} alignItems="center">
-                          <Typography color="secondary">役割</Typography>
-                          <Typography variant="h5">{data.people_number}</Typography>
+                          <Typography color="secondary">稼働時間</Typography>
+                          <Typography variant="h5">{data.working_hours}h</Typography>
                         </Stack>
                         <Divider orientation="vertical" flexItem />
                         <Stack spacing={0.5} alignItems="center">
-                          <Typography color="secondary">人数</Typography>
-                          <Typography variant="h5">{data.people_number}人</Typography>
+                          <Typography color="secondary">請求金額</Typography>
+                          <Typography variant="h5">{data.invoice_amount}円</Typography>
+                        </Stack>
+                        <Divider orientation="vertical" flexItem />
+                        <Stack spacing={0.5} alignItems="center">
+                          <Typography color="secondary">支払い状況</Typography>
+                          <Typography variant="h5">{data.payment_flg ? '済' : '未'}</Typography>
                         </Stack>
                       </Stack>
                     </Grid>
                   </Grid>
                 </MainCard>
-                {data.skill && data.skill.length > 0 && (
-                  <MainCard title="使用スキル">
-                    {data.skill?.map((item: skill) => {
-                      // eslint-disable-next-line react/jsx-key
-                      return <Typography color="secondary">{`${item.name} (${item.technic_name})`}</Typography>;
-                    })}
-                  </MainCard>
-                )}
               </Stack>
             </Grid>
           </Grid>
