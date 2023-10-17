@@ -1,78 +1,227 @@
-import { ReactElement, useEffect, useState } from 'react';
+import { useEffect, useRef, useState, ReactElement } from 'react';
 
 // material-ui
-import { Typography } from '@mui/material';
+import { Theme } from '@mui/material/styles';
+import { useMediaQuery, Box, Dialog, SpeedDial, Tooltip, Grid, useTheme } from '@mui/material';
+import HoverSocialCard from 'components/cards/statistics/HoverSocialCard';
 
-// project imports
+// third-party
+import FullCalendar from '@fullcalendar/react';
+import { DateSelectArg, EventClickArg, EventDropArg, EventSourceInput } from '@fullcalendar/core';
+import interactionPlugin, { EventResizeDoneArg } from '@fullcalendar/interaction';
+import listPlugin from '@fullcalendar/list';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import timelinePlugin from '@fullcalendar/timeline';
+
+// project import
 import Layout from 'layout';
 import Page from 'components/Page';
-import MainCard from 'components/MainCard';
+import Loader from 'components/Loader';
+import { PopupTransition } from 'components/@extended/Transitions';
+import CalendarStyled from 'sections/apps/calendar/CalendarStyled';
+import Toolbar from 'sections/apps/calendar/Toolbar';
+import AddEventForm from 'sections/apps/calendar/AddEventForm';
 
-async function fetchTableData() {
-  try {
-    const response = await fetch('/api/getTable?tableName=Users');
-    if (!response.ok) {
-      throw new Error('API request failed');
-    }
-    const data = await response.json();
-    return data; // APIから返されたデータを返します
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-}
+import { dispatch, useSelector } from 'store';
+import { getEvents, selectEvent, selectRange, toggleModal, updateCalendarView, updateEvent } from 'store/reducers/calendar';
 
-// ==============================|| SAMPLE PAGE ||============================== //
+// types
+import { PlusOutlined } from '@ant-design/icons';
+
+// ==============================|| CALENDAR - MAIN ||============================== //
 
 const Top = () => {
-  const [tableData, setTableData] = useState<dbResponse>(); // データを保持する状態変数
+  const theme = useTheme();
+  const matchDownSM = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const { calendarView, events, isModalOpen, selectedRange } = useSelector((state) => state.calendar);
+  const selectedEvent = useSelector((state) => {
+    const { events, selectedEventId } = state.calendar;
+    if (selectedEventId) {
+      return events.find((event) => event.id === selectedEventId);
+    }
+    return null;
+  });
+
+  const calendarRef = useRef<FullCalendar>(null);
 
   useEffect(() => {
-    // ページがロードされたときにデータを取得
-    fetchTableData()
-      .then((data) => {
-        setTableData(data); // データを状態に設定
-      })
-      .catch((error) => {
-        // エラーハンドリング
-        console.error('Error:', error);
-      });
-  }, []); // 空の依存リストを指定することで、一度だけ実行される
+    const newView = matchDownSM ? 'listWeek' : 'dayGridMonth';
+    const viewCall = dispatch(updateCalendarView(newView));
+    const eventCall = dispatch(getEvents());
+    Promise.all([viewCall, eventCall]).then(() => setLoading(false));
+    // eslint-disable-next-line
+  }, []);
 
-  type dbResponse = {
-    data: sqlResult;
-  };
-  type sqlResult = {
-    command: string;
-    fields: Array<any>;
-    rowAsArray: boolean;
-    rowCount: number;
-    rows: Array<Param>;
-    viaNeonFetch: boolean;
+  useEffect(() => {
+    const calendarEl = calendarRef.current;
+    if (calendarEl) {
+      const calendarApi = calendarEl.getApi();
+      const newView = matchDownSM ? 'listWeek' : 'dayGridMonth';
+      calendarApi.changeView(newView);
+      dispatch(updateCalendarView(newView));
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchDownSM]);
+
+  const [date, setDate] = useState(new Date());
+
+  // calendar toolbar events
+  const handleDateToday = () => {
+    const calendarEl = calendarRef.current;
+
+    if (calendarEl) {
+      const calendarApi = calendarEl.getApi();
+
+      calendarApi.today();
+      setDate(calendarApi.getDate());
+    }
   };
 
-  type Param = {
-    id: string;
-    name: string;
+  const handleViewChange = (newView: string) => {
+    const calendarEl = calendarRef.current;
+
+    if (calendarEl) {
+      const calendarApi = calendarEl.getApi();
+
+      calendarApi.changeView(newView);
+      dispatch(updateCalendarView(newView));
+    }
   };
+
+  const handleDatePrev = () => {
+    const calendarEl = calendarRef.current;
+
+    if (calendarEl) {
+      const calendarApi = calendarEl.getApi();
+
+      calendarApi.prev();
+      setDate(calendarApi.getDate());
+    }
+  };
+
+  const handleDateNext = () => {
+    const calendarEl = calendarRef.current;
+
+    if (calendarEl) {
+      const calendarApi = calendarEl.getApi();
+
+      calendarApi.next();
+      setDate(calendarApi.getDate());
+    }
+  };
+
+  // calendar events
+  const handleRangeSelect = (arg: DateSelectArg) => {
+    const calendarEl = calendarRef.current;
+    if (calendarEl) {
+      const calendarApi = calendarEl.getApi();
+      calendarApi.unselect();
+    }
+
+    dispatch(selectRange(arg.start, arg.end));
+  };
+
+  const handleEventSelect = (arg: EventClickArg) => {
+    dispatch(selectEvent(arg.event.id));
+  };
+
+  const handleEventUpdate = async ({ event }: EventResizeDoneArg | EventDropArg) => {
+    try {
+      dispatch(
+        updateEvent(event.id, {
+          allDay: event.allDay,
+          start: event.start,
+          end: event.end
+        })
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleModal = () => {
+    dispatch(toggleModal());
+  };
+
+  if (loading) return <Loader />;
 
   return (
-    <Page title="Sample Page">
-      <MainCard title="Sample Card">
-        <Typography variant="body2">
-          {/* データをマップして表示 */}
-          <p>-----------テーブル------------</p>
-          {tableData?.data.rows.map((item) => (
-            // <div key={item.user_id}>{item.email}</div>
-            <p key={item.id}>
-              {item.id} {item.name}
-            </p>
-          ))}
-        </Typography>
-      </MainCard>
+    <Page title="Calendar">
+      <Grid container rowSpacing={4.5} columnSpacing={2.75}>
+        <Grid item xs={12} sx={{ mb: -2.25 }}>
+          <Grid item xs={12} lg={3} sm={6}>
+            <HoverSocialCard primary="9:00" secondary="出勤" color={theme.palette.primary.main} />
+          </Grid>
+          <Grid item xs={12} lg={3} sm={6}>
+            <HoverSocialCard primary="18:00" secondary="退勤" color={theme.palette.error.main} />
+          </Grid>
+        </Grid>
+        <Grid item xs={12}>
+          <Box sx={{ position: 'relative' }}>
+            <CalendarStyled>
+              <Toolbar
+                date={date}
+                view={calendarView}
+                onClickNext={handleDateNext}
+                onClickPrev={handleDatePrev}
+                onClickToday={handleDateToday}
+                onChangeView={handleViewChange}
+              />
+
+              <FullCalendar
+                weekends
+                editable
+                droppable
+                selectable
+                events={events as EventSourceInput}
+                ref={calendarRef}
+                rerenderDelay={10}
+                initialDate={date}
+                initialView={calendarView}
+                dayMaxEventRows={3}
+                eventDisplay="block"
+                headerToolbar={false}
+                allDayMaintainDuration
+                eventResizableFromStart
+                select={handleRangeSelect}
+                eventDrop={handleEventUpdate}
+                eventClick={handleEventSelect}
+                eventResize={handleEventUpdate}
+                height={matchDownSM ? 'auto' : 720}
+                plugins={[listPlugin, dayGridPlugin, timelinePlugin, timeGridPlugin, interactionPlugin]}
+              />
+            </CalendarStyled>
+
+            {/* Dialog renders its body even if not open */}
+            <Dialog
+              maxWidth="sm"
+              TransitionComponent={PopupTransition}
+              fullWidth
+              onClose={handleModal}
+              open={isModalOpen}
+              sx={{ '& .MuiDialog-paper': { p: 0 } }}
+            >
+              <AddEventForm event={selectedEvent} range={selectedRange} onCancel={handleModal} />
+            </Dialog>
+            <Tooltip title="Add New Event">
+              <SpeedDial
+                ariaLabel="add-event-fab"
+                sx={{ display: 'inline-flex', position: 'sticky', bottom: 24, left: '100%', transform: 'translate(-50%, -50% )' }}
+                icon={<PlusOutlined style={{ fontSize: '1.5rem' }} />}
+                onClick={handleModal}
+              />
+            </Tooltip>
+          </Box>
+        </Grid>
+      </Grid>
     </Page>
   );
 };
+
 Top.getLayout = function getLayout(page: ReactElement) {
   return <Layout>{page}</Layout>;
 };
