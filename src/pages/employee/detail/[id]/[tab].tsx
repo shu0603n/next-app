@@ -19,7 +19,7 @@ import TabPassword from 'sections/apps/employee/TabPassword';
 import TabSettings from 'sections/apps/employee/TabSettings';
 
 // assets
-import { ContainerOutlined, FileTextOutlined, LockOutlined, SettingOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
+import { ContainerOutlined, FileTextOutlined, LockOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 
 // ==============================|| PROFILE - ACCOUNT ||============================== //
 
