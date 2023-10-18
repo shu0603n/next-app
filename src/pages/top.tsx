@@ -47,6 +47,52 @@ import { renderFilterTypes } from 'utils/react-table';
 // assets
 import { EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 
+function getDaysInMonth(year: number, month: number): number {
+  return new Date(year, month, 0).getDate();
+}
+
+export const processAttendanceData = (attendanceData: AttendanceType[]): Array<AttendanceType> => {
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1;
+  const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+
+  const result: Record<string, AttendanceType> = {};
+
+  for (let i = 1; i <= daysInMonth; i++) {
+    const currentDateStr = new Date(currentYear, currentMonth - 1, i); // 日付を Date 型に保持
+    const formattedDate = `${currentDateStr.getFullYear()}/${(currentDateStr.getMonth() + 1).toString().padStart(2, '0')}/${currentDateStr
+      .getDate()
+      .toString()
+      .padStart(2, '0')}`;
+
+    const matchingRecord = attendanceData.find((record) => {
+      // 文字列から Date オブジェクトに変換
+      const recordDate = new Date(record.date);
+      const recordDateString = `${recordDate.getFullYear()}/${(recordDate.getMonth() + 1).toString().padStart(2, '0')}/${recordDate
+        .getDate()
+        .toString()
+        .padStart(2, '0')}`;
+      return recordDateString === formattedDate;
+    });
+
+    if (matchingRecord) {
+      result[formattedDate] = matchingRecord;
+    } else {
+      result[formattedDate] = {
+        employee_id: 0, // Replace with the appropriate default value
+        date: formattedDate,
+        start_time: '',
+        end_time: '',
+        location: ''
+      };
+    }
+  }
+  console.log(Object.values(result));
+
+  return Object.values(result);
+};
+
 // ==============================|| REACT TABLE ||============================== //
 
 // Propsインターフェース
@@ -506,7 +552,7 @@ const Top = () => {
           <ScrollX>
             <ReactTable
               columns={columns}
-              data={tableData}
+              data={processAttendanceData(tableData)}
               handleAdd={handleAdd}
               getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
             />
