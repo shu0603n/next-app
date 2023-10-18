@@ -224,14 +224,21 @@ const Top = () => {
   const [endTime, setEndTime] = useState<string>();
   const [currentTime, setCurrentTime] = useState<string>(getNow()); // 現在時刻のステート
 
+  function getDayOfWeek(date: Date) {
+    const daysOfWeek = ['日', '月', '火', '水', '木', '金', '土'];
+    const dayIndex = date.getDay();
+    return daysOfWeek[dayIndex];
+  }
+
   function getNow() {
     const now = new Date();
-    const formattedTime = now.toLocaleString('ja-JP', {
-      timeZone: 'Asia/Tokyo',
-      hour: 'numeric',
-      minute: 'numeric',
-      second: 'numeric'
-    });
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    const dayOfWeek = getDayOfWeek(now);
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const formattedTime = `${year}/${month}/${day}(${dayOfWeek}) ${hours}:${minutes}`;
     return formattedTime;
   }
 
@@ -264,10 +271,9 @@ const Top = () => {
     // 時、分、秒を取得
     const hours = now.getHours();
     const minutes = now.getMinutes();
-    const seconds = now.getSeconds();
 
     // データベースに挿入する形式に整形
-    const timeString = `${hours}:${minutes}:${seconds}`;
+    const timeString = `${hours}:${minutes}`;
 
     const updatedData = {
       employee_id: 1,
@@ -339,10 +345,9 @@ const Top = () => {
     // 時、分、秒を取得
     const hours = now.getHours();
     const minutes = now.getMinutes();
-    const seconds = now.getSeconds();
 
     // データベースに挿入する形式に整形
-    const timeString = `${hours}:${minutes}:${seconds}`;
+    const timeString = `${hours}:${minutes}`;
 
     const updatedData = {
       employee_id: 1,
@@ -467,7 +472,7 @@ const Top = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [theme]
   );
-
+  console.log(tableData);
   return (
     <Page title="Top">
       <Grid container spacing={3}>
@@ -475,13 +480,24 @@ const Top = () => {
           <ReportCard primary={currentTime} secondary="現在時刻" color={theme.palette.secondary.main} iconPrimary={ClockCircleOutlined} />
         </Grid>
         <Grid item xs={6}>
-          <div onClick={workStart}>
-            <HoverSocialCard primary="出勤" secondary={startTime ?? '打刻なし'} color={theme.palette.primary.main} />
-          </div>
+          {startTime ? (
+            <HoverSocialCard primary="出勤済み" secondary={startTime} color={theme.palette.grey[500]} />
+          ) : (
+            <div onClick={workStart}>
+              <HoverSocialCard primary="出勤" secondary={'打刻なし'} color={theme.palette.primary.main} />
+            </div>
+          )}
         </Grid>
         <Grid item xs={6}>
+          {endTime ? (
+            <HoverSocialCard primary="退勤済み" secondary={endTime} color={theme.palette.grey[500]} />
+          ) : (
+            <div onClick={workEnd}>
+              <HoverSocialCard primary="退勤" secondary={'打刻なし'} color={theme.palette.warning.main} />
+            </div>
+          )}
           <div onClick={workEnd}>
-            <HoverSocialCard primary="退勤" secondary={endTime ?? '打刻なし'} color={theme.palette.error.main} />
+            <HoverSocialCard primary="退勤" secondary={'打刻なし'} color={theme.palette.warning.main} />
           </div>
         </Grid>
       </Grid>
