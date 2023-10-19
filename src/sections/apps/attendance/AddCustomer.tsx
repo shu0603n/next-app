@@ -45,7 +45,7 @@ import { AttendanceType } from 'types/attendance/attendance';
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
   const newCustomer = {
-    employee_id: 1, //セッションユーザーから取得する
+    employee_id: 0, //セッションユーザーから取得する
     date: '',
     start_time: '',
     end_time: '',
@@ -81,9 +81,6 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   const CustomerSchema = Yup.object().shape({
     start_time: Yup.string().max(255).required('Name is required'),
     end_time: Yup.string().max(255).required('Name is required')
-    // orderStatus: Yup.string().required('Status is required'),
-    // email: Yup.string().max(255).required('Email is required').email('Must be a valid email'),
-    // location: Yup.string().max(500)
   });
 
   const [openAlert, setOpenAlert] = useState(false);
@@ -91,9 +88,6 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   const handleAlertClose = () => {
     setOpenAlert(!openAlert);
     onCancel();
-  };
-  const handleClear = () => {
-    console.log('clear');
   };
 
   const formik = useFormik({
@@ -153,7 +147,6 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               })
             );
           });
-        handleClear();
         setSubmitting(false);
         onCancel();
       } catch (error) {
@@ -201,8 +194,6 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                             placeholder="start_time"
                             error={Boolean(touched.start_time && errors.start_time)}
                             helperText={touched.start_time && errors.start_time}
-                            // onBlur={() => {}}
-                            // onChange={() => {}}
                           />
                         </Stack>
                       </Stack>
@@ -221,8 +212,6 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                             placeholder="end_time"
                             error={Boolean(touched.end_time && errors.end_time)}
                             helperText={touched.end_time && errors.end_time}
-                            // onBlur={() => {}}
-                            // onChange={() => {}}
                           />
                         </Stack>
                       </Stack>
