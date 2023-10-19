@@ -21,7 +21,6 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import { PatternFormat } from 'react-number-format';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -45,7 +44,7 @@ import { AttendanceType } from 'types/attendance/attendance';
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
   const newCustomer = {
-    employee_id: 0, //セッションユーザーから取得する
+    employee_id: 1, //セッションユーザーから取得する
     date: '',
     start_time: '',
     end_time: '',
@@ -172,8 +171,8 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                         <InputLabel htmlFor="customer-date">日付</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-date"
-                          placeholder="Enter Customer date"
+                          id="date"
+                          placeholder="date"
                           {...getFieldProps('date')}
                           error={Boolean(touched.date && errors.date)}
                           helperText={touched.date && errors.date}
@@ -181,37 +180,39 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                       </Stack>
                     </Grid>
                     <Grid item xs={6}>
-                    <Stack spacing={1.25}>
+                      <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-start_time">開始時刻</InputLabel>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
-                          <PatternFormat
-                            id="customer-start_time"
-                            format="##:##"
-                            mask="_"
-                            fullWidth
-                            customInput={TextField}
-                            {...getFieldProps('start_time')}
+                          <TextField
+                            id="start_time"
                             placeholder="start_time"
-                            error={Boolean(touched.start_time && errors.start_time)}
-                            helperText={touched.start_time && errors.start_time}
+                            type="time"
+                            {...getFieldProps('start_time')}
+                            InputLabelProps={{
+                              shrink: true
+                            }}
+                            inputProps={{
+                              step: 300 // 5 min
+                            }}
                           />
                         </Stack>
                       </Stack>
                     </Grid>
                     <Grid item xs={6}>
-                    <Stack spacing={1.25}>
+                      <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-end_time">終了時刻</InputLabel>
                         <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
-                          <PatternFormat
-                            id="customer-end_time"
-                            format="##:##"
-                            mask="_"
-                            fullWidth
-                            customInput={TextField}
-                            {...getFieldProps('end_time')}
+                          <TextField
+                            id="end_time"
                             placeholder="end_time"
-                            error={Boolean(touched.end_time && errors.end_time)}
-                            helperText={touched.end_time && errors.end_time}
+                            type="time"
+                            {...getFieldProps('end_time')}
+                            InputLabelProps={{
+                              shrink: true
+                            }}
+                            inputProps={{
+                              step: 300 // 5 min
+                            }}
                           />
                         </Stack>
                       </Stack>
@@ -257,7 +258,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               <Grid container justifyContent="space-between" alignItems="center">
                 <Grid item>
                   {!isCreating && (
-                    <Tooltip title="Delete Customer" placement="top">
+                    <Tooltip title="勤怠情報削除" placement="top">
                       <IconButton onClick={() => setOpenAlert(true)} size="large" color="error">
                         <DeleteFilled />
                       </IconButton>
@@ -280,7 +281,13 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
         </LocalizationProvider>
       </FormikProvider>
       {!isCreating && (
-        <AlertCustomerDelete employee_id={'1'} date={'2023/10/19'} open={openAlert} handleClose={handleAlertClose} onReload={onReload} />
+        <AlertCustomerDelete
+          employee_id={customer.employee_id}
+          date={customer.date}
+          open={openAlert}
+          handleClose={handleAlertClose}
+          onReload={onReload}
+        />
       )}
     </>
   );
