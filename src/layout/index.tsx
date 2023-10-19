@@ -58,7 +58,7 @@ const MainLayout = ({ children }: Props) => {
             flexDirection: 'column'
           }}
         >
-          <Breadcrumbs icon title navigation={navigation} titleBottom card={false} divider={false} />
+          <Breadcrumbs navigation={navigation} title titleBottom card={false} divider={false} />
           {children}
           <Footer />
         </Container>
