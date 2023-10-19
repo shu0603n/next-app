@@ -40,12 +40,11 @@ import { PopupTransition } from 'components/@extended/Transitions';
 import { CSVExport, HeaderSort, TablePagination, TableRowSelection } from 'components/third-party/ReactTable';
 
 // import AddCustomer from 'sections/apps/parameter/skill/AddCustomer';
-// import AlertCustomerDelete from 'sections/apps/parameter/skill/AlertCustomerDelete';
 
 import { renderFilterTypes } from 'utils/react-table';
 
 // assets
-import { EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
+import { EditTwoTone } from '@ant-design/icons';
 
 function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
@@ -88,7 +87,6 @@ export const processAttendanceData = (attendanceData: AttendanceType[]): Array<A
       };
     }
   }
-  console.log(Object.values(result));
 
   return Object.values(result);
 };
@@ -127,7 +125,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10 }
+      initialState: { pageIndex: 0, pageSize: 50 }
     },
     useGlobalFilter,
     useFilters,
@@ -282,9 +280,10 @@ const Top = () => {
     const month = now.getMonth() + 1;
     const day = now.getDate();
     const dayOfWeek = getDayOfWeek(now);
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const formattedTime = `${year}/${month}/${day}(${dayOfWeek}) ${hours}:${minutes}`;
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    const formattedTime = `${year}/${month}/${day}(${dayOfWeek}) ${hours}:${minutes}:${seconds}`;
     return formattedTime;
   }
 
@@ -447,9 +446,7 @@ const Top = () => {
         );
       });
   };
-  const [open, setOpen] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
-  const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
 
   const handleAdd = () => {
@@ -457,9 +454,6 @@ const Top = () => {
     if (customer && !add) setCustomer(null);
   };
 
-  const handleClose = () => {
-    setOpen(!open);
-  };
 
   const columns = useMemo(
     () => [
@@ -498,19 +492,6 @@ const Top = () => {
                   <EditTwoTone twoToneColor={theme.palette.primary.main} />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="削除">
-                <IconButton
-                  color="error"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    handleClose();
-                    setCustomerDeleteId(row.values.id);
-                    console.log(customerDeleteId);
-                  }}
-                >
-                  <DeleteTwoTone twoToneColor={theme.palette.error.main} />
-                </IconButton>
-              </Tooltip>
             </Stack>
           );
         }
@@ -519,7 +500,6 @@ const Top = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [theme]
   );
-  console.log(tableData);
   return (
     <Page title="Top">
       <Grid container spacing={3}>
@@ -543,9 +523,6 @@ const Top = () => {
               <HoverSocialCard primary="退勤" secondary={'打刻なし'} color={theme.palette.warning.main} />
             </div>
           )}
-          <div onClick={workEnd}>
-            <HoverSocialCard primary="退勤" secondary={'打刻なし'} color={theme.palette.warning.main} />
-          </div>
         </Grid>
       </Grid>
       {tableData && (
@@ -558,7 +535,6 @@ const Top = () => {
               getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
             />
           </ScrollX>
-          {/* <AlertCustomerDelete id={customerDeleteId} open={open} handleClose={handleClose} onReload={setTableData} /> */}
           <Dialog
             maxWidth="sm"
             TransitionComponent={PopupTransition}
