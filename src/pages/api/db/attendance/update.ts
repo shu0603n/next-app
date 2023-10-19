@@ -14,7 +14,16 @@ export default async function handler(request: NextApiRequest, response: NextApi
     if (!employee_id || !date) {
       throw new Error('パラメーターが不足しています');
     }
-
+    console.log(`
+      UPDATE attendance
+      SET
+        start_time = ${toNull(start_time)},
+        end_time = ${toNull(end_time)},
+        location = ${toNull(location)}
+      WHERE
+        employee_id = ${Number(employee_id)} AND
+        date = ${toNull(date)}
+      `);
     // 既存のデータをUPDATE
     const updateResult = await sql`
       UPDATE attendance
