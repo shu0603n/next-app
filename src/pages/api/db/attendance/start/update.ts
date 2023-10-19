@@ -45,7 +45,11 @@ export default async function handler(request: NextApiRequest, response: NextApi
 
     const data = await sql`
       SELECT 
-        *
+        employee_id,
+        TO_CHAR(date, 'YYYY/MM/DD') AS date,
+        TO_CHAR(start_time, 'HH24:MI') AS start_time,
+        TO_CHAR(end_time, 'HH24:MI') AS end_time,
+        location
       FROM 
         attendance
       WHERE 
