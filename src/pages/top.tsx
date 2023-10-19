@@ -39,7 +39,7 @@ import {
 import { PopupTransition } from 'components/@extended/Transitions';
 import { CSVExport, HeaderSort, TablePagination, TableRowSelection } from 'components/third-party/ReactTable';
 
-// import AddCustomer from 'sections/apps/parameter/skill/AddCustomer';
+import AddCustomer from 'sections/apps/attendance/AddCustomer';
 
 import { renderFilterTypes } from 'utils/react-table';
 
@@ -545,7 +545,7 @@ const Top = () => {
             sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
             aria-describedby="alert-dialog-slide-description"
           >
-            {/* <AddCustomer customer={customer} onCancel={handleAdd} onReload={setTableData} /> */}
+            <AddCustomer customer={customer} onCancel={handleAdd} onReload={setTableData} />
           </Dialog>
         </>
       )}
