@@ -11,10 +11,6 @@ import AddCustomer from 'sections/apps/customer/AddCustomer';
 import MainCard from 'components/MainCard';
 import { PopupTransition } from 'components/@extended/Transitions';
 
-// assets
-
-// types
-
 // ==============================|| CUSTOMER - CARD ||============================== //
 
 type ProjectCard = {
@@ -64,7 +60,7 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
           <Grid item xs={12}>
             <Divider />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={7}>
             <Grid item xs={12}>
               <Typography variant="h5" component="span">
                 業務内容
@@ -79,7 +75,7 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
               </Typography>
             </Grid>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={5}>
             <Grid item xs={12}>
               <Typography variant="h5" component="span">
                 使用スキル
