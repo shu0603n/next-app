@@ -137,9 +137,9 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
 
   useEffect(() => {
     if (matchDownSM) {
-      setHiddenColumns(['location']);
+      setHiddenColumns(['employee_id', 'location']);
     } else {
-      setHiddenColumns(['location']);
+      setHiddenColumns(['employee_id']);
     }
     // eslint-disable-next-line
   }, [matchDownSM]);
@@ -245,7 +245,6 @@ const Top = () => {
     fetchTableData()
       .then((data) => {
         setTableData(data.data.rows); // データを状態に設定
-        console.log(data.data.rows);
         const now = new Date();
 
         const today = data.data.rows.filter((item: AttendanceType) => {
@@ -454,9 +453,12 @@ const Top = () => {
     if (customer && !add) setCustomer(null);
   };
 
-
   const columns = useMemo(
     () => [
+      {
+        Header: '社員ID',
+        accessor: 'employee_id'
+      },
       {
         Header: '日付',
         accessor: 'date'
@@ -475,11 +477,10 @@ const Top = () => {
       },
       {
         Header: 'アクション',
-        // className: 'cell-right',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           return (
-            <Stack direction="row" alignItems="right" justifyContent="right" spacing={0}>
+            <Stack direction="row" spacing={0}>
               <Tooltip title="編集">
                 <IconButton
                   color="primary"
@@ -502,31 +503,36 @@ const Top = () => {
   );
   return (
     <Page title="Top">
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <ReportCard primary={currentTime} secondary="現在時刻" color={theme.palette.secondary.main} iconPrimary={ClockCircleOutlined} />
-        </Grid>
-        <Grid item xs={6}>
-          {startTime ? (
-            <HoverSocialCard primary="出勤済み" secondary={startTime} color={theme.palette.grey[500]} />
-          ) : (
-            <div onClick={workStart}>
-              <HoverSocialCard primary="出勤" secondary={'打刻なし'} color={theme.palette.primary.main} />
-            </div>
-          )}
-        </Grid>
-        <Grid item xs={6}>
-          {endTime ? (
-            <HoverSocialCard primary="退勤済み" secondary={endTime} color={theme.palette.grey[500]} />
-          ) : (
-            <div onClick={workEnd}>
-              <HoverSocialCard primary="退勤" secondary={'打刻なし'} color={theme.palette.warning.main} />
-            </div>
-          )}
-        </Grid>
-      </Grid>
       {tableData && (
         <>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <ReportCard
+                primary={currentTime}
+                secondary="現在時刻"
+                color={theme.palette.secondary.main}
+                iconPrimary={ClockCircleOutlined}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              {startTime ? (
+                <HoverSocialCard primary="出勤済み" secondary={startTime} color={theme.palette.grey[500]} />
+              ) : (
+                <div onClick={workStart}>
+                  <HoverSocialCard primary="出勤" secondary={'打刻なし'} color={theme.palette.primary.main} />
+                </div>
+              )}
+            </Grid>
+            <Grid item xs={6}>
+              {endTime ? (
+                <HoverSocialCard primary="退勤済み" secondary={endTime} color={theme.palette.grey[500]} />
+              ) : (
+                <div onClick={workEnd}>
+                  <HoverSocialCard primary="退勤" secondary={'打刻なし'} color={theme.palette.warning.main} />
+                </div>
+              )}
+            </Grid>
+          </Grid>
           <ScrollX>
             <ReactTable
               columns={columns}
@@ -545,7 +551,7 @@ const Top = () => {
             sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
             aria-describedby="alert-dialog-slide-description"
           >
-            <AddCustomer customer={customer} onCancel={handleAdd} onReload={setTableData} />
+            {customer && <AddCustomer customer={customer} onCancel={handleAdd} onReload={setTableData} />}
           </Dialog>
         </>
       )}
