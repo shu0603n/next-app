@@ -1,99 +1,70 @@
-import { lazy, Suspense, ReactElement } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, ReactNode } from 'react';
 
 // material-ui
-import { styled } from '@mui/material/styles';
-import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
-import { Container, Toolbar } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { Box, Container, Toolbar, useMediaQuery } from '@mui/material';
 
 // project import
-import ComponentLayout from './ComponentLayout';
-import MainLayout from './MainLayout';
-import AuthGuard from 'utils/route-guard/AuthGuard';
-import GuestGuard from 'utils/route-guard/GuestGuard';
+import Drawer from './Drawer';
+import Header from './Header';
+import Footer from './Footer';
+import HorizontalBar from './Drawer/HorizontalBar';
+import Breadcrumbs from 'components/@extended/Breadcrumbs';
 
-// project import - store
-import { openComponentDrawer } from 'store/reducers/menu';
+import navigation from 'menu-items';
+import useConfig from 'hooks/useConfig';
+import { dispatch } from 'store';
+import { openDrawer } from 'store/reducers/menu';
 
 // types
-import { RootStateProps } from 'types/root';
+import { MenuOrientation } from 'types/config';
 
-const Header = lazy(() => import('./Header'));
-const FooterBlock = lazy(() => import('./FooterBlock'));
-
-// ==============================|| Loader ||============================== //
-
-const LoaderWrapper = styled('div')(({ theme }) => ({
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  zIndex: 2001,
-  width: '100%',
-  '& > * + *': {
-    marginTop: theme.spacing(2)
-  }
-}));
-
-export interface LoaderProps extends LinearProgressProps {}
-
-const Loader = () => (
-  <LoaderWrapper>
-    <LinearProgress color="primary" />
-  </LoaderWrapper>
-);
-
-// ==============================|| LAYOUTS - STRUCTURE ||============================== //
+// ==============================|| MAIN LAYOUT ||============================== //
 
 interface Props {
-  children: ReactElement;
-  variant?: 'main' | 'blank' | 'landing' | 'simple' | 'component' | 'auth';
+  children: ReactNode;
 }
 
-export default function Layout({ variant = 'main', children }: Props) {
-  const dispatch = useDispatch();
+const MainLayout = ({ children }: Props) => {
+  const theme = useTheme();
+  const matchDownXL = useMediaQuery(theme.breakpoints.down('xl'));
+  const downLG = useMediaQuery(theme.breakpoints.down('lg'));
 
-  const menu = useSelector((state: RootStateProps) => state.menu);
-  const { componentDrawerOpen } = menu;
+  const { container, miniDrawer, menuOrientation } = useConfig();
 
-  const handleDrawerOpen = () => {
-    dispatch(openComponentDrawer({ componentDrawerOpen: !componentDrawerOpen }));
-  };
+  const isHorizontal = menuOrientation === MenuOrientation.HORIZONTAL && !downLG;
 
-  if (variant === 'landing' || variant === 'simple') {
-    return (
-      <Suspense fallback={<Loader />}>
-        <Header layout={variant} />
-        {children}
-        <FooterBlock isFull={variant === 'landing'} />
-      </Suspense>
-    );
-  }
-
-  if (variant === 'component') {
-    return (
-      <Suspense fallback={<Loader />}>
-        <Container maxWidth="lg" sx={{ px: { xs: 0, sm: 2 } }}>
-          <Header handleDrawerOpen={handleDrawerOpen} layout="component" />
-          <Toolbar sx={{ my: 2 }} />
-          <ComponentLayout handleDrawerOpen={handleDrawerOpen} componentDrawerOpen={componentDrawerOpen}>
-            {children}
-          </ComponentLayout>
-        </Container>
-      </Suspense>
-    );
-  }
-
-  if (variant === 'blank') {
-    return children;
-  }
-
-  if (variant === 'auth') {
-    return <GuestGuard>{children}</GuestGuard>;
-  }
+  // set media wise responsive drawer
+  useEffect(() => {
+    if (!miniDrawer) {
+      dispatch(openDrawer(!matchDownXL));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchDownXL]);
 
   return (
-    <AuthGuard>
-      <MainLayout>{children}</MainLayout>
-    </AuthGuard>
+    <Box sx={{ display: 'flex', width: '100%' }}>
+      <Header />
+      {!isHorizontal ? <Drawer /> : <HorizontalBar />}
+      <Box component="main" sx={{ width: 'calc(100% - 260px)', flexGrow: 1, p: { xs: 2, sm: 3 } }}>
+        <Toolbar sx={{ mt: isHorizontal ? 8 : 'inherit' }} />
+        <Container
+          maxWidth={container ? 'xl' : false}
+          sx={{
+            ...(container && { px: { xs: 0, sm: 2 } }),
+            position: 'relative',
+            minHeight: 'calc(100vh - 110px)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
+          <Breadcrumbs icon title navigation={navigation} titleBottom card={false} divider={false} />
+          {children}
+          <Footer />
+        </Container>
+      </Box>
+    </Box>
   );
-}
+};
+
+export default MainLayout;
