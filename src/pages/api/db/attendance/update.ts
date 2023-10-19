@@ -48,7 +48,11 @@ export default async function handler(request: NextApiRequest, response: NextApi
 
     const data = await sql`
       SELECT 
-        *
+        employee_id,
+        TO_CHAR(date, 'YYYY/MM/DD') AS date,
+        TO_CHAR(start_time, 'HH24:MI') AS start_time,
+        TO_CHAR(end_time, 'HH24:MI') AS end_time,
+        location
       FROM 
         attendance
       WHERE 
@@ -56,7 +60,6 @@ export default async function handler(request: NextApiRequest, response: NextApi
         AND EXTRACT(YEAR FROM date) = ${year}
         AND EXTRACT(MONTH FROM date) = ${month};
     `;
-
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);
