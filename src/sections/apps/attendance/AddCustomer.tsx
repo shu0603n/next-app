@@ -194,6 +194,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                             inputProps={{
                               step: 300 // 5 min
                             }}
+                            sx={{ width: '100%' }}
                           />
                         </Stack>
                       </Stack>
@@ -213,6 +214,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                             inputProps={{
                               step: 300 // 5 min
                             }}
+                            sx={{ width: '100%' }}
                           />
                         </Stack>
                       </Stack>
