@@ -79,7 +79,7 @@ export const processAttendanceData = (attendanceData: AttendanceType[]): Array<A
       result[formattedDate] = matchingRecord;
     } else {
       result[formattedDate] = {
-        employee_id: 0, // Replace with the appropriate default value
+        employee_id: 1, // Replace with the appropriate default value
         date: formattedDate,
         start_time: '',
         end_time: '',
@@ -551,7 +551,7 @@ const Top = () => {
             sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
             aria-describedby="alert-dialog-slide-description"
           >
-            {customer && <AddCustomer customer={customer} onCancel={handleAdd} onReload={setTableData} />}
+            {add && <AddCustomer customer={customer} onCancel={handleAdd} onReload={setTableData} />}
           </Dialog>
         </>
       )}
