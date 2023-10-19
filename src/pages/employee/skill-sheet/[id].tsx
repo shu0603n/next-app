@@ -19,7 +19,7 @@ import Layout from 'layout';
 import Page from 'components/Page';
 import MainCard from 'components/MainCard';
 import LogoSection from 'components/logo';
-import ExportPDFView from 'sections/apps/invoice/export-pdf';
+import ExportPDFView from 'sections/apps/employee/skill-sheet/export-pdf';
 
 import { useSelector } from 'store';
 
@@ -209,7 +209,7 @@ const SkillSheet = () => {
       ・ルート情報取り込み機能(CSV,nmea,kml)の実装。\r\n
       ・ルートを探索し、緯度経度から情報を算出後(距離、標高、勾配、曲率)、集計結果出力する機能を実装。\r\n
       ・WSL内にDockerコンテナを複数作成し、フロントエンド、バックエンド、データベースのそれぞれの実行環境を作成。\r\n
-      　 ーフロントエンド:React,TypeScripte\r\n
+      　 ーフロントエンド:React,TypeScript\r\n
       　 ーBFF:node.js\r\n
       　 ーバックエンド:Python(FLASK,django)\r\n
       　 ーデータベース:PostgreSQL`,
@@ -217,7 +217,7 @@ const SkillSheet = () => {
         'Python',
         'JavaScript',
         'Shellスクリプト',
-        'TypeScripte',
+        'TypeScript',
         'React',
         'FLASK',
         'django',
@@ -246,8 +246,29 @@ const SkillSheet = () => {
       フロント改修のチームにて、コンポーネント設計及び作成。\r\n
       ・APIからのデータ取得を行うBFF層の実装\r\n
       ・Figmaを元にスタイル適用し、レスポンシブ対応の追加`,
-      skills: ['TypeScripte', 'React', 'CSS', 'Figma', 'Windows 10', 'Ubuntu'],
+      skills: ['TypeScript', 'React', 'CSS', 'Figma', 'Windows 10', 'Ubuntu'],
       process: ['調査・分析', '基本設計', 'プログラミング', 'テスト・評価'],
+      time: ''
+    },
+    {
+      id: 9,
+      title: '人材派遣会社向け統合管理システムの開発',
+      start_date: '2023/09',
+      end_date: '',
+      people: 1,
+      client: '',
+      description: `以下機能を取り込んだ統合管理ツールの作成\r\n
+      ・勤怠情報\r\n
+      ・企業情報\r\n
+      ・社員情報\r\n
+      ・案件情報\r\n
+      ・スキルシート作成・出力\r\n
+      \r\n
+      フロントエンドにMaterial-UIを使用し、バックエンドにNEXT-APIを使用\r\n
+      サーバーはプレビュー環境をXServer、本番環境はVercelを使用。\r\n
+      git hub actionsからメインブランチにプッシュ時に自動公開。\r\n`,
+      skills: ['TypeScript', 'React', 'Next.js', 'node.js', 'WSL', 'docker', 'postgreSQL', 'Material-UI', 'Vercel'],
+      process: ['基本設計', '詳細設計', '製造'],
       time: ''
     }
   ];
