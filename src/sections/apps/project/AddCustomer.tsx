@@ -1,7 +1,6 @@
-import { useEffect, useState, ChangeEvent } from 'react';
+import { useState } from 'react';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
 import {
   Box,
   Button,
@@ -10,7 +9,7 @@ import {
   DialogTitle,
   Divider,
   FormControl,
-  FormLabel,
+  FormControlLabel,
   Grid,
   FormHelperText,
   InputLabel,
@@ -20,13 +19,12 @@ import {
   Select,
   SelectChangeEvent,
   Stack,
+  Switch,
   TextField,
   Tooltip,
   Typography
 } from '@mui/material';
-import { PatternFormat } from 'react-number-format';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
@@ -37,169 +35,150 @@ import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
 
 // project imports
 import AlertCustomerDelete from './AlertCustomerDelete';
-import Avatar from 'components/@extended/Avatar';
 import IconButton from 'components/@extended/IconButton';
 
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 
-// types
-import { ThemeMode } from 'types/config';
+// assets
+import { DeleteFilled } from '@ant-design/icons';
+
+// material-ui
+import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
-import { CameraOutlined, DeleteFilled } from '@ant-design/icons';
-import { EmployeeType } from 'types/employee/employee';
-
+import { CloseOutlined } from '@ant-design/icons';
 // constant
-const getInitialValues = (customer: FormikValues | null) => {
+const getInitialValues = (customer: FormikValues | null, startTime: Date | null, endTime: Date | null) => {
   const newCustomer = {
-    id: '',
-    sei: '',
-    mei: '',
-    sei_k: '',
-    mei_k: '',
-    gender: '',
-    birthday: null,
-    remarks: '',
-    phone_number: '',
-    email: '',
-    postal_code: '',
-    address: '',
-    joining_date: null,
-    retirement_date: null,
-    employment_id: '',
-    position_id: '',
-    job_category_id: ''
+    project_title: '',
+    description: '',
+    working_start_time: null as Date | null,
+    working_end_time: null as Date | null,
+    contract_name: '',
+    working_postal_code: '',
+    working_postal_address: '',
+    holiday: '',
+    hp_posting_flag: false,
+    skills: [],
+    process: [],
+    client_name: '',
+    role: ''
   };
 
   if (customer) {
-    newCustomer.id = customer.id;
-    newCustomer.sei = customer.sei;
-    newCustomer.mei = customer.mei;
-    newCustomer.sei_k = customer.sei_k;
-    newCustomer.mei_k = customer.mei_k;
-    newCustomer.gender = customer.gender;
-    newCustomer.birthday = customer.birthday;
-    newCustomer.remarks = customer.remarks;
-    newCustomer.phone_number = customer.phone_number;
-    newCustomer.email = customer.email;
-    newCustomer.postal_code = customer.postal_code;
-    newCustomer.address = customer.address;
-    newCustomer.joining_date = customer.joining_date;
-    newCustomer.retirement_date = customer.retirement_date;
-    newCustomer.employment_id = customer.employment_id;
-    newCustomer.position_id = customer.position_id;
-    newCustomer.job_category_id = customer.job_category_id;
-
+    newCustomer.project_title = customer.project_title;
+    newCustomer.description = customer.description;
+    newCustomer.client_name = customer.client_name;
+    newCustomer.working_start_time = startTime;
+    newCustomer.working_end_time = endTime;
+    newCustomer.contract_name = customer.contract_name;
+    newCustomer.working_postal_code = customer.working_postal_code;
+    newCustomer.working_postal_address = customer.working_postal_address;
+    newCustomer.holiday = customer.holiday;
+    newCustomer.hp_posting_flag = customer.hp_posting_flag;
     return _.merge({}, newCustomer, customer);
   }
 
   return newCustomer;
 };
 
-const genderList = ['男', '女'];
-async function fetchPositionData() {
-  try {
-    const response = await fetch('/api/db/parameter/position/select');
-    if (!response.ok) {
-      throw new Error('API request failed');
-    }
-    const data = await response.json();
-    return data; // APIから返されたデータを返します
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-}
-async function fetchEmploymentData() {
-  try {
-    const response = await fetch('/api/db/parameter/employment/select');
-    if (!response.ok) {
-      throw new Error('API request failed');
-    }
-    const data = await response.json();
-    return data; // APIから返されたデータを返します
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-}
-async function fetchJobCategoryData() {
-  try {
-    const response = await fetch('/api/db/parameter/job_category/select');
-    if (!response.ok) {
-      throw new Error('API request failed');
-    }
-    const data = await response.json();
-    return data; // APIから返されたデータを返します
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-}
-type Parameter = {
-  id: number;
-  name: string;
-};
-// ==============================|| CUSTOMER ADD / EDIT ||============================== //
+const role = ['PG', 'L', 'PL', 'PM'];
+const contract = ['派遣', '業務委託', '準委任契約', '請負'];
+
+const skills = [
+  'Java',
+  'HTML',
+  'CSS',
+  'Bootstrap',
+  'JavaScript',
+  'TypeScript',
+  'NodeJS',
+  'React',
+  'Angular',
+  'CI',
+  'C言語',
+  'C++',
+  'Java',
+  'C#',
+  'JavaScript',
+  'PHP',
+  'Ruby',
+  'TypeScript',
+  'Python',
+  'R言語',
+  'Go言語',
+  'Swift',
+  'Kotlin',
+  'Objective-C',
+  'Visual Basic',
+  'VBScript',
+  'BASIC',
+  'Google Apps Script',
+  'Haskell',
+  'Scala',
+  'Groovy',
+  'Delphi',
+  'Dart',
+  'D言語',
+  'Perl',
+  'COBOL',
+  'SQL',
+  'FORTRAN',
+  'MATLAB',
+  'Scratch'
+];
+const candidate_skills = ['Java', 'JavaScript', 'Python', 'PHP', 'TypeScript', 'C', 'C#', 'C++'];
+
+const process = ['要件定義', '基本設計', '詳細設計', '製造', '単体テスト', '結合テスト', '運用テスト', '保守'];
+
+const filterProcess = createFilterOptions<string>();
+const filterSkills = createFilterOptions<string>();
+
+// ==============================|| 顧客の追加/編集 ||============================== //
 
 export interface Props {
   customer?: any;
   onCancel: () => void;
-  onReload: (data: EmployeeType) => void;
+  onReload: () => void;
 }
 
 const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
-  const theme = useTheme();
+  const [startTime, setStartTime] = useState<Date | null>(customer.working_start_time);
+  const [endTime, setEndTime] = useState<Date | null>(customer.working_end_time);
   const isCreating = !customer;
 
-  const [selectedImage, setSelectedImage] = useState<File | undefined>(undefined);
-  const [avatar, setAvatar] = useState<string | undefined>(
-    `/assets/images/users/avatar-${isCreating && !customer?.avatar ? 1 : customer.avatar}.png`
-  );
-
-  const [positionData, setPositionData] = useState<Array<Parameter>>();
-  const [employmentData, setEmploymentData] = useState<Array<Parameter>>();
-  const [jobCategoryData, setJobCategoryData] = useState<Array<Parameter>>();
-
-  useEffect(() => {
-    // ページがロードされたときにデータを取得
-    fetchPositionData()
-      .then((data) => {
-        setPositionData(data.data.rows);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-
-    fetchEmploymentData()
-      .then((data) => {
-        setEmploymentData(data.data.rows);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-
-    fetchJobCategoryData()
-      .then((data) => {
-        setJobCategoryData(data.data.rows);
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-  }, []); // 空の依存リストを指定することで、一度だけ実行される
-  useEffect(() => {
-    if (selectedImage) {
-      setAvatar(URL.createObjectURL(selectedImage));
-    }
-  }, [selectedImage]);
-
   const CustomerSchema = Yup.object().shape({
-    sei: Yup.string().max(255).required('Name is required'),
-    mei: Yup.string().max(255).required('Name is required')
-    // orderStatus: Yup.string().required('Status is required'),
-    // email: Yup.string().max(255).required('Email is required').email('Must be a valid email'),
-    // location: Yup.string().max(500)
+    project_title: Yup.string().max(255).required('プロジェクト名は必須です')
+    // orderStatus: Yup.string().required('ステータスは必須です'),
+    // location: Yup.string().max(500),
+    // role: Yup.string()
+    //   .trim()
+    //   .required('役割の選択は必須です')
+    //   .matches(/^[a-z\d\-/#_\s]+$/i, 'アルファベットと数字しか許可されていません')
+    //   .max(50, '役割は最大50文字までです'),
+    // skills: Yup.array()
+    //   .of(
+    //     Yup.string()
+    //       .trim()
+    //       .required('タグに先頭の空白があります')
+    //       .matches(/^[a-z\d\-/#.&_\s]+$/i, 'アルファベットと数字しか許可されていません')
+    //       .max(50, 'スキルタグは最大50文字までです')
+    //   )
+    //   .required('スキルの選択は必須です')
+    //   // .min(3, 'スキルタグは少なくとも3つ必要です')
+    //   .max(15, '最大で15個のスキルを選択してください'),
+    // process: Yup.array()
+    //   .of(
+    //     Yup.string()
+    //       .trim()
+    //       .required('タグに先頭の空白があります')
+    //       .matches(/^[a-z\d\-/#.&_\s]+$/i, 'アルファベットと数字しか許可されていません')
+    //       .max(50, '担当工程タグは最大50文字までです')
+    //   )
+    //   .required('担当工程の選択は必須です')
+    //   // .min(3, 'スキルタグは少なくとも3つ必要です')
+    //   .max(15, '最大で15個の担当工程を選択してください')
   });
 
   const [openAlert, setOpenAlert] = useState(false);
@@ -208,68 +187,40 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     setOpenAlert(!openAlert);
     onCancel();
   };
-  const handleClear = () => {
-    console.log('clear');
-  };
 
   const formik = useFormik({
-    initialValues: getInitialValues(customer!),
+    initialValues: getInitialValues(customer!, startTime, endTime),
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
+      console.log('フォームが送信されました！');
+      console.log(values);
       try {
-        dispatch(
-          openSnackbar({
-            open: true,
-            message: '更新処理中…',
-            variant: 'alert',
-            alert: {
-              color: 'secondary'
-            },
-            close: false
-          })
-        );
-        fetch(`/api/db/employee/insert`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(values)
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error('API request failed');
-            }
-            return response.json();
-          })
-          .then((responseData) => {
-            onReload(responseData.data.rows);
-            dispatch(
-              openSnackbar({
-                open: true,
-                message: '正常に更新されました。',
-                variant: 'alert',
-                alert: {
-                  color: 'success'
-                },
-                close: false
-              })
-            );
-          })
-          .catch((error) => {
-            console.error('Error updating data:', error);
-            dispatch(
-              openSnackbar({
-                open: true,
-                message: 'データの更新に失敗しました。',
-                variant: 'alert',
-                alert: {
-                  color: 'error'
-                },
-                close: false
-              })
-            );
-          });
-        handleClear();
+        if (customer) {
+          dispatch(
+            openSnackbar({
+              open: true,
+              message: '顧客情報を正常に更新しました。（ダミー）',
+              variant: 'alert',
+              alert: {
+                color: 'success'
+              },
+              close: false
+            })
+          );
+        } else {
+          dispatch(
+            openSnackbar({
+              open: true,
+              message: '顧客を正常に追加しました。（ダミー）',
+              variant: 'alert',
+              alert: {
+                color: 'success'
+              },
+              close: false
+            })
+          );
+        }
+
         setSubmitting(false);
         onCancel();
       } catch (error) {
@@ -278,6 +229,31 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     }
   });
   const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
+  let TagsError: boolean | string | undefined = false;
+  if (formik.touched.skills && typeof formik.errors.skills) {
+    if (formik.touched.skills && typeof formik.errors.skills === 'string') {
+      TagsError = formik.errors.skills;
+    } else {
+      formik.errors.skills &&
+        typeof formik.errors.skills !== 'string' &&
+        formik.errors.skills.map((item) => {
+          // @ts-ignore
+          if (typeof item === 'object') TagsError = item.label;
+          return item;
+        });
+    }
+  }
+
+  const message = `■フロントエンド開発
+  ユーザーインターフェース（UI）の設計と実装。HTML、CSS、JavaScriptを使用して、見栄えの良いウェブページを構築します。
+  レスポンシブデザインを確保し、異なる画面サイズとデバイスでの適切な表示を保証します。
+  フレームワーク（例: React、Angular、Vue.js）を使用して、動的なコンポーネントを開発し、ユーザーエクスペリエンスを向上させます。
+
+  ■バックエンド開発
+
+  サーバーサイドプログラムを設計・実装し、データベースとの通信を可能にします。主要なバックエンド言語（例: Node.js、Python、Ruby）を使用します。
+  RESTful APIエンドポイントを設計し、データの受信と送信を管理します。セキュリティを確保し、APIエンドポイントを守ります。
+  データベースの設計と管理。SQLデータベース（例: MySQL、PostgreSQL）やNoSQLデータベース（例: MongoDB）を使用します。`;
 
   return (
     <>
@@ -288,350 +264,358 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
             <Divider />
             <DialogContent sx={{ p: 2.5 }}>
               <Grid container spacing={3}>
-                <Grid item xs={12} md={3}>
-                  <Stack direction="row" justifyContent="center" sx={{ mt: 3 }}>
-                    <FormLabel
-                      htmlFor="change-avtar"
-                      sx={{
-                        position: 'relative',
-                        borderRadius: '50%',
-                        overflow: 'hidden',
-                        '&:hover .MuiBox-root': { opacity: 1 },
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <Avatar alt="Avatar 1" src={avatar} sx={{ width: 72, height: 72, border: '1px dashed' }} />
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          backgroundColor: theme.palette.mode === ThemeMode.DARK ? 'rgba(255, 255, 255, .75)' : 'rgba(0,0,0,.65)',
-                          width: '100%',
-                          height: '100%',
-                          opacity: 0,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <Stack spacing={0.5} alignItems="center">
-                          <CameraOutlined style={{ color: theme.palette.secondary.lighter, fontSize: '2rem' }} />
-                          <Typography sx={{ color: 'secondary.lighter' }}>Upload</Typography>
-                        </Stack>
-                      </Box>
-                    </FormLabel>
-                    <TextField
-                      type="file"
-                      id="change-avtar"
-                      placeholder="Outlined"
-                      variant="outlined"
-                      sx={{ display: 'none' }}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) => setSelectedImage(e.target.files?.[0])}
-                    />
-                  </Stack>
-                </Grid>
-                <Grid item xs={12} md={8}>
+                <Grid item xs={12}>
                   <Grid container spacing={3}>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-sei">性</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="customer-sei"
-                          placeholder="Enter Customer sei"
-                          {...getFieldProps('sei')}
-                          error={Boolean(touched.sei && errors.sei)}
-                          helperText={touched.sei && errors.sei}
-                        />
+                        <InputLabel htmlFor="customer-working_start_time">開始日</InputLabel>
+                        <DatePicker value={startTime} onChange={(newValue) => setStartTime(newValue)} format="yyyy/MM/dd" />
                       </Stack>
                     </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-mei">名</InputLabel>
+                        <InputLabel htmlFor="customer-working_end_time">終了日</InputLabel>
+                        <DatePicker value={endTime} onChange={(newValue) => setEndTime(newValue)} format="yyyy/MM/dd" />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="customer-client_name">企業名</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-mei"
-                          placeholder="Enter Customer mei"
-                          {...getFieldProps('mei')}
-                          error={Boolean(touched.mei && errors.mei)}
-                          helperText={touched.mei && errors.mei}
+                          id="customer-client_name"
+                          placeholder="企業名を入力"
+                          {...getFieldProps('client_name')}
+                          error={Boolean(touched.client_name && errors.client_name)}
+                          helperText={touched.client_name && errors.client_name}
                         />
                       </Stack>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-sei_k">性（カナ）</InputLabel>
+                        <InputLabel htmlFor="customer-description">業務内容</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-sei_k"
-                          placeholder="Enter Customer sei_k"
-                          {...getFieldProps('sei_k')}
-                          error={Boolean(touched.sei_k && errors.sei_k)}
-                          helperText={touched.sei_k && errors.sei_k}
+                          id="customer-description"
+                          multiline
+                          rows={20}
+                          placeholder={message}
+                          {...getFieldProps('description')}
+                          error={Boolean(touched.description && errors.description)}
+                          helperText={touched.description && errors.description}
                         />
                       </Stack>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-mei_k">名（カナ）</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="customer-mei_k"
-                          placeholder="Enter Customer mei_k"
-                          {...getFieldProps('mei_k')}
-                          error={Boolean(touched.mei_k && errors.mei_k)}
-                          helperText={touched.mei_k && errors.mei_k}
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-gender">性別</InputLabel>
+                        <InputLabel htmlFor="customer-contract_name">契約区分</InputLabel>
                         <FormControl fullWidth>
                           <Select
                             id="column-hiding"
                             displayEmpty
-                            {...getFieldProps('gender')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('gender', event.target.value as string)}
-                            input={<OutlinedInput id="select-column-hiding" placeholder="Sort by" />}
+                            {...getFieldProps('contract_name')}
+                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('contract_name', event.target.value as string)}
+                            input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
                             renderValue={(selected) => {
                               if (!selected) {
-                                return <Typography variant="subtitle1">性別を選択してください</Typography>;
+                                return <Typography variant="subtitle1">役割を選択</Typography>;
                               }
 
                               return <Typography variant="subtitle2">{selected}</Typography>;
                             }}
                           >
-                            {genderList.map((column: any) => (
+                            {contract.map((column: any) => (
                               <MenuItem key={column} value={column}>
                                 <ListItemText primary={column} />
                               </MenuItem>
                             ))}
                           </Select>
                         </FormControl>
-                        {touched.gender && errors.gender && (
+                        {touched.contract_name && errors.contract_name && (
                           <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.gender}
+                            {errors.contract_name}
                           </FormHelperText>
                         )}
                       </Stack>
                     </Grid>
-                    <Grid item xs={6}>
+
+                    <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-birthday">生年月日</InputLabel>
-                        <DatePicker
-                          {...getFieldProps('birthday')}
-                          onChange={(newValue) => setFieldValue('birthday', newValue)}
-                          format="yyyy/MM/dd"
+                        <InputLabel htmlFor="customer-working_postal_code">郵便番号</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="customer-working_postal_code"
+                          {...getFieldProps('working_postal_code')}
+                          error={Boolean(touched.working_postal_code && errors.working_postal_code)}
+                          helperText={touched.working_postal_code && errors.working_postal_code}
                         />
-                        {/* <DatePicker format="dd/MM/yyyy" value={values.date} onChange={(newValue) => setFieldValue('date', newValue)} /> */}
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-email">Email</InputLabel>
+                        <InputLabel htmlFor="customer-working_postal_address">住所</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-email"
-                          placeholder="Enter Customer Email"
-                          {...getFieldProps('email')}
-                          error={Boolean(touched.email && errors.email)}
-                          helperText={touched.email && errors.email}
+                          id="customer-working_postal_address"
+                          {...getFieldProps('working_postal_address')}
+                          error={Boolean(touched.working_postal_address && errors.working_postal_address)}
+                          helperText={touched.working_postal_address && errors.working_postal_address}
                         />
                       </Stack>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-phone_number">電話番号</InputLabel>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
-                          <PatternFormat
-                            id="customer-phone_number"
-                            format="###-####-####"
-                            mask="_"
-                            fullWidth
-                            customInput={TextField}
-                            {...getFieldProps('phone_number')}
-                            placeholder="phone_number"
-                            error={Boolean(touched.phone_number && errors.phone_number)}
-                            helperText={touched.phone_number && errors.phone_number}
-                            // onBlur={() => {}}
-                            // onChange={() => {}}
-                          />
+                        <InputLabel htmlFor="customer-holiday">休日</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="customer-holiday"
+                          {...getFieldProps('holiday')}
+                          error={Boolean(touched.holiday && errors.holiday)}
+                          helperText={touched.holiday && errors.holiday}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="customer-role">役割</InputLabel>
+                        <FormControl fullWidth>
+                          <Select
+                            id="column-hiding"
+                            displayEmpty
+                            {...getFieldProps('role')}
+                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('role', event.target.value as string)}
+                            input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
+                            renderValue={(selected) => {
+                              if (!selected) {
+                                return <Typography variant="subtitle1">役割を選択</Typography>;
+                              }
+
+                              return <Typography variant="subtitle2">{selected}</Typography>;
+                            }}
+                          >
+                            {role.map((column: any) => (
+                              <MenuItem key={column} value={column}>
+                                <ListItemText primary={column} />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {touched.role && errors.role && (
+                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
+                            {errors.role}
+                          </FormHelperText>
+                        )}
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="customer-orderStatus">スキル</InputLabel>
+                        <Autocomplete
+                          id="skills"
+                          multiple
+                          fullWidth
+                          autoHighlight
+                          freeSolo
+                          disableCloseOnSelect
+                          options={skills}
+                          value={formik.values.skills}
+                          onBlur={formik.handleBlur}
+                          getOptionLabel={(option) => option}
+                          onChange={(event, newValue) => {
+                            const jobExist = skills.includes(newValue[newValue.length - 1]);
+                            if (!jobExist) {
+                              setFieldValue('skills', newValue);
+                            } else {
+                              setFieldValue('skills', newValue);
+                            }
+                          }}
+                          filterOptions={(options, params) => {
+                            const filtered = filterSkills(options, params);
+                            const { inputValue } = params;
+                            const isExisting = options.some((option) => inputValue === option);
+                            if (inputValue !== '' && !isExisting) {
+                              filtered.push(inputValue);
+                            }
+
+                            return filtered;
+                          }}
+                          renderOption={(props, option) => {
+                            return (
+                              <Box component="li" {...props}>
+                                {!skills.some((v) => option.includes(v)) ? `Add "${option}"` : option}
+                              </Box>
+                            );
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              name="skills"
+                              placeholder="使用したスキルを入力してください"
+                              error={formik.touched.skills && Boolean(formik.errors.skills)}
+                              helperText={TagsError}
+                            />
+                          )}
+                          renderTags={(value, getTagProps) =>
+                            value.map((option, index) => {
+                              let error = false;
+                              if (formik.touched.skills && formik.errors.skills && typeof formik.errors.skills !== 'string') {
+                                if (typeof formik.errors.skills[index] === 'object') error = true;
+                              }
+
+                              return (
+                                // eslint-disable-next-line react/jsx-key
+                                <Chip
+                                  {...getTagProps({ index })}
+                                  variant="combined"
+                                  color={error ? 'error' : 'secondary'}
+                                  label={
+                                    <Typography variant="caption" color="secondary.dark">
+                                      {option}
+                                    </Typography>
+                                  }
+                                  // eslint-disable-next-line react/jsx-no-undef
+                                  deleteIcon={<CloseOutlined style={{ fontSize: '0.875rem' }} />}
+                                  size="small"
+                                />
+                              );
+                            })
+                          }
+                        />
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          alignItems="center"
+                          sx={{ mt: 1.5, flexWrap: { xs: 'wrap', sm: 'inherit' }, gap: { xs: 1, sm: 0 } }}
+                        >
+                          <Typography variant="caption">候補:</Typography>
+                          {candidate_skills
+                            .filter(
+                              (skill: string) => formik.values.skills && !formik.values.skills.map((item) => item).includes(skill as never)
+                            )
+                            .slice(0, 5)
+                            .map((option, index) => (
+                              <Chip
+                                key={index}
+                                variant="outlined"
+                                onClick={() => setFieldValue('skills', [...formik.values.skills, option])}
+                                label={<Typography variant="caption">{option}</Typography>}
+                                size="small"
+                              />
+                            ))}
                         </Stack>
-                        <TextField
-                          fullWidth
-                          id="customer-phone_number"
-                          placeholder="Enter Customer phone_number"
-                          {...getFieldProps('phone_number')}
-                          error={Boolean(touched.phone_number && errors.phone_number)}
-                          helperText={touched.phone_number && errors.phone_number}
-                        />
                       </Stack>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-postal_code">郵便番号</InputLabel>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
-                          <PatternFormat
-                            id="customer-postal_code"
-                            format="###-####"
-                            mask="_"
-                            fullWidth
-                            customInput={TextField}
-                            {...getFieldProps('postal_code')}
-                            placeholder="postal_code"
-                            error={Boolean(touched.postal_code && errors.postal_code)}
-                            helperText={touched.postal_code && errors.postal_code}
-                            // onBlur={() => {}}
-                            // onChange={() => {}}
-                          />
+                        <InputLabel htmlFor="customer-orderStatus">担当工程</InputLabel>
+                        <Autocomplete
+                          id="process"
+                          multiple
+                          fullWidth
+                          autoHighlight
+                          freeSolo
+                          disableCloseOnSelect
+                          options={process}
+                          value={formik.values.process}
+                          onBlur={formik.handleBlur}
+                          getOptionLabel={(option) => option}
+                          onChange={(event, newValue) => {
+                            const jobExist = process.includes(newValue[newValue.length - 1]);
+                            if (!jobExist) {
+                              setFieldValue('process', newValue);
+                            } else {
+                              setFieldValue('process', newValue);
+                            }
+                          }}
+                          filterOptions={(options, params) => {
+                            const filtered = filterProcess(options, params);
+                            const { inputValue } = params;
+                            const isExisting = options.some((option) => inputValue === option);
+                            if (inputValue !== '' && !isExisting) {
+                              filtered.push(inputValue);
+                            }
+
+                            return filtered;
+                          }}
+                          renderOption={(props, option) => {
+                            return (
+                              <Box component="li" {...props}>
+                                {!process.some((v) => option.includes(v)) ? `Add "${option}"` : option}
+                              </Box>
+                            );
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              name="process"
+                              placeholder="担当した工程を入力してください"
+                              error={formik.touched.process && Boolean(formik.errors.process)}
+                              helperText={TagsError}
+                            />
+                          )}
+                          renderTags={(value, getTagProps) =>
+                            value.map((option, index) => {
+                              let error = false;
+                              if (formik.touched.process && formik.errors.process && typeof formik.errors.process !== 'string') {
+                                if (typeof formik.errors.process[index] === 'object') error = true;
+                              }
+
+                              return (
+                                // eslint-disable-next-line react/jsx-key
+                                <Chip
+                                  {...getTagProps({ index })}
+                                  variant="combined"
+                                  color={error ? 'error' : 'secondary'}
+                                  label={
+                                    <Typography variant="caption" color="secondary.dark">
+                                      {option}
+                                    </Typography>
+                                  }
+                                  // eslint-disable-next-line react/jsx-no-undef
+                                  deleteIcon={<CloseOutlined style={{ fontSize: '0.875rem' }} />}
+                                  size="small"
+                                />
+                              );
+                            })
+                          }
+                        />
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          alignItems="center"
+                          sx={{ mt: 1.5, flexWrap: { xs: 'wrap', sm: 'inherit' }, gap: { xs: 1, sm: 0 } }}
+                        >
+                          <Typography variant="caption">候補:</Typography>
+                          {process
+                            .filter(
+                              (process: string) =>
+                                formik.values.process && !formik.values.process.map((item) => item).includes(process as never)
+                            )
+                            .slice(0, 5)
+                            .map((option, index) => (
+                              <Chip
+                                key={index}
+                                variant="outlined"
+                                onClick={() => setFieldValue('process', [...formik.values.process, option])}
+                                label={<Typography variant="caption">{option}</Typography>}
+                                size="small"
+                              />
+                            ))}
                         </Stack>
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-address">住所</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="customer-address"
-                          placeholder="Enter Customer address"
-                          {...getFieldProps('address')}
-                          error={Boolean(touched.address && errors.address)}
-                          helperText={touched.address && errors.address}
+                      <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                        <Stack spacing={0.5}>
+                          <Typography variant="subtitle1">スキルシートに掲載する</Typography>
+                        </Stack>
+                        <FormControlLabel
+                          control={<Switch {...getFieldProps('hp_posting_flag')} defaultChecked sx={{ mt: 0 }} />}
+                          label=""
+                          labelPlacement="start"
                         />
                       </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-employment_id">雇用区分</InputLabel>
-                        <FormControl fullWidth>
-                          <Select
-                            id="column-hiding"
-                            displayEmpty
-                            {...getFieldProps('employment_id')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('employment_id', event.target.value as string)}
-                            input={<OutlinedInput id="select-column-hiding" placeholder="Sort by" />}
-                            renderValue={(selected) => {
-                              if (!selected) {
-                                return <Typography variant="subtitle1">選択してください</Typography>;
-                              }
-
-                              return <Typography variant="subtitle2">{selected}</Typography>;
-                            }}
-                          >
-                            {employmentData?.map((item: Parameter) => (
-                              <MenuItem key={item.id} value={item.id}>
-                                <ListItemText primary={item.name} />
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                        {touched.employment_id && errors.employment_id && (
-                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.employment_id}
-                          </FormHelperText>
-                        )}
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-position_id">役職</InputLabel>
-                        <FormControl fullWidth>
-                          <Select
-                            id="column-hiding"
-                            displayEmpty
-                            {...getFieldProps('position_id')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('position_id', event.target.value as string)}
-                            input={<OutlinedInput id="select-column-hiding" placeholder="Sort by" />}
-                            renderValue={(selected) => {
-                              if (!selected) {
-                                return <Typography variant="subtitle1">選択してください</Typography>;
-                              }
-
-                              return <Typography variant="subtitle2">{selected}</Typography>;
-                            }}
-                          >
-                            {positionData?.map((item: Parameter) => (
-                              <MenuItem key={item.id} value={item.id}>
-                                <ListItemText primary={item.name} />
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                        {touched.position_id && errors.position_id && (
-                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.position_id}
-                          </FormHelperText>
-                        )}
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-job_category_id">職種区分</InputLabel>
-                        <FormControl fullWidth>
-                          <Select
-                            id="column-hiding"
-                            displayEmpty
-                            {...getFieldProps('job_category_id')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('job_category_id', event.target.value as string)}
-                            input={<OutlinedInput id="select-column-hiding" placeholder="Sort by" />}
-                            renderValue={(selected) => {
-                              if (!selected) {
-                                return <Typography variant="subtitle1">選択してください</Typography>;
-                              }
-
-                              return <Typography variant="subtitle2">{selected}</Typography>;
-                            }}
-                          >
-                            {jobCategoryData?.map((item: Parameter) => (
-                              <MenuItem key={item.id} value={item.id}>
-                                <ListItemText primary={item.name} />
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                        {touched.job_category_id && errors.job_category_id && (
-                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.job_category_id}
-                          </FormHelperText>
-                        )}
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-joining_date">入社日</InputLabel>
-                        <DatePicker
-                          {...getFieldProps('joining_date')}
-                          onChange={(newValue) => setFieldValue('joining_date', newValue)}
-                          format="yyyy/MM/dd"
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-retirement_date">退職日</InputLabel>
-                        <DatePicker
-                          {...getFieldProps('retirement_date')}
-                          onChange={(newValue) => setFieldValue('retirement_date', newValue)}
-                          format="yyyy/MM/dd"
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-remarks">備考</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="customer-remarks"
-                          multiline
-                          rows={2}
-                          placeholder="Enter remarks"
-                          {...getFieldProps('remarks')}
-                          error={Boolean(touched.remarks && errors.remarks)}
-                          helperText={touched.remarks && errors.remarks}
-                        />
-                      </Stack>
+                      <Divider sx={{ my: 2 }} />
                     </Grid>
                   </Grid>
                 </Grid>
@@ -642,7 +626,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               <Grid container justifyContent="space-between" alignItems="center">
                 <Grid item>
                   {!isCreating && (
-                    <Tooltip title="Delete Customer" placement="top">
+                    <Tooltip title="スキルの削除" placement="top">
                       <IconButton onClick={() => setOpenAlert(true)} size="large" color="error">
                         <DeleteFilled />
                       </IconButton>
@@ -652,10 +636,10 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                 <Grid item>
                   <Stack direction="row" spacing={2} alignItems="center">
                     <Button color="error" onClick={onCancel}>
-                      Cancel
+                      キャンセル
                     </Button>
                     <Button type="submit" variant="contained" disabled={isSubmitting}>
-                      {customer ? 'Edit' : 'Add'}
+                      {customer ? '編集' : '追加'}
                     </Button>
                   </Stack>
                 </Grid>
