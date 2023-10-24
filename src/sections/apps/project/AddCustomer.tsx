@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // material-ui
 import {
@@ -48,6 +48,7 @@ import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
 import { CloseOutlined } from '@ant-design/icons';
+import { ProjectType } from 'types/project/project';
 // constant
 const getInitialValues = (customer: FormikValues | null, startTime: Date | null, endTime: Date | null) => {
   const newCustomer = {
@@ -84,7 +85,6 @@ const getInitialValues = (customer: FormikValues | null, startTime: Date | null,
 };
 
 const role = ['PG', 'L', 'PL', 'PM'];
-const contract = ['派遣', '業務委託', '準委任契約', '請負'];
 
 const skills = [
   'Java',
@@ -137,16 +137,48 @@ const filterSkills = createFilterOptions<string>();
 
 // ==============================|| 顧客の追加/編集 ||============================== //
 
+async function fetchContract() {
+  try {
+    const response = await fetch('/api/db/parameter/contract/select');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    console.log(data);
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+
 export interface Props {
   customer?: any;
   onCancel: () => void;
-  onReload: () => void;
+  onReload: (data: Array<ProjectType>) => void;
 }
-
+type ParameterType = {
+  id: number;
+  name: string;
+};
 const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   const [startTime, setStartTime] = useState<Date | null>(customer.working_start_time);
   const [endTime, setEndTime] = useState<Date | null>(customer.working_end_time);
   const isCreating = !customer;
+
+  const [contract, setContract] = useState<Array<ParameterType>>(); // データを保持する状態変数
+
+  useEffect(() => {
+    // ページがロードされたときにデータを取得
+    fetchContract()
+      .then((data) => {
+        setContract(data.data.rows); // データを状態に設定
+      })
+      .catch((error) => {
+        // エラーハンドリング
+        console.error('Error:', error);
+      });
+  }, []); // 空の依存リストを指定することで、一度だけ実行される
 
   const CustomerSchema = Yup.object().shape({
     project_title: Yup.string().max(255).required('プロジェクト名は必須です')
@@ -192,33 +224,88 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     initialValues: getInitialValues(customer!, startTime, endTime),
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
-      console.log('フォームが送信されました！');
-      console.log(values);
       try {
+        const requestOptions = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json' // 必要に応じてヘッダーを調整
+          },
+          body: JSON.stringify(values) // valuesをJSON文字列に変換してbodyに設定
+        };
+
         if (customer) {
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: '顧客情報を正常に更新しました。（ダミー）',
-              variant: 'alert',
-              alert: {
-                color: 'success'
-              },
-              close: false
+          fetch(`/api/db/project/update`, requestOptions)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error('更新に失敗しました。');
+              }
+              return response.json();
             })
-          );
+            .then((data) => {
+              console.log(data);
+              onReload(data);
+              dispatch(
+                openSnackbar({
+                  open: true,
+                  message: '正常に更新されました。',
+                  variant: 'alert',
+                  alert: {
+                    color: 'success'
+                  },
+                  close: false
+                })
+              );
+            })
+            .catch((error) => {
+              console.error('エラー:', error);
+              dispatch(
+                openSnackbar({
+                  open: true,
+                  message: 'データの更新に失敗しました。',
+                  variant: 'alert',
+                  alert: {
+                    color: 'error'
+                  },
+                  close: false
+                })
+              );
+            });
         } else {
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: '顧客を正常に追加しました。（ダミー）',
-              variant: 'alert',
-              alert: {
-                color: 'success'
-              },
-              close: false
+          fetch(`/api/db/project/insert`, requestOptions)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error('更新に失敗しました。');
+              }
+              return response.json();
             })
-          );
+            .then((data) => {
+              onReload(data);
+              dispatch(
+                openSnackbar({
+                  open: true,
+                  message: '正常に追加されました。',
+                  variant: 'alert',
+                  alert: {
+                    color: 'success'
+                  },
+                  close: false
+                })
+              );
+            })
+            .catch((error) => {
+              console.error('エラー:', error);
+              dispatch(
+                openSnackbar({
+                  open: true,
+                  message: 'データの追加に失敗しました。',
+                  variant: 'alert',
+                  alert: {
+                    color: 'error'
+                  },
+                  close: false
+                })
+              );
+            });
         }
 
         setSubmitting(false);
@@ -324,9 +411,9 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                               return <Typography variant="subtitle2">{selected}</Typography>;
                             }}
                           >
-                            {contract.map((column: any) => (
-                              <MenuItem key={column} value={column}>
-                                <ListItemText primary={column} />
+                            {contract?.map((column: any) => (
+                              <MenuItem key={column.id} value={column.name}>
+                                <ListItemText primary={column.name} />
                               </MenuItem>
                             ))}
                           </Select>
