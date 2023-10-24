@@ -78,6 +78,7 @@ const getInitialValues = (customer: FormikValues | null, startTime: Date | null,
     newCustomer.working_postal_address = customer.working_postal_address;
     newCustomer.holiday = customer.holiday;
     newCustomer.hp_posting_flag = customer.hp_posting_flag;
+    newCustomer.skills = customer.skills;
     return _.merge({}, newCustomer, customer);
   }
 
@@ -144,7 +145,34 @@ async function fetchContract() {
       throw new Error('API request failed');
     }
     const data = await response.json();
-    console.log(data);
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+
+async function fetchProjectSkills() {
+  try {
+    const response = await fetch('/api/db/project/skills/select?id=1');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+
+async function fetchSkill() {
+  try {
+    const response = await fetch('/api/db/parameter/skill/select');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
     return data; // APIから返されたデータを返します
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -161,12 +189,20 @@ type ParameterType = {
   id: number;
   name: string;
 };
+type SkillType = {
+  id: number;
+  name: string;
+  technic_name: string;
+  candidate_flag: boolean;
+};
 const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   const [startTime, setStartTime] = useState<Date | null>(customer.working_start_time);
   const [endTime, setEndTime] = useState<Date | null>(customer.working_end_time);
   const isCreating = !customer;
 
-  const [contract, setContract] = useState<Array<ParameterType>>(); // データを保持する状態変数
+  const [contract, setContract] = useState<Array<ParameterType>>();
+  const [skill, setSkill] = useState<Array<SkillType>>();
+  const [projectSkills, setProjectSkills] = useState<Array<SkillType>>();
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
@@ -178,7 +214,28 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
         // エラーハンドリング
         console.error('Error:', error);
       });
+
+    fetchProjectSkills()
+      .then((data) => {
+        setProjectSkills(data.data.rows); // データを状態に設定
+      })
+      .catch((error) => {
+        // エラーハンドリング
+        console.error('Error:', error);
+      });
+
+    fetchSkill()
+      .then((data) => {
+        setSkill(data.data.rows); // データを状態に設定
+      })
+      .catch((error) => {
+        // エラーハンドリング
+        console.error('Error:', error);
+      });
   }, []); // 空の依存リストを指定することで、一度だけ実行される
+
+  console.log(skill);
+  console.log(projectSkills);
 
   const CustomerSchema = Yup.object().shape({
     project_title: Yup.string().max(255).required('プロジェクト名は必須です')
@@ -411,7 +468,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                               return <Typography variant="subtitle2">{selected}</Typography>;
                             }}
                           >
-                            {contract?.map((column: any) => (
+                            {contract?.map((column: ParameterType) => (
                               <MenuItem key={column.id} value={column.name}>
                                 <ListItemText primary={column.name} />
                               </MenuItem>
