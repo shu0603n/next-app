@@ -176,7 +176,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   
         setContract(contractData.data.rows);
         setProjectSkills(projectSkillsData.data.rows);
-        setFieldValue('skills',projectSkillsData.data.rows.map((item: SkillType) => item.name));
+        setFieldValue('skills', projectSkillsData.data.rows.map((item: SkillType) => item.name));
         setSkill(skillData.data.rows);
   
         // ここで画面描画などの処理を行います
