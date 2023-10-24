@@ -596,12 +596,9 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                           >
                             <Typography variant="caption">候補:</Typography>
                             {skill
-                              ?.filter((skill) => {
-                                skill.candidate_flag;
-                              })
-                              .filter((skill: SkillType) => {
+                              ?.filter((skill: SkillType) => {
                                 const skillName = skill.name as never;
-                                return formik.values.skills && !formik.values.skills.includes(skillName);
+                                return skill.candidate_flag && formik.values.skills && !formik.values.skills.includes(skillName);
                               })
                               .slice(0, 5)
                               .map((option, index) => (
