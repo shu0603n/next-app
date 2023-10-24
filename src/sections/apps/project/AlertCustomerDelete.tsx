@@ -15,7 +15,7 @@ interface Props {
   handleClose: (status: boolean) => void;
 }
 
-// ==============================|| CUSTOMER - DELETE ||============================== //
+// ==============================|| 顧客 - 削除 ||============================== //
 
 export default function AlertCustomerDelete({ title, open, handleClose }: Props) {
   return (
@@ -35,25 +35,23 @@ export default function AlertCustomerDelete({ title, open, handleClose }: Props)
           </Avatar>
           <Stack spacing={2}>
             <Typography variant="h4" align="center">
-              Are you sure you want to delete?
+              削除してもよろしいですか？
             </Typography>
             <Typography align="center">
-              By deleting
+              「
               <Typography variant="subtitle1" component="span">
-                {' "'}
                 {title}
-                {'" '}
               </Typography>
-              user, all task assigned to that user will also be deleted.
+              」ユーザーを削除すると、そのユーザーに割り当てられたすべてのタスクも削除されます。
             </Typography>
           </Stack>
 
           <Stack direction="row" spacing={2} sx={{ width: 1 }}>
             <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
-              Cancel
+              キャンセル
             </Button>
             <Button fullWidth color="error" variant="contained" onClick={() => handleClose(true)} autoFocus>
-              Delete
+              削除
             </Button>
           </Stack>
         </Stack>
