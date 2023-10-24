@@ -11,5 +11,5 @@ export type ProjectType = {
   working_end_time: string;
   holiday: string;
   project_title: string;
-  business_outline: string;
+  description: string;
 };
