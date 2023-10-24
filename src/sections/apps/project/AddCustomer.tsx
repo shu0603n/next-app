@@ -50,7 +50,12 @@ import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 import { CloseOutlined } from '@ant-design/icons';
 import { ProjectType } from 'types/project/project';
 // constant
-const getInitialValues = (customer: FormikValues | null, startTime: Date | null, endTime: Date | null) => {
+const getInitialValues = (
+  customer: FormikValues | null,
+  startTime: Date | null,
+  endTime: Date | null,
+  projectSkills: string[] | undefined
+) => {
   const newCustomer = {
     project_title: '',
     description: '',
@@ -61,7 +66,7 @@ const getInitialValues = (customer: FormikValues | null, startTime: Date | null,
     working_postal_address: '',
     holiday: '',
     hp_posting_flag: false,
-    skills: [],
+    skills: projectSkills ?? [],
     process: [],
     client_name: '',
     role: ''
@@ -86,50 +91,6 @@ const getInitialValues = (customer: FormikValues | null, startTime: Date | null,
 };
 
 const role = ['PG', 'L', 'PL', 'PM'];
-
-const skills = [
-  'Java',
-  'HTML',
-  'CSS',
-  'Bootstrap',
-  'JavaScript',
-  'TypeScript',
-  'NodeJS',
-  'React',
-  'Angular',
-  'CI',
-  'C言語',
-  'C++',
-  'Java',
-  'C#',
-  'JavaScript',
-  'PHP',
-  'Ruby',
-  'TypeScript',
-  'Python',
-  'R言語',
-  'Go言語',
-  'Swift',
-  'Kotlin',
-  'Objective-C',
-  'Visual Basic',
-  'VBScript',
-  'BASIC',
-  'Google Apps Script',
-  'Haskell',
-  'Scala',
-  'Groovy',
-  'Delphi',
-  'Dart',
-  'D言語',
-  'Perl',
-  'COBOL',
-  'SQL',
-  'FORTRAN',
-  'MATLAB',
-  'Scratch'
-];
-const candidate_skills = ['Java', 'JavaScript', 'Python', 'PHP', 'TypeScript', 'C', 'C#', 'C++'];
 
 const process = ['要件定義', '基本設計', '詳細設計', '製造', '単体テスト', '結合テスト', '運用テスト', '保守'];
 
@@ -218,6 +179,10 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     fetchProjectSkills()
       .then((data) => {
         setProjectSkills(data.data.rows); // データを状態に設定
+        setFieldValue(
+          'skills',
+          data.data.rows.map((item: SkillType) => item.name)
+        );
       })
       .catch((error) => {
         // エラーハンドリング
@@ -278,7 +243,12 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   };
 
   const formik = useFormik({
-    initialValues: getInitialValues(customer!, startTime, endTime),
+    initialValues: getInitialValues(
+      customer!,
+      startTime,
+      endTime,
+      projectSkills?.map((skill) => skill.name)
+    ),
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
       try {
@@ -551,104 +521,112 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                         )}
                       </Stack>
                     </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-orderStatus">スキル</InputLabel>
-                        <Autocomplete
-                          id="skills"
-                          multiple
-                          fullWidth
-                          autoHighlight
-                          freeSolo
-                          disableCloseOnSelect
-                          options={skills}
-                          value={formik.values.skills}
-                          onBlur={formik.handleBlur}
-                          getOptionLabel={(option) => option}
-                          onChange={(event, newValue) => {
-                            const jobExist = skills.includes(newValue[newValue.length - 1]);
-                            if (!jobExist) {
-                              setFieldValue('skills', newValue);
-                            } else {
-                              setFieldValue('skills', newValue);
-                            }
-                          }}
-                          filterOptions={(options, params) => {
-                            const filtered = filterSkills(options, params);
-                            const { inputValue } = params;
-                            const isExisting = options.some((option) => inputValue === option);
-                            if (inputValue !== '' && !isExisting) {
-                              filtered.push(inputValue);
-                            }
-
-                            return filtered;
-                          }}
-                          renderOption={(props, option) => {
-                            return (
-                              <Box component="li" {...props}>
-                                {!skills.some((v) => option.includes(v)) ? `Add "${option}"` : option}
-                              </Box>
-                            );
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              name="skills"
-                              placeholder="使用したスキルを入力してください"
-                              error={formik.touched.skills && Boolean(formik.errors.skills)}
-                              helperText={TagsError}
-                            />
-                          )}
-                          renderTags={(value, getTagProps) =>
-                            value.map((option, index) => {
-                              let error = false;
-                              if (formik.touched.skills && formik.errors.skills && typeof formik.errors.skills !== 'string') {
-                                if (typeof formik.errors.skills[index] === 'object') error = true;
+                    {skill && (
+                      <Grid item xs={12}>
+                        <Stack spacing={1.25}>
+                          <InputLabel htmlFor="customer-orderStatus">スキル</InputLabel>
+                          {getFieldProps('skills').value}
+                          {['1', '2', '3']}
+                          <Autocomplete
+                            id="skills"
+                            multiple
+                            fullWidth
+                            autoHighlight
+                            freeSolo
+                            disableCloseOnSelect
+                            options={skill?.map((item) => item.name) as string[]}
+                            {...getFieldProps('skills')}
+                            onBlur={formik.handleBlur}
+                            getOptionLabel={(option) => option}
+                            onChange={(event, newValue) => {
+                              const jobExist = skill?.map((item) => item.name)?.includes(newValue[newValue.length - 1]);
+                              if (!jobExist) {
+                                setFieldValue('skills', newValue);
+                              } else {
+                                setFieldValue('skills', newValue);
+                              }
+                            }}
+                            filterOptions={(options, params) => {
+                              const filtered = filterSkills(options, params);
+                              const { inputValue } = params;
+                              const isExisting = options.some((option) => inputValue === option);
+                              if (inputValue !== '' && !isExisting) {
+                                filtered.push(inputValue);
                               }
 
+                              return filtered;
+                            }}
+                            renderOption={(props, option) => {
                               return (
-                                // eslint-disable-next-line react/jsx-key
+                                <Box component="li" {...props}>
+                                  {!skill?.some((v) => option.includes(v.name)) ? `追加 "${option}"` : option}
+                                </Box>
+                              );
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                name="skills"
+                                placeholder="使用したスキルを入力してください"
+                                error={formik.touched.skills && Boolean(formik.errors.skills)}
+                                helperText={TagsError}
+                              />
+                            )}
+                            renderTags={(value, getTagProps) =>
+                              value.map((option, index) => {
+                                let error = false;
+                                if (formik.touched.skills && formik.errors.skills && typeof formik.errors.skills !== 'string') {
+                                  if (typeof formik.errors.skills[index] === 'object') error = true;
+                                }
+
+                                return (
+                                  // eslint-disable-next-line react/jsx-key
+                                  <Chip
+                                    {...getTagProps({ index })}
+                                    variant="combined"
+                                    color={error ? 'error' : 'secondary'}
+                                    label={
+                                      <Typography variant="caption" color="secondary.dark">
+                                        {option}
+                                      </Typography>
+                                    }
+                                    // eslint-disable-next-line react/jsx-no-undef
+                                    deleteIcon={<CloseOutlined style={{ fontSize: '0.875rem' }} />}
+                                    size="small"
+                                  />
+                                );
+                              })
+                            }
+                          />
+                          <Stack
+                            direction="row"
+                            spacing={1}
+                            alignItems="center"
+                            sx={{ mt: 1.5, flexWrap: { xs: 'wrap', sm: 'inherit' }, gap: { xs: 1, sm: 0 } }}
+                          >
+                            <Typography variant="caption">候補:</Typography>
+                            {skill
+                              ?.filter((skill) => {
+                                skill.candidate_flag;
+                              })
+                              .filter((skill: SkillType) => {
+                                const skillName = skill.name as never;
+                                return formik.values.skills && !formik.values.skills.includes(skillName);
+                              })
+                              .slice(0, 5)
+                              .map((option, index) => (
                                 <Chip
-                                  {...getTagProps({ index })}
-                                  variant="combined"
-                                  color={error ? 'error' : 'secondary'}
-                                  label={
-                                    <Typography variant="caption" color="secondary.dark">
-                                      {option}
-                                    </Typography>
-                                  }
-                                  // eslint-disable-next-line react/jsx-no-undef
-                                  deleteIcon={<CloseOutlined style={{ fontSize: '0.875rem' }} />}
+                                  key={index}
+                                  variant="outlined"
+                                  onClick={() => setFieldValue('skills', [...formik.values.skills, option])}
+                                  label={<Typography variant="caption">{option.name}</Typography>}
                                   size="small"
                                 />
-                              );
-                            })
-                          }
-                        />
-                        <Stack
-                          direction="row"
-                          spacing={1}
-                          alignItems="center"
-                          sx={{ mt: 1.5, flexWrap: { xs: 'wrap', sm: 'inherit' }, gap: { xs: 1, sm: 0 } }}
-                        >
-                          <Typography variant="caption">候補:</Typography>
-                          {candidate_skills
-                            .filter(
-                              (skill: string) => formik.values.skills && !formik.values.skills.map((item) => item).includes(skill as never)
-                            )
-                            .slice(0, 5)
-                            .map((option, index) => (
-                              <Chip
-                                key={index}
-                                variant="outlined"
-                                onClick={() => setFieldValue('skills', [...formik.values.skills, option])}
-                                label={<Typography variant="caption">{option}</Typography>}
-                                size="small"
-                              />
-                            ))}
+                              ))}
+                          </Stack>
                         </Stack>
-                      </Stack>
-                    </Grid>
+                      </Grid>
+                    )}
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-orderStatus">担当工程</InputLabel>
