@@ -519,7 +519,7 @@ const Top = () => {
                 <HoverSocialCard primary="出勤済み" secondary={startTime} color={theme.palette.grey[500]} />
               ) : (
                 <div onClick={workStart}>
-                  <HoverSocialCard primary="出勤" secondary={'打刻なし'} color={theme.palette.primary.main} />
+                  <HoverSocialCard primary="打刻なし" secondary={'出勤'} color={theme.palette.primary.main} />
                 </div>
               )}
             </Grid>
@@ -528,7 +528,7 @@ const Top = () => {
                 <HoverSocialCard primary="退勤済み" secondary={endTime} color={theme.palette.grey[500]} />
               ) : (
                 <div onClick={workEnd}>
-                  <HoverSocialCard primary="退勤" secondary={'打刻なし'} color={theme.palette.warning.main} />
+                  <HoverSocialCard primary="打刻なし" secondary={'退勤'} color={theme.palette.warning.main} />
                 </div>
               )}
             </Grid>
