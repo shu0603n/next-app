@@ -189,9 +189,6 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     fetchData();
   }, []); // 空の依存リストを指定することで、一度だけ実行されます
 
-  console.log(skill);
-  console.log(projectSkills);
-
   const CustomerSchema = Yup.object().shape({
     project_title: Yup.string().max(255).required('プロジェクト名は必須です')
     // orderStatus: Yup.string().required('ステータスは必須です'),
