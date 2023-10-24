@@ -166,38 +166,28 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   const [projectSkills, setProjectSkills] = useState<Array<SkillType>>();
 
   useEffect(() => {
-    // ページがロードされたときにデータを取得
-    fetchContract()
-      .then((data) => {
-        setContract(data.data.rows); // データを状態に設定
-      })
-      .catch((error) => {
+    const fetchData = async () => {
+      try {
+        const [contractData, projectSkillsData, skillData] = await Promise.all([
+          fetchContract(),
+          fetchProjectSkills(),
+          fetchSkill()
+        ]);
+  
+        setContract(contractData.data.rows);
+        setProjectSkills(projectSkillsData.data.rows);
+        setFieldValue('skills', projectSkillsData.data.rows.map((item) => item.name));
+        setSkill(skillData.data.rows);
+  
+        // ここで画面描画などの処理を行います
+      } catch (error) {
         // エラーハンドリング
         console.error('Error:', error);
-      });
-
-    fetchProjectSkills()
-      .then((data) => {
-        setProjectSkills(data.data.rows); // データを状態に設定
-        setFieldValue(
-          'skills',
-          data.data.rows.map((item: SkillType) => item.name)
-        );
-      })
-      .catch((error) => {
-        // エラーハンドリング
-        console.error('Error:', error);
-      });
-
-    fetchSkill()
-      .then((data) => {
-        setSkill(data.data.rows); // データを状態に設定
-      })
-      .catch((error) => {
-        // エラーハンドリング
-        console.error('Error:', error);
-      });
-  }, []); // 空の依存リストを指定することで、一度だけ実行される
+      }
+    };
+  
+    fetchData();
+  }, []); // 空の依存リストを指定することで、一度だけ実行されます
 
   console.log(skill);
   console.log(projectSkills);
