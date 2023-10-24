@@ -15,7 +15,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
       project.working_end_time,
       project.holiday,
       project.project_title,
-      project.business_outline
+      project.description
   FROM project
   LEFT JOIN client ON project.client_id = client.id
   LEFT JOIN contract ON project.contract_id = contract.id;
