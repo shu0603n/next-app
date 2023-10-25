@@ -54,7 +54,7 @@ const getInitialValues = (
   customer: FormikValues | null,
   startTime: Date | null,
   endTime: Date | null,
-  projectSkills: string[] | undefined
+  projectSkills: SkillType[] | undefined
 ) => {
   const newCustomer = {
     project_title: '',
@@ -66,8 +66,8 @@ const getInitialValues = (
     working_postal_address: '',
     holiday: '',
     hp_posting_flag: false,
-    skills: projectSkills ?? [],
-    process: [],
+    skills: projectSkills?.map((skill) => skill.name as string) ?? [],
+    process: [] as string[],
     client_name: '',
     role: ''
   };
@@ -84,6 +84,7 @@ const getInitialValues = (
     newCustomer.holiday = customer.holiday;
     newCustomer.hp_posting_flag = customer.hp_posting_flag;
     newCustomer.skills = customer.skills;
+    newCustomer.process = customer.process;
     return _.merge({}, newCustomer, customer);
   }
 
@@ -254,21 +255,23 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   };
 
   const formik = useFormik({
-    initialValues: getInitialValues(
-      customer!,
-      startTime,
-      endTime,
-      projectSkills?.map((skill) => skill.name)
-    ),
+    initialValues: getInitialValues(customer!, startTime, endTime, projectSkills),
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
       try {
+        const matchingSkills = skill?.filter((skillItem: SkillType) => values.skills.includes(skillItem.name));
+        const skillIds = matchingSkills?.map((skillItem: SkillType) => skillItem.id);
+
+        const matchingProcess = process?.filter((processItem: ParameterType) => values.process.includes(processItem.name));
+        const processIds = matchingProcess?.map((processItem: ParameterType) => processItem.id);
+
+        const newValues = { ...values, skills_id: skillIds, process_id: processIds };
         const requestOptions = {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json' // 必要に応じてヘッダーを調整
           },
-          body: JSON.stringify(values) // valuesをJSON文字列に変換してbodyに設定
+          body: JSON.stringify(newValues) // valuesをJSON文字列に変換してbodyに設定
         };
 
         if (customer) {
