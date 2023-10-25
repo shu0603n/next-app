@@ -54,7 +54,8 @@ const getInitialValues = (
   customer: FormikValues | null,
   startTime: Date | null,
   endTime: Date | null,
-  projectSkills: SkillType[] | undefined
+  projectSkills: SkillType[] | undefined,
+  projectProcess: ParameterType[] | undefined
 ) => {
   const newCustomer = {
     project_title: '',
@@ -67,7 +68,7 @@ const getInitialValues = (
     holiday: '',
     hp_posting_flag: false,
     skills: projectSkills?.map((skill) => skill.name as string) ?? [],
-    process: [] as string[],
+    process: projectProcess?.map((process) => process.name as string) ?? [],
     client_name: '',
     role: ''
   };
@@ -140,6 +141,21 @@ async function fetchProjectSkills() {
   }
 }
 
+async function fetchProjectProcess() {
+  try {
+    const response = await fetch('/api/db/project/process/select?id=1');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+
+
 async function fetchSkill() {
   try {
     const response = await fetch('/api/db/parameter/skill/select');
@@ -178,31 +194,35 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   const [process, setProcess] = useState<Array<ParameterType>>();
   const [skill, setSkill] = useState<Array<SkillType>>();
   const [projectSkills, setProjectSkills] = useState<Array<SkillType>>();
+  const [projectProcess, setProjectProcess] = useState<Array<ParameterType>>();
+  const [loading, setLoading] = useState(true); // データの読み込み状態を管理
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [contractData, projectSkillsData, skillData, processData] = await Promise.all([
+        const [contractData, projectSkillsData, projectProcessData, skillData, processData] = await Promise.all([
           fetchContract(),
           fetchProjectSkills(),
+          fetchProjectProcess(),
           fetchSkill(),
           fetchProcess()
         ]);
         setContract(contractData.data.rows);
         if (customer) {
           setProjectSkills(projectSkillsData.data.rows);
+          setProjectProcess(projectProcessData.data.rows);
           setFieldValue(
             'skills',
             projectSkillsData.data.rows.map((item: SkillType) => item.name)
           );
           setFieldValue(
             'process',
-            ['(初期値)']
-            // projectSkillsData.data.rows.map((item: ParameterType) => item.name)
+            projectProcessData.data.rows.map((item: ParameterType) => item.name)
           );
         }
         setSkill(skillData.data.rows);
         setProcess(processData.data.rows);
+        setLoading(false);
 
         // ここで画面描画などの処理を行います
       } catch (error) {
@@ -255,7 +275,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   };
 
   const formik = useFormik({
-    initialValues: getInitialValues(customer!, startTime, endTime, projectSkills),
+    initialValues: getInitialValues(customer!, startTime, endTime, projectSkills, projectProcess),
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
       try {
@@ -274,80 +294,42 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
           body: JSON.stringify(newValues) // valuesをJSON文字列に変換してbodyに設定
         };
 
-        if (customer) {
-          fetch(`/api/db/project/update`, requestOptions)
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error('更新に失敗しました。');
-              }
-              return response.json();
-            })
-            .then((data) => {
-              console.log(data);
-              onReload(data);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: '正常に更新されました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'success'
-                  },
-                  close: false
-                })
-              );
-            })
-            .catch((error) => {
-              console.error('エラー:', error);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: 'データの更新に失敗しました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'error'
-                  },
-                  close: false
-                })
-              );
-            });
-        } else {
-          fetch(`/api/db/project/insert`, requestOptions)
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error('更新に失敗しました。');
-              }
-              return response.json();
-            })
-            .then((data) => {
-              onReload(data);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: '正常に追加されました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'success'
-                  },
-                  close: false
-                })
-              );
-            })
-            .catch((error) => {
-              console.error('エラー:', error);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: 'データの追加に失敗しました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'error'
-                  },
-                  close: false
-                })
-              );
-            });
-        }
+        fetch(`/api/db/project/update`, requestOptions)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('更新に失敗しました。');
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log(data);
+            onReload(data);
+            dispatch(
+              openSnackbar({
+                open: true,
+                message: '正常に更新されました。',
+                variant: 'alert',
+                alert: {
+                  color: 'success'
+                },
+                close: false
+              })
+            );
+          })
+          .catch((error) => {
+            console.error('エラー:', error);
+            dispatch(
+              openSnackbar({
+                open: true,
+                message: 'データの更新に失敗しました。',
+                variant: 'alert',
+                alert: {
+                  color: 'error'
+                },
+                close: false
+              })
+            );
+          });
 
         setSubmitting(false);
         onCancel();
@@ -383,6 +365,10 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   RESTful APIエンドポイントを設計し、データの受信と送信を管理します。セキュリティを確保し、APIエンドポイントを守ります。
   データベースの設計と管理。SQLデータベース（例: MySQL、PostgreSQL）やNoSQLデータベース（例: MongoDB）を使用します。`;
 
+  if (loading) {
+    return <div>待機中</div>;
+  }
+
   return (
     <>
       <FormikProvider value={formik}>
@@ -404,6 +390,19 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-working_end_time">終了日</InputLabel>
                         <DatePicker value={endTime} onChange={(newValue) => setEndTime(newValue)} format="yyyy/MM/dd" />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="customer-client_name">プロジェクト名</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="customer-project_title"
+                          placeholder="企業名を入力"
+                          {...getFieldProps('project_title')}
+                          error={Boolean(touched.project_title && errors.project_title)}
+                          helperText={touched.project_title && errors.project_title}
+                        />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
