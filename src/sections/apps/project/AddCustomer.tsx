@@ -92,8 +92,6 @@ const getInitialValues = (
 
 const role = ['PG', 'L', 'PL', 'PM'];
 
-const process = ['要件定義', '基本設計', '詳細設計', '製造', '単体テスト', '結合テスト', '運用テスト', '保守'];
-
 const filterProcess = createFilterOptions<string>();
 const filterSkills = createFilterOptions<string>();
 
@@ -102,6 +100,20 @@ const filterSkills = createFilterOptions<string>();
 async function fetchContract() {
   try {
     const response = await fetch('/api/db/parameter/contract/select');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+
+async function fetchProcess() {
+  try {
+    const response = await fetch('/api/db/parameter/process/select');
     if (!response.ok) {
       throw new Error('API request failed');
     }
@@ -157,36 +169,48 @@ type SkillType = {
   candidate_flag: boolean;
 };
 const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
-  const [startTime, setStartTime] = useState<Date | null>(customer.working_start_time);
-  const [endTime, setEndTime] = useState<Date | null>(customer.working_end_time);
+  const [startTime, setStartTime] = useState<Date | null>(customer?.working_start_time);
+  const [endTime, setEndTime] = useState<Date | null>(customer?.working_end_time);
   const isCreating = !customer;
 
   const [contract, setContract] = useState<Array<ParameterType>>();
+  const [process, setProcess] = useState<Array<ParameterType>>();
   const [skill, setSkill] = useState<Array<SkillType>>();
   const [projectSkills, setProjectSkills] = useState<Array<SkillType>>();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [contractData, projectSkillsData, skillData] = await Promise.all([
+        const [contractData, projectSkillsData, skillData, processData] = await Promise.all([
           fetchContract(),
           fetchProjectSkills(),
-          fetchSkill()
+          fetchSkill(),
+          fetchProcess()
         ]);
-  
         setContract(contractData.data.rows);
-        setProjectSkills(projectSkillsData.data.rows);
-        setFieldValue('skills', projectSkillsData.data.rows.map((item: SkillType) => item.name));
+        if (customer) {
+          setProjectSkills(projectSkillsData.data.rows);
+          setFieldValue(
+            'skills',
+            projectSkillsData.data.rows.map((item: SkillType) => item.name)
+          );
+          setFieldValue(
+            'process',
+            ['(初期値)']
+            // projectSkillsData.data.rows.map((item: ParameterType) => item.name)
+          );
+        }
         setSkill(skillData.data.rows);
-  
+        setProcess(processData.data.rows);
+
         // ここで画面描画などの処理を行います
       } catch (error) {
         // エラーハンドリング
         console.error('Error:', error);
       }
     };
-  
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 空の依存リストを指定することで、一度だけ実行されます
 
   const CustomerSchema = Yup.object().shape({
@@ -439,7 +463,6 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                         )}
                       </Stack>
                     </Grid>
-
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-working_postal_code">郵便番号</InputLabel>
@@ -512,8 +535,6 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                       <Grid item xs={12}>
                         <Stack spacing={1.25}>
                           <InputLabel htmlFor="customer-orderStatus">スキル</InputLabel>
-                          {getFieldProps('skills').value}
-                          {['1', '2', '3']}
                           <Autocomplete
                             id="skills"
                             multiple
@@ -526,12 +547,12 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                             onBlur={formik.handleBlur}
                             getOptionLabel={(option) => option}
                             onChange={(event, newValue) => {
-                              const jobExist = skill?.map((item) => item.name)?.includes(newValue[newValue.length - 1]);
-                              if (!jobExist) {
-                                setFieldValue('skills', newValue);
-                              } else {
-                                setFieldValue('skills', newValue);
-                              }
+                              // const jobExist = skill?.map((item) => item.name)?.includes(newValue[newValue.length - 1]);
+                              // if (!jobExist) {
+                              //   setFieldValue('skills', newValue);
+                              // } else {
+                              setFieldValue('skills', newValue);
+                              // }
                             }}
                             filterOptions={(options, params) => {
                               const filtered = filterSkills(options, params);
@@ -602,7 +623,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                                 <Chip
                                   key={index}
                                   variant="outlined"
-                                  onClick={() => setFieldValue('skills', [...formik.values.skills, option])}
+                                  onClick={() => setFieldValue('skills', [...formik.values.skills, option.name])}
                                   label={<Typography variant="caption">{option.name}</Typography>}
                                   size="small"
                                 />
@@ -611,105 +632,107 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                         </Stack>
                       </Grid>
                     )}
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-orderStatus">担当工程</InputLabel>
-                        <Autocomplete
-                          id="process"
-                          multiple
-                          fullWidth
-                          autoHighlight
-                          freeSolo
-                          disableCloseOnSelect
-                          options={process}
-                          value={formik.values.process}
-                          onBlur={formik.handleBlur}
-                          getOptionLabel={(option) => option}
-                          onChange={(event, newValue) => {
-                            const jobExist = process.includes(newValue[newValue.length - 1]);
-                            if (!jobExist) {
+                    {process && (
+                      <Grid item xs={12}>
+                        <Stack spacing={1.25}>
+                          <InputLabel htmlFor="customer-orderStatus">担当工程</InputLabel>
+                          <Autocomplete
+                            id="process"
+                            multiple
+                            fullWidth
+                            autoHighlight
+                            freeSolo
+                            disableCloseOnSelect
+                            options={process?.map((item) => item.name) as string[]}
+                            {...getFieldProps('process')}
+                            onBlur={formik.handleBlur}
+                            getOptionLabel={(option) => option}
+                            onChange={(event, newValue) => {
+                              // const jobExist = process.includes(newValue[newValue.length - 1]);
+                              // if (!jobExist) {
+                              //   setFieldValue('process', newValue);
+                              // } else {
                               setFieldValue('process', newValue);
-                            } else {
-                              setFieldValue('process', newValue);
-                            }
-                          }}
-                          filterOptions={(options, params) => {
-                            const filtered = filterProcess(options, params);
-                            const { inputValue } = params;
-                            const isExisting = options.some((option) => inputValue === option);
-                            if (inputValue !== '' && !isExisting) {
-                              filtered.push(inputValue);
-                            }
-
-                            return filtered;
-                          }}
-                          renderOption={(props, option) => {
-                            return (
-                              <Box component="li" {...props}>
-                                {!process.some((v) => option.includes(v)) ? `Add "${option}"` : option}
-                              </Box>
-                            );
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              name="process"
-                              placeholder="担当した工程を入力してください"
-                              error={formik.touched.process && Boolean(formik.errors.process)}
-                              helperText={TagsError}
-                            />
-                          )}
-                          renderTags={(value, getTagProps) =>
-                            value.map((option, index) => {
-                              let error = false;
-                              if (formik.touched.process && formik.errors.process && typeof formik.errors.process !== 'string') {
-                                if (typeof formik.errors.process[index] === 'object') error = true;
+                              // }
+                            }}
+                            filterOptions={(options, params) => {
+                              const filtered = filterProcess(options, params);
+                              const { inputValue } = params;
+                              const isExisting = options.some((option) => inputValue === option);
+                              if (inputValue !== '' && !isExisting) {
+                                filtered.push(inputValue);
                               }
 
+                              return filtered;
+                            }}
+                            renderOption={(props, option) => {
                               return (
-                                // eslint-disable-next-line react/jsx-key
+                                <Box component="li" {...props}>
+                                  {!process?.some((v) => option.includes(v.name)) ? `追加 "${option}"` : option}
+                                </Box>
+                              );
+                            }}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                name="process"
+                                placeholder="担当した工程を入力してください"
+                                error={formik.touched.process && Boolean(formik.errors.process)}
+                                helperText={TagsError}
+                              />
+                            )}
+                            renderTags={(value, getTagProps) =>
+                              value.map((option, index) => {
+                                let error = false;
+                                if (formik.touched.process && formik.errors.process && typeof formik.errors.process !== 'string') {
+                                  if (typeof formik.errors.process[index] === 'object') error = true;
+                                }
+
+                                return (
+                                  // eslint-disable-next-line react/jsx-key
+                                  <Chip
+                                    {...getTagProps({ index })}
+                                    variant="combined"
+                                    color={error ? 'error' : 'secondary'}
+                                    label={
+                                      <Typography variant="caption" color="secondary.dark">
+                                        {option}
+                                      </Typography>
+                                    }
+                                    // eslint-disable-next-line react/jsx-no-undef
+                                    deleteIcon={<CloseOutlined style={{ fontSize: '0.875rem' }} />}
+                                    size="small"
+                                  />
+                                );
+                              })
+                            }
+                          />
+                          <Stack
+                            direction="row"
+                            spacing={1}
+                            alignItems="center"
+                            sx={{ mt: 1.5, flexWrap: { xs: 'wrap', sm: 'inherit' }, gap: { xs: 1, sm: 0 } }}
+                          >
+                            <Typography variant="caption">候補:</Typography>
+                            {process
+                              .filter((process: ParameterType) => {
+                                const processName = process.name as never;
+                                return formik.values.process && !formik.values.process.map((item) => item).includes(processName);
+                              })
+                              .slice(0, 5)
+                              .map((option, index) => (
                                 <Chip
-                                  {...getTagProps({ index })}
-                                  variant="combined"
-                                  color={error ? 'error' : 'secondary'}
-                                  label={
-                                    <Typography variant="caption" color="secondary.dark">
-                                      {option}
-                                    </Typography>
-                                  }
-                                  // eslint-disable-next-line react/jsx-no-undef
-                                  deleteIcon={<CloseOutlined style={{ fontSize: '0.875rem' }} />}
+                                  key={index}
+                                  variant="outlined"
+                                  onClick={() => setFieldValue('process', [...formik.values.process, option.name])}
+                                  label={<Typography variant="caption">{option.name}</Typography>}
                                   size="small"
                                 />
-                              );
-                            })
-                          }
-                        />
-                        <Stack
-                          direction="row"
-                          spacing={1}
-                          alignItems="center"
-                          sx={{ mt: 1.5, flexWrap: { xs: 'wrap', sm: 'inherit' }, gap: { xs: 1, sm: 0 } }}
-                        >
-                          <Typography variant="caption">候補:</Typography>
-                          {process
-                            .filter(
-                              (process: string) =>
-                                formik.values.process && !formik.values.process.map((item) => item).includes(process as never)
-                            )
-                            .slice(0, 5)
-                            .map((option, index) => (
-                              <Chip
-                                key={index}
-                                variant="outlined"
-                                onClick={() => setFieldValue('process', [...formik.values.process, option])}
-                                label={<Typography variant="caption">{option}</Typography>}
-                                size="small"
-                              />
-                            ))}
+                              ))}
+                          </Stack>
                         </Stack>
-                      </Stack>
-                    </Grid>
+                      </Grid>
+                    )}
                     <Grid item xs={12}>
                       <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                         <Stack spacing={0.5}>
