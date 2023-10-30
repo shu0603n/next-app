@@ -6,7 +6,7 @@
     "dev": "next dev -p 8081",
     "build": "next build",
     "start": "next start",
-    "vercel-build": "yarn prisma db pull && yarn prisma generate && yarn prisma migrate deploy && next build" 
+    "vercel-build": "yarn prisma db pull && yarn prisma generate && yarn prisma migrate deploy && next build"
   },
   "dependencies": {
     "@ant-design/colors": "^7.0.0",
