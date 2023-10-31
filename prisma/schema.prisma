@@ -1,14 +1,13 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider  = "postgresql"
   url       = env("POSTGRES_PRISMA_URL")
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
+
 model attendance {
   employee_id Int
   date        DateTime  @db.Date
@@ -17,8 +16,10 @@ model attendance {
   location    String?
   approve     Boolean?  @default(false)
   employee    employee  @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   @@id([employee_id, date])
 }
+
 model client {
   id              Int               @id @default(autoincrement())
   name            String            @db.VarChar(255)
@@ -32,11 +33,13 @@ model client {
   invoice         invoice[]
   project         project[]
 }
+
 model contract {
   id      Int       @id @default(autoincrement())
   name    String    @db.VarChar(30)
   project project[]
 }
+
 model employee {
   id              Int               @id @default(autoincrement())
   sei             String            @db.VarChar(255)
@@ -64,6 +67,7 @@ model employee {
   employee_skills employee_skills[]
   invoice         invoice[]
 }
+
 model employee_skills {
   id            Int            @id @default(autoincrement())
   employee_id   Int
@@ -78,11 +82,13 @@ model employee_skills {
   process_used  process_used[]
   skills_used   skills_used[]
 }
+
 model employment {
   id       Int        @id @default(autoincrement())
   name     String     @db.VarChar(30)
   employee employee[]
 }
+
 model invoice {
   id             Int       @id @default(autoincrement())
   invoice_date   DateTime? @db.Date
@@ -99,22 +105,26 @@ model invoice {
   employee       employee  @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   project        project   @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
+
 model job_category {
   id       Int        @id @default(autoincrement())
   name     String     @db.VarChar(30)
   employee employee[]
 }
+
 model position {
   id       Int        @id @default(autoincrement())
   name     String     @db.VarChar(30)
   employee employee[]
 }
+
 model process {
   id              Int               @id @default(autoincrement())
   name            String            @db.VarChar(30)
   process_used    process_used[]
   project_process project_process[]
 }
+
 model process_used {
   id              Int              @id @default(autoincrement())
   project_id      Int?
@@ -122,6 +132,7 @@ model process_used {
   employee_skills employee_skills? @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_used_employee_skills_id_fkey")
   process         process?         @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
+
 model project {
   id                  Int               @id(map: "example_table_pkey") @default(autoincrement())
   hp_posting_flag     Boolean           @default(false)
@@ -140,6 +151,7 @@ model project {
   project_process     project_process[]
   project_skills      project_skills[]
 }
+
 model project_process {
   id         Int      @id @default(autoincrement())
   project_id Int?
@@ -147,6 +159,7 @@ model project_process {
   process    process? @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   project    project? @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
+
 model project_skills {
   id         Int      @id @default(autoincrement())
   project_id Int?
@@ -154,10 +167,12 @@ model project_skills {
   project    project? @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   skill      skill?   @relation(fields: [skill_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
+
 model project_type {
   id   Int    @id @default(autoincrement())
   name String @db.VarChar(30)
 }
+
 model skill {
   id             Int              @id @default(autoincrement())
   name           String           @db.VarChar(30)
@@ -167,6 +182,7 @@ model skill {
   technic        technic?         @relation(fields: [technic_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   skills_used    skills_used[]
 }
+
 model skills_used {
   id                 Int              @id @default(autoincrement())
   employee_skills_id Int?
@@ -174,15 +190,18 @@ model skills_used {
   employee_skills    employee_skills? @relation(fields: [employee_skills_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   skill              skill?           @relation(fields: [skill_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
+
 model technic {
   id    Int     @id @default(autoincrement())
   name  String  @db.VarChar(30)
   skill skill[]
 }
+
 model working {
   id   Int    @id @default(autoincrement())
   name String @db.VarChar(30)
 }
+
 model your_table_name {
   id             Int       @id @default(autoincrement())
   invoice_date   DateTime? @db.Date
