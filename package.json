@@ -35,6 +35,7 @@
     "@mui/system": "^5.12.1",
     "@mui/x-date-pickers": "^6.2.0",
     "@mui/x-date-pickers-pro": "^6.2.0",
+    "@prisma/client": "^5.5.2",
     "@react-pdf/renderer": "^3.1.9",
     "@reduxjs/toolkit": "^1.9.5",
     "@vercel/postgres": "^0.5.0",
