@@ -24,5 +24,15 @@ module.exports = withTM({
     REACT_APP_GOOGLE_MAPS_API_KEY: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     REACT_APP_API_URL: process.env.REACT_APP_API_URL
+  },
+  async redirects() {
+    // redirect - default first page should be `login` when root URL like http://example.com/
+    return [
+      {
+        source: '/',
+        destination: '/login',
+        permanent: true
+      }
+    ];
   }
 });
