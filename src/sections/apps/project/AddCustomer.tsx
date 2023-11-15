@@ -64,7 +64,7 @@ const getInitialValues = (
     working_end_time: null as Date | null,
     contract_name: '',
     working_postal_code: '',
-    working_postal_address: '',
+    working_address: '',
     holiday: '',
     hp_posting_flag: false,
     skills: projectSkills?.map((skill) => skill.name as string) ?? [],
@@ -81,7 +81,7 @@ const getInitialValues = (
     newCustomer.working_end_time = endTime;
     newCustomer.contract_name = customer.contract_name;
     newCustomer.working_postal_code = customer.working_postal_code;
-    newCustomer.working_postal_address = customer.working_postal_address;
+    newCustomer.working_address = customer.working_address;
     newCustomer.holiday = customer.holiday;
     newCustomer.hp_posting_flag = customer.hp_posting_flag;
     newCustomer.skills = customer.skills;
@@ -302,8 +302,9 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
             return response.json();
           })
           .then((data) => {
-            console.log(data);
-            onReload(data);
+            console.log('データ取得');
+            console.log(data.data.rows);
+            onReload(data.data.rows);
             dispatch(
               openSnackbar({
                 open: true,
@@ -479,13 +480,13 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-working_postal_address">住所</InputLabel>
+                        <InputLabel htmlFor="customer-working_address">住所</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-working_postal_address"
-                          {...getFieldProps('working_postal_address')}
-                          error={Boolean(touched.working_postal_address && errors.working_postal_address)}
-                          helperText={touched.working_postal_address && errors.working_postal_address}
+                          id="customer-working_address"
+                          {...getFieldProps('working_address')}
+                          error={Boolean(touched.working_address && errors.working_address)}
+                          helperText={touched.working_address && errors.working_address}
                         />
                       </Stack>
                     </Grid>
