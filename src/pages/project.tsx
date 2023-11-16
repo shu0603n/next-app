@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement } from 'react';
+import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement, useId } from 'react';
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
@@ -39,6 +39,9 @@ import { EditTwoTone, PlusOutlined, DeleteTwoTone } from '@ant-design/icons';
 import { ProjectType } from 'types/project/project';
 
 // ==============================|| REACT TABLE ||============================== //
+type ProjectDataList = {
+  project: Array<ProjectType>;
+};
 
 interface Props {
   columns: Column[];
@@ -89,10 +92,10 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
     if (matchDownSM) {
       setHiddenColumns([
         'description',
-        'client_name',
+        // 'client',
         'working_start_time',
         'working_end_time',
-        'contract_name',
+        // 'contract',
         'working_postal_code',
         'working_postal_address',
         'holiday',
@@ -103,7 +106,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
         'description',
         'working_start_time',
         'working_end_time',
-        'contract_name',
+        // 'contract',
         'working_postal_code',
         'working_postal_address',
         'holiday',
@@ -132,7 +135,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Customer
+              追加
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
@@ -167,7 +170,14 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
                   >
                     {row.cells.map((cell: Cell, i: number) => (
                       <TableCell {...cell.getCellProps([{ className: cell.column.className }])} key={i}>
-                        {cell.render('Cell')}
+                        {/* 特定の列のIDが 'client' または 'contract' の場合、'name' プロパティを表示 */}
+                        {cell.column.id === 'client' &&
+                          'client' in cell.row.original &&
+                          (cell.row.original.client as { name: string })?.name}
+                        {cell.column.id === 'contract' &&
+                          'contract' in cell.row.original &&
+                          (cell.row.original.contract as { name: string })?.name}
+                        {!(cell.column.id === 'client' || cell.column.id === 'contract') && cell.render('Cell')}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -175,7 +185,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
               );
             })}
             <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-              <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
+              <TableCell sx={{ p: 2, py: 3 }} colSpan={9} key={useId()}>
                 <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
               </TableCell>
             </TableRow>
@@ -205,13 +215,13 @@ const CustomerProjectPage = () => {
   const theme = useTheme();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const [tableData, setTableData] = useState<Array<ProjectType>>(); // データを保持する状態変数
+  const [tableData, setTableData] = useState<ProjectDataList>(); // データを保持する状態変数
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
     fetchTableData()
       .then((data) => {
-        setTableData(data.data.rows); // データを状態に設定
+        setTableData(data); // データを状態に設定
       })
       .catch((error) => {
         // エラーハンドリング
@@ -261,7 +271,7 @@ const CustomerProjectPage = () => {
       },
       {
         Header: '企業名',
-        accessor: 'client_name',
+        accessor: 'client',
         disableSortBy: true
       },
       {
@@ -270,18 +280,18 @@ const CustomerProjectPage = () => {
         disableSortBy: true
       },
       {
-        Header: '開始日',
+        Header: '掲載開始日',
         accessor: 'working_start_time',
         disableSortBy: true
       },
       {
-        Header: '終了日',
+        Header: '掲載終了日',
         accessor: 'working_end_time',
         disableSortBy: true
       },
       {
         Header: '契約区分',
-        accessor: 'contract_name',
+        accessor: 'contract',
         disableSortBy: true
       },
       {
@@ -352,7 +362,7 @@ const CustomerProjectPage = () => {
             <ScrollX>
               <ReactTable
                 columns={columns}
-                data={tableData}
+                data={tableData.project}
                 handleAdd={handleAdd}
                 getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
               />

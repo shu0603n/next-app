@@ -52,34 +52,38 @@ import { ProjectType } from 'types/project/project';
 // constant
 const getInitialValues = (
   customer: FormikValues | null,
-  startTime: Date | null,
-  endTime: Date | null,
   projectSkills: SkillType[] | undefined,
   projectProcess: ParameterType[] | undefined
 ) => {
   const newCustomer = {
     project_title: '',
     description: '',
-    working_start_time: null as Date | null,
-    working_end_time: null as Date | null,
-    contract_name: '',
+    client: {
+      id: 0,
+      name: ''
+    } as ParameterType | null,
+    contract: {
+      id: 0,
+      name: ''
+    } as ParameterType | null,
+    working_start_time: '',
+    working_end_time: '',
     working_postal_code: '',
     working_address: '',
     holiday: '',
     hp_posting_flag: false,
     skills: projectSkills?.map((skill) => skill.name as string) ?? [],
     process: projectProcess?.map((process) => process.name as string) ?? [],
-    client_name: '',
     role: ''
   };
 
   if (customer) {
     newCustomer.project_title = customer.project_title;
     newCustomer.description = customer.description;
-    newCustomer.client_name = customer.client_name;
-    newCustomer.working_start_time = startTime;
-    newCustomer.working_end_time = endTime;
-    newCustomer.contract_name = customer.contract_name;
+    newCustomer.client = customer.client;
+    newCustomer.contract = customer.contract;
+    newCustomer.working_start_time = customer.working_start_time;
+    newCustomer.working_end_time = customer.working_end_time;
     newCustomer.working_postal_code = customer.working_postal_code;
     newCustomer.working_address = customer.working_address;
     newCustomer.holiday = customer.holiday;
@@ -99,23 +103,9 @@ const filterSkills = createFilterOptions<string>();
 
 // ==============================|| 顧客の追加/編集 ||============================== //
 
-async function fetchContract() {
+async function fetchAllData() {
   try {
-    const response = await fetch('/api/db/parameter/contract/select');
-    if (!response.ok) {
-      throw new Error('API request failed');
-    }
-    const data = await response.json();
-    return data; // APIから返されたデータを返します
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-}
-
-async function fetchProcess() {
-  try {
-    const response = await fetch('/api/db/parameter/process/select');
+    const response = await fetch('/api/db/project/update/select');
     if (!response.ok) {
       throw new Error('API request failed');
     }
@@ -155,21 +145,6 @@ async function fetchProjectProcess() {
   }
 }
 
-
-async function fetchSkill() {
-  try {
-    const response = await fetch('/api/db/parameter/skill/select');
-    if (!response.ok) {
-      throw new Error('API request failed');
-    }
-    const data = await response.json();
-    return data; // APIから返されたデータを返します
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-}
-
 export interface Props {
   customer?: any;
   onCancel: () => void;
@@ -186,11 +161,10 @@ type SkillType = {
   candidate_flag: boolean;
 };
 const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
-  const [startTime, setStartTime] = useState<Date | null>(customer?.working_start_time);
-  const [endTime, setEndTime] = useState<Date | null>(customer?.working_end_time);
   const isCreating = !customer;
 
   const [contract, setContract] = useState<Array<ParameterType>>();
+  const [client, setClient] = useState<Array<ParameterType>>();
   const [process, setProcess] = useState<Array<ParameterType>>();
   const [skill, setSkill] = useState<Array<SkillType>>();
   const [projectSkills, setProjectSkills] = useState<Array<SkillType>>();
@@ -200,16 +174,15 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [contractData, projectSkillsData, projectProcessData, skillData, processData] = await Promise.all([
-          fetchContract(),
+        const [projectSkillsData, projectProcessData, allData] = await Promise.all([
           fetchProjectSkills(),
           fetchProjectProcess(),
-          fetchSkill(),
-          fetchProcess()
+          fetchAllData()
         ]);
-        setContract(contractData.data.rows);
+        setClient(allData.client);
+        setContract(allData.contract);
         if (customer) {
-          setProjectSkills(projectSkillsData.data.rows);
+          setProjectSkills(allData.contract);
           setProjectProcess(projectProcessData.data.rows);
           setFieldValue(
             'skills',
@@ -220,8 +193,8 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
             projectProcessData.data.rows.map((item: ParameterType) => item.name)
           );
         }
-        setSkill(skillData.data.rows);
-        setProcess(processData.data.rows);
+        setSkill(allData.skill);
+        setProcess(allData.process);
         setLoading(false);
 
         // ここで画面描画などの処理を行います
@@ -275,7 +248,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   };
 
   const formik = useFormik({
-    initialValues: getInitialValues(customer!, startTime, endTime, projectSkills, projectProcess),
+    initialValues: getInitialValues(customer!, projectSkills, projectProcess),
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
       try {
@@ -302,8 +275,6 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
             return response.json();
           })
           .then((data) => {
-            console.log('データ取得');
-            console.log(data.data.rows);
             onReload(data.data.rows);
             dispatch(
               openSnackbar({
@@ -375,7 +346,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
       <FormikProvider value={formik}>
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
-            <DialogTitle>{customer ? 'Edit Customer' : 'New Customer'}</DialogTitle>
+            <DialogTitle>{customer ? '編集' : '新規追加'}</DialogTitle>
             <Divider />
             <DialogContent sx={{ p: 2.5 }}>
               <Grid container spacing={3}>
@@ -383,19 +354,59 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                   <Grid container spacing={3}>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-working_start_time">開始日</InputLabel>
-                        <DatePicker value={startTime} onChange={(newValue) => setStartTime(newValue)} format="yyyy/MM/dd" />
+                        <InputLabel htmlFor="customer-working_start_time">掲載開始日</InputLabel>
+                        <DatePicker format="yyyy/MM/dd" />
                       </Stack>
                     </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-working_end_time">終了日</InputLabel>
-                        <DatePicker value={endTime} onChange={(newValue) => setEndTime(newValue)} format="yyyy/MM/dd" />
+                        <InputLabel htmlFor="customer-working_end_time">掲載終了日</InputLabel>
+                        <DatePicker format="yyyy/MM/dd" />
+                      </Stack>
+                    </Grid>
+                  </Grid>
+                  <Grid container spacing={3}>
+                    <Grid item xs={6}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="customer-working_start_time">就業開始時刻</InputLabel>
+                        <TextField
+                          id="time"
+                          placeholder="Alarm Clock"
+                          type="time"
+                          InputLabelProps={{
+                            shrink: true
+                          }}
+                          inputProps={{
+                            step: 300 // 5 min
+                          }}
+                          sx={{ width: 150 }}
+                          {...getFieldProps('working_start_time')}
+                          onChange={(event: any) => setFieldValue('working_start_time', event.target.value as string)}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="customer-working_end_time">就業終了時刻</InputLabel>
+                        <TextField
+                          id="time"
+                          placeholder="Alarm Clock"
+                          type="time"
+                          InputLabelProps={{
+                            shrink: true
+                          }}
+                          inputProps={{
+                            step: 300 // 5 min
+                          }}
+                          sx={{ width: 150 }}
+                          {...getFieldProps('working_end_time')}
+                          onChange={(event: any) => setFieldValue('working_end_time', event.target.value as string)}
+                        />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-client_name">プロジェクト名</InputLabel>
+                        <InputLabel htmlFor="customer-client">プロジェクト名</InputLabel>
                         <TextField
                           fullWidth
                           id="customer-project_title"
@@ -408,15 +419,39 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-client_name">企業名</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="customer-client_name"
-                          placeholder="企業名を入力"
-                          {...getFieldProps('client_name')}
-                          error={Boolean(touched.client_name && errors.client_name)}
-                          helperText={touched.client_name && errors.client_name}
-                        />
+                        <InputLabel htmlFor="customer-client">企業名</InputLabel>
+                        <FormControl fullWidth>
+                          <Select
+                            id="column-hiding"
+                            displayEmpty
+                            {...getFieldProps('client')}
+                            onChange={(event: SelectChangeEvent<string>) =>
+                              setFieldValue(
+                                'client',
+                                client?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
+                              )
+                            }
+                            input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
+                            renderValue={(selected: any) => {
+                              if (!selected) {
+                                return <Typography variant="subtitle1">企業を選択</Typography>;
+                              }
+
+                              return <Typography variant="subtitle2">{selected.name}</Typography>;
+                            }}
+                          >
+                            {client?.map((column: ParameterType) => (
+                              <MenuItem key={column.id} value={column.name}>
+                                <ListItemText primary={column.name} />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {touched.client && errors.client && (
+                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
+                            {errors.client}
+                          </FormHelperText>
+                        )}
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
@@ -436,20 +471,25 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-contract_name">契約区分</InputLabel>
+                        <InputLabel htmlFor="customer-contract">契約区分</InputLabel>
                         <FormControl fullWidth>
                           <Select
                             id="column-hiding"
                             displayEmpty
-                            {...getFieldProps('contract_name')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('contract_name', event.target.value as string)}
+                            {...getFieldProps('contract')}
+                            onChange={(event: SelectChangeEvent<string>) =>
+                              setFieldValue(
+                                'contract',
+                                contract?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
+                              )
+                            }
                             input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
-                            renderValue={(selected) => {
+                            renderValue={(selected: any) => {
                               if (!selected) {
                                 return <Typography variant="subtitle1">役割を選択</Typography>;
                               }
 
-                              return <Typography variant="subtitle2">{selected}</Typography>;
+                              return <Typography variant="subtitle2">{selected.name}</Typography>;
                             }}
                           >
                             {contract?.map((column: ParameterType) => (
@@ -459,9 +499,9 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                             ))}
                           </Select>
                         </FormControl>
-                        {touched.contract_name && errors.contract_name && (
+                        {touched.contract && errors.contract && (
                           <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.contract_name}
+                            {errors.contract}
                           </FormHelperText>
                         )}
                       </Stack>

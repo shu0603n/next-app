@@ -1,10 +1,12 @@
+type ParameterType = {
+  id: number;
+  name: string;
+}
 export type ProjectType = {
   id: number;
   hp_posting_flag: boolean;
-  client_id: number;
-  client_name: string;
-  contract_id: number;
-  contract_name: string;
+  client: ParameterType;
+  contract: ParameterType;
   working_postal_code: string;
   working_address: string;
   working_start_time: string;
