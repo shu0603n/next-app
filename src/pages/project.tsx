@@ -295,6 +295,11 @@ const CustomerProjectPage = () => {
         disableSortBy: true
       },
       {
+        Header: '金額',
+        accessor: 'price',
+        disableSortBy: true
+      },
+      {
         Header: '郵便番号',
         accessor: 'working_postal_code',
         disableSortBy: true

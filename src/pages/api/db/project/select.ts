@@ -17,7 +17,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
         working_end_time: true,
         holiday: true,
         project_title: true,
-        description: true
+        description: true,
+        price: true
       }
     });
 

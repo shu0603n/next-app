@@ -24,7 +24,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
       working_end_time,
       holiday,
       project_title,
-      description
+      description,
+      price
     } = request.body;
 
     // project_title が存在しない場合はエラーをスロー
@@ -46,7 +47,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
           working_end_time: toNull(working_end_time),
           holiday: toNull(holiday),
           project_title: toNull(project_title),
-          description: toNull(description)
+          description: toNull(description),
+          price: Number(price)
         }
       });
 
@@ -64,7 +66,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
           working_end_time: toNull(working_end_time),
           holiday: toNull(holiday),
           project_title: toNull(project_title),
-          description: toNull(description)
+          description: toNull(description),
+          price: Number(price)
         }
       });
 
@@ -84,7 +87,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
         working_end_time: true,
         holiday: true,
         project_title: true,
-        description: true
+        description: true,
+        price: true
       }
     });
 

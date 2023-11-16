@@ -74,7 +74,8 @@ const getInitialValues = (
     hp_posting_flag: false,
     skills: projectSkills?.map((skill) => skill.name as string) ?? [],
     process: projectProcess?.map((process) => process.name as string) ?? [],
-    role: ''
+    role: '',
+    price: 0
   };
 
   if (customer) {
@@ -90,6 +91,7 @@ const getInitialValues = (
     newCustomer.hp_posting_flag = customer.hp_posting_flag;
     newCustomer.skills = customer.skills;
     newCustomer.process = customer.process;
+    newCustomer.price = customer.price;
     return _.merge({}, newCustomer, customer);
   }
 
@@ -364,8 +366,6 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                         <DatePicker format="yyyy/MM/dd" />
                       </Stack>
                     </Grid>
-                  </Grid>
-                  <Grid container spacing={3}>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-working_start_time">就業開始時刻</InputLabel>
@@ -504,6 +504,19 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                             {errors.contract}
                           </FormHelperText>
                         )}
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="customer-price">金額</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="customer-price"
+                          placeholder="金額を入力"
+                          {...getFieldProps('price')}
+                          error={Boolean(touched.price && errors.price)}
+                          helperText={touched.price && errors.price}
+                        />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
