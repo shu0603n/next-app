@@ -8,15 +8,8 @@ const prisma = new PrismaClient({
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    // const {id} = request.body;
-    console.log(request.body);
-    const id = 1;
+    const id = request.query.id;
 
-    const data = await prisma.project.findMany({
-      where: {
-        id: id
-      }
-    });
     const project_process = await prisma.project_process.findMany({
       where: {
         project_id: Number(id)
@@ -52,7 +45,6 @@ export default async function handler(request: NextApiRequest, response: NextApi
 
     response.status(200).json({
       message: 'データを取得しました。',
-      data: data,
       project_process: project_process,
       project_skills: project_skills
     });

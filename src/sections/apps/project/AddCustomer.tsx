@@ -57,6 +57,7 @@ const getInitialValues = (
   projectProcess: ParameterType[] | undefined
 ) => {
   const newCustomer = {
+    id: 0,
     project_title: '',
     description: '',
     client: {
@@ -95,6 +96,7 @@ const getInitialValues = (
   };
 
   if (customer) {
+    newCustomer.id = customer.id;
     newCustomer.project_title = customer.project_title;
     newCustomer.description = customer.description;
     newCustomer.client = customer.client;
@@ -122,9 +124,9 @@ const filterSkills = createFilterOptions<string>();
 
 // ==============================|| 顧客の追加/編集 ||============================== //
 
-async function fetchAllData() {
+async function fetchAllData(id: number) {
   try {
-    const response = await fetch('/api/db/project/update/select');
+    const response = await fetch(`/api/db/project/update/select?id=${id}`);
     if (!response.ok) {
       throw new Error('API request failed');
     }
@@ -154,11 +156,10 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
-    fetchAllData()
+    fetchAllData(customer.id)
       .then((data) => {
         const skills = data.project_skills?.map((item: SkillArrayType) => item.skill);
         const process = data.project_process?.map((item: ProcessArrayType) => item.process);
-
         setProjectSkills(skills);
         setProjectProcess(process);
         setFieldValue('skills', skills);
@@ -217,19 +218,12 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
       try {
-        const matchingSkills = skillAll?.filter((skillItem: SkillParameterType) => values.skills?.includes(skillItem));
-        const skillIds = matchingSkills?.map((skillItem: SkillParameterType) => skillItem.id);
-
-        const matchingProcess = processAll?.filter((processItem: ParameterType) => values.process?.includes(processItem));
-        const processIds = matchingProcess?.map((processItem: ParameterType) => processItem.id);
-
-        const newValues = { ...values, skills_id: skillIds, process_id: processIds };
         const requestOptions = {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json' // 必要に応じてヘッダーを調整
           },
-          body: JSON.stringify(newValues) // valuesをJSON文字列に変換してbodyに設定
+          body: JSON.stringify(values) // valuesをJSON文字列に変換してbodyに設定
         };
 
         fetch(`/api/db/project/update`, requestOptions)

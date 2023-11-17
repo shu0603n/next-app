@@ -1,6 +1,7 @@
 // pages/api/your-api-route.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
+import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
 
 const prisma = new PrismaClient({
   // デバッグモードを有効にする
@@ -25,8 +26,18 @@ export default async function handler(request: NextApiRequest, response: NextApi
       holiday,
       project_title,
       description,
-      price
+      price,
+      skills,
+      process
     } = request.body;
+
+    console.log('body', request.body);
+
+    const skillIds = skills?.map((skillItem: SkillParameterType) => skillItem.id);
+    console.log(skillIds);
+
+    const processIds = process?.map((processItem: ParameterType) => processItem.id);
+    console.log(processIds);
 
     // project_title が存在しない場合はエラーをスロー
     if (!project_title) {
@@ -72,6 +83,36 @@ export default async function handler(request: NextApiRequest, response: NextApi
       });
 
       // 挿入結果を必要に応じて処理
+    }
+
+    await prisma.project_skills.deleteMany({
+      where: {
+        project_id: Number(id)
+      }
+    });
+
+    for (const skillId of skillIds) {
+      await prisma.project_skills.create({
+        data: {
+          project_id: Number(id),
+          skill_id: skillId
+        }
+      });
+    }
+
+    await prisma.project_process.deleteMany({
+      where: {
+        project_id: Number(id)
+      }
+    });
+
+    for (const processId of processIds) {
+      await prisma.project_process.create({
+        data: {
+          project_id: Number(id),
+          process_id: processId
+        }
+      });
     }
 
     // データを取得
