@@ -1,7 +1,10 @@
 import { NextApiResponse, NextApiRequest } from 'next';
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  // デバッグモードを有効にする
+  log: ['query']
+});
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
