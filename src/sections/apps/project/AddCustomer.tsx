@@ -594,7 +594,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                               <TextField
                                 {...params}
                                 name="skills"
-                                placeholder="使用したスキルを入力してください"
+                                placeholder="使用したスキルを選択してください"
                                 error={formik.touched.skills && Boolean(formik.errors.skills)}
                                 helperText={TagsError}
                               />
@@ -690,7 +690,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                               <TextField
                                 {...params}
                                 name="process"
-                                placeholder="担当した工程を入力してください"
+                                placeholder="担当した工程を選択してください"
                                 error={formik.touched.process && Boolean(formik.errors.process)}
                                 helperText={TagsError}
                               />
