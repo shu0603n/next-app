@@ -12,3 +12,7 @@ export type SkillParameterType = {
 export type SkillArrayType = {
   skill: SkillParameterType;
 };
+
+export type ProcessArrayType = {
+  process: ParameterType;
+};

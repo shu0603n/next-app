@@ -49,7 +49,7 @@ import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 // assets
 import { CloseOutlined } from '@ant-design/icons';
 import { ProjectType } from 'types/project/project';
-import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
+import { ParameterType, SkillParameterType, SkillArrayType, ProcessArrayType } from 'types/parameter/parameter';
 // constant
 const getInitialValues = (
   customer: FormikValues | null,
@@ -156,10 +156,13 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
     // ページがロードされたときにデータを取得
     fetchAllData()
       .then((data) => {
-        setProjectSkills(data.project_skills);
-        setProjectProcess(data.project_process);
-        setFieldValue('skills', data.project_skills);
-        setFieldValue('process', data.project_process);
+        const skills = data.project_skills?.map((item: SkillArrayType) => item.skill);
+        const process = data.project_process?.map((item: ProcessArrayType) => item.process);
+
+        setProjectSkills(skills);
+        setProjectProcess(process);
+        setFieldValue('skills', skills);
+        setFieldValue('process', process);
         setLoading(false);
       })
       .catch((error) => {
@@ -563,9 +566,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                             fullWidth
                             autoHighlight
                             disableCloseOnSelect
-                            options={skillAll?.map((item) => {
-                              return { skill: item };
-                            })}
+                            options={skillAll}
                             {...getFieldProps('skills')}
                             onBlur={formik.handleBlur}
                             getOptionLabel={(option) => option}
@@ -585,7 +586,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                             renderOption={(props, option) => {
                               return (
                                 <Box component="li" {...props}>
-                                  {option.skill.name}
+                                  {option.name}
                                 </Box>
                               );
                             }}
@@ -613,7 +614,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                                     color={error ? 'error' : 'secondary'}
                                     label={
                                       <Typography variant="caption" color="secondary.dark">
-                                        {option.skill.name}
+                                        {option.name}
                                       </Typography>
                                     }
                                     // eslint-disable-next-line react/jsx-no-undef
@@ -634,9 +635,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                             {skillAll
                               ?.filter((item) => {
                                 return (
-                                  item.candidate_flag &&
-                                  formik.values.skills &&
-                                  !formik.values.skills.some((skill) => skill.skill.id === item.id)
+                                  item.candidate_flag && formik.values.skills && !formik.values.skills.some((skill) => skill.id === item.id)
                                 );
                               })
                               ?.slice(0, 5)
@@ -644,7 +643,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                                 <Chip
                                   key={index}
                                   variant="outlined"
-                                  onClick={() => setFieldValue('skills', [...(formik.values.skills || []), { skill: option }])}
+                                  onClick={() => setFieldValue('skills', [...(formik.values.skills || []), option])}
                                   label={<Typography variant="caption">{option.name}</Typography>}
                                   size="small"
                                 />
@@ -663,9 +662,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                             fullWidth
                             autoHighlight
                             disableCloseOnSelect
-                            options={processAll?.map((item) => {
-                              return { process: item };
-                            })}
+                            options={processAll}
                             {...getFieldProps('process')}
                             onBlur={formik.handleBlur}
                             getOptionLabel={(option) => option}
@@ -685,7 +682,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                             renderOption={(props, option) => {
                               return (
                                 <Box component="li" {...props}>
-                                  {option.sprocesskill.name}
+                                  {option.name}
                                 </Box>
                               );
                             }}
@@ -713,7 +710,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                                     color={error ? 'error' : 'secondary'}
                                     label={
                                       <Typography variant="caption" color="secondary.dark">
-                                        {option.process.name}
+                                        {option.name}
                                       </Typography>
                                     }
                                     // eslint-disable-next-line react/jsx-no-undef
@@ -733,14 +730,14 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                             <Typography variant="caption">候補:</Typography>
                             {processAll
                               ?.filter((item) => {
-                                return formik.values.process && !formik.values.process.some((process) => process.process.id === item.id);
+                                return formik.values.process && !formik.values.process.some((process) => process.id === item.id);
                               })
                               ?.slice(0, 5)
                               .map((option, index) => (
                                 <Chip
                                   key={index}
                                   variant="outlined"
-                                  onClick={() => setFieldValue('process', [...(formik.values.process || []), { process: option }])}
+                                  onClick={() => setFieldValue('process', [...(formik.values.process || []), option])}
                                   label={<Typography variant="caption">{option.name}</Typography>}
                                   size="small"
                                 />
