@@ -49,6 +49,13 @@ const other: NavItemType = {
       type: 'item',
       url: '/project',
       icon: icons.ProjectOutlined
+    },
+    {
+      id: 'hpme-page',
+      title: <FormattedMessage id="hpme-page" />,
+      type: 'item',
+      url: '/hp',
+      icon: icons.ProjectOutlined
     }
   ]
 };
