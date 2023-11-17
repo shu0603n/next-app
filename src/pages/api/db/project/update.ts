@@ -63,56 +63,80 @@ export default async function handler(request: NextApiRequest, response: NextApi
         }
       });
 
+      // 既存データを削除
+      await prisma.project_skills.deleteMany({
+        where: {
+          project_id: Number(id)
+        }
+      });
+      await prisma.project_process.deleteMany({
+        where: {
+          project_id: Number(id)
+        }
+      });
+
+      // 新規でINSERT
+      for (const skillId of skillIds) {
+        await prisma.project_skills.create({
+          data: {
+            project_id: Number(id),
+            skill_id: skillId
+          }
+        });
+      }
+      for (const processId of processIds) {
+        await prisma.project_process.create({
+          data: {
+            project_id: Number(id),
+            process_id: processId
+          }
+        });
+      }
+
       // 更新結果を必要に応じて処理
     } else {
       // id が存在しない場合は新規挿入を行う
-      await prisma.project.create({
+      const res = await prisma.project.create({
         data: {
           hp_posting_flag,
-          client: { connect: { id: client.id } },
-          contract: { connect: { id: contract.id } },
-          working_postal_code: toNull(working_postal_code),
-          working_address: toNull(working_address),
-          working_start_time: toNull(working_start_time),
-          working_end_time: toNull(working_end_time),
-          holiday: toNull(holiday),
-          project_title: toNull(project_title),
-          description: toNull(description),
+          client: {
+            connect: client.id ? { id: client.id } : undefined
+          },
+          contract: {
+            connect: contract.id ? { id: contract.id } : undefined
+          },
+          working_postal_code,
+          working_address,
+          working_start_time,
+          working_end_time,
+          holiday,
+          project_title,
+          description,
           price: Number(price)
         }
       });
 
+      console.log('res!!!!', res);
+
+      for (const skillId of skillIds) {
+        await prisma.project_skills.create({
+          data: {
+            project_id: Number(res.id),
+            skill_id: skillId
+          }
+        });
+      }
+
+      for (const processId of processIds) {
+        await prisma.project_process.create({
+          data: {
+            project_id: Number(res.id),
+            process_id: processId
+          }
+        });
+      }
+
       // 挿入結果を必要に応じて処理
-    }
-
-    await prisma.project_skills.deleteMany({
-      where: {
-        project_id: Number(id)
-      }
-    });
-
-    for (const skillId of skillIds) {
-      await prisma.project_skills.create({
-        data: {
-          project_id: Number(id),
-          skill_id: skillId
-        }
-      });
-    }
-
-    await prisma.project_process.deleteMany({
-      where: {
-        project_id: Number(id)
-      }
-    });
-
-    for (const processId of processIds) {
-      await prisma.project_process.create({
-        data: {
-          project_id: Number(id),
-          process_id: processId
-        }
-      });
     }
 
     // データを取得

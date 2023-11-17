@@ -57,15 +57,15 @@ const getInitialValues = (
   projectProcess: ParameterType[] | undefined
 ) => {
   const newCustomer = {
-    id: 0,
+    id: null as number | null,
     project_title: '',
     description: '',
     client: {
-      id: 0,
+      id: null as number | null,
       name: ''
     } as ParameterType | null,
     contract: {
-      id: 0,
+      id: null as number | null,
       name: ''
     } as ParameterType | null,
     working_start_time: '',
@@ -76,10 +76,10 @@ const getInitialValues = (
     hp_posting_flag: false,
     skills: [
       {
-        id: 0,
+        id: null as number | null,
         name: '',
         technic: {
-          id: 0,
+          id: null as number | null,
           name: ''
         } as ParameterType | null,
         candidate_flag: false
@@ -124,9 +124,9 @@ const filterSkills = createFilterOptions<string>();
 
 // ==============================|| 顧客の追加/編集 ||============================== //
 
-async function fetchAllData(id: number) {
+async function fetchAllData(id: number | undefined) {
   try {
-    const response = await fetch(`/api/db/project/update/select?id=${id}`);
+    const response = await fetch(id ? `/api/db/project/update/select?id=${id}` : '/api/db/project/update/select');
     if (!response.ok) {
       throw new Error('API request failed');
     }
@@ -156,7 +156,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
-    fetchAllData(customer.id)
+    fetchAllData(customer?.id)
       .then((data) => {
         const skills = data.project_skills?.map((item: SkillArrayType) => item.skill);
         const process = data.project_process?.map((item: ProcessArrayType) => item.process);
