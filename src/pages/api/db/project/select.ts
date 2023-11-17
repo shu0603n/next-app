@@ -21,10 +21,25 @@ export default async function handler(request: NextApiRequest, response: NextApi
         price: true
       }
     });
+    const skill = await prisma.skill.findMany({
+      select: {
+        id: true,
+        name: true,
+        technic: { select: { id: true, name: true } },
+        candidate_flag: true
+      }
+    });
+    const client = await prisma.client.findMany({ select: { id: true, name: true } });
+    const contract = await prisma.contract.findMany({ select: { id: true, name: true } });
+    const process = await prisma.process.findMany({ select: { id: true, name: true } });
 
     response.status(200).json({
       message: 'データを取得しました。',
-      project: projects
+      project: projects,
+      skill: skill,
+      client: client,
+      contract: contract,
+      process: process
     });
   } catch (error) {
     console.error('エラーが発生しました:', error);

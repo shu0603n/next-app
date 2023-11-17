@@ -1,7 +1,5 @@
-type ParameterType = {
-  id: number;
-  name: string;
-}
+import { ParameterType, SkillParameterType } from '../parameter/parameter';
+
 export type ProjectType = {
   id: number;
   hp_posting_flag: boolean;
@@ -14,4 +12,12 @@ export type ProjectType = {
   holiday: string;
   project_title: string;
   description: string;
+};
+
+export type ProjectDataList = {
+  project: Array<ProjectType>;
+  skill: Array<SkillParameterType>;
+  client: Array<ParameterType>;
+  contract: Array<ParameterType>;
+  process: Array<ParameterType>;
 };

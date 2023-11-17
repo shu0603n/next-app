@@ -5,7 +5,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
 
 import { PopupTransition } from 'components/@extended/Transitions';
-
+import { ProjectDataList } from '../types/project/project';
 // third-party
 import {
   useFilters,
@@ -39,9 +39,6 @@ import { EditTwoTone, PlusOutlined, DeleteTwoTone } from '@ant-design/icons';
 import { ProjectType } from 'types/project/project';
 
 // ==============================|| REACT TABLE ||============================== //
-type ProjectDataList = {
-  project: Array<ProjectType>;
-};
 
 interface Props {
   columns: Column[];
@@ -306,7 +303,7 @@ const CustomerProjectPage = () => {
       },
       {
         Header: '住所',
-        accessor: 'working_postal_address',
+        accessor: 'working_address',
         disableSortBy: true
       },
       {
@@ -385,7 +382,17 @@ const CustomerProjectPage = () => {
               sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
               aria-describedby="alert-dialog-slide-description"
             >
-              {add && <AddCustomer customer={customer} onCancel={handleAdd} onReload={() => setTableData} />}
+              {add && (
+                <AddCustomer
+                  customer={customer}
+                  onCancel={handleAdd}
+                  onReload={() => setTableData}
+                  skillAll={tableData.skill}
+                  contractAll={tableData.contract}
+                  clientAll={tableData.client}
+                  processAll={tableData.process}
+                />
+              )}
             </Dialog>
           </Fragment>
         )}

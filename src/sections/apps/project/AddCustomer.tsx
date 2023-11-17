@@ -49,10 +49,11 @@ import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 // assets
 import { CloseOutlined } from '@ant-design/icons';
 import { ProjectType } from 'types/project/project';
+import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
 // constant
 const getInitialValues = (
   customer: FormikValues | null,
-  projectSkills: SkillType[] | undefined,
+  projectSkills: SkillParameterType[] | undefined,
   projectProcess: ParameterType[] | undefined
 ) => {
   const newCustomer = {
@@ -72,8 +73,23 @@ const getInitialValues = (
     working_address: '',
     holiday: '',
     hp_posting_flag: false,
-    skills: projectSkills?.map((skill) => skill.name as string) ?? [],
-    process: projectProcess?.map((process) => process.name as string) ?? [],
+    skills: [
+      {
+        id: 0,
+        name: '',
+        technic: {
+          id: 0,
+          name: ''
+        } as ParameterType | null,
+        candidate_flag: false
+      } as SkillParameterType | null
+    ] as SkillParameterType[] | undefined,
+    process: [
+      {
+        id: 0,
+        name: ''
+      } as ParameterType | null
+    ] as ParameterType[] | undefined,
     role: '',
     price: 0
   };
@@ -89,8 +105,9 @@ const getInitialValues = (
     newCustomer.working_address = customer.working_address;
     newCustomer.holiday = customer.holiday;
     newCustomer.hp_posting_flag = customer.hp_posting_flag;
-    newCustomer.skills = customer.skills;
-    newCustomer.process = customer.process;
+    newCustomer.skills = projectSkills;
+    newCustomer.process = projectProcess;
+    newCustomer.role = customer.role;
     newCustomer.price = customer.price;
     return _.merge({}, newCustomer, customer);
   }
@@ -119,95 +136,39 @@ async function fetchAllData() {
   }
 }
 
-async function fetchProjectSkills() {
-  try {
-    const response = await fetch('/api/db/project/skills/select?id=1');
-    if (!response.ok) {
-      throw new Error('API request failed');
-    }
-    const data = await response.json();
-    return data; // APIから返されたデータを返します
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-}
-
-async function fetchProjectProcess() {
-  try {
-    const response = await fetch('/api/db/project/process/select?id=1');
-    if (!response.ok) {
-      throw new Error('API request failed');
-    }
-    const data = await response.json();
-    return data; // APIから返されたデータを返します
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-}
-
 export interface Props {
   customer?: any;
+  skillAll: Array<SkillParameterType>;
+  contractAll: Array<ParameterType>;
+  clientAll: Array<ParameterType>;
+  processAll: Array<ParameterType>;
   onCancel: () => void;
   onReload: (data: Array<ProjectType>) => void;
 }
-type ParameterType = {
-  id: number;
-  name: string;
-};
-type SkillType = {
-  id: number;
-  name: string;
-  technic_name: string;
-  candidate_flag: boolean;
-};
-const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
+const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, onCancel, onReload }: Props) => {
   const isCreating = !customer;
 
-  const [contract, setContract] = useState<Array<ParameterType>>();
-  const [client, setClient] = useState<Array<ParameterType>>();
-  const [process, setProcess] = useState<Array<ParameterType>>();
-  const [skill, setSkill] = useState<Array<SkillType>>();
-  const [projectSkills, setProjectSkills] = useState<Array<SkillType>>();
+  const [projectSkills, setProjectSkills] = useState<Array<SkillParameterType>>();
   const [projectProcess, setProjectProcess] = useState<Array<ParameterType>>();
   const [loading, setLoading] = useState(true); // データの読み込み状態を管理
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [projectSkillsData, projectProcessData, allData] = await Promise.all([
-          fetchProjectSkills(),
-          fetchProjectProcess(),
-          fetchAllData()
-        ]);
-        setClient(allData.client);
-        setContract(allData.contract);
-        if (customer) {
-          setProjectSkills(allData.contract);
-          setProjectProcess(projectProcessData.data.rows);
-          setFieldValue(
-            'skills',
-            projectSkillsData.data.rows.map((item: SkillType) => item.name)
-          );
-          setFieldValue(
-            'process',
-            projectProcessData.data.rows.map((item: ParameterType) => item.name)
-          );
-        }
-        setSkill(allData.skill);
-        setProcess(allData.process);
+    // ページがロードされたときにデータを取得
+    fetchAllData()
+      .then((data) => {
+        setProjectSkills(data.project_skills);
+        setProjectProcess(data.project_process);
+        setFieldValue('skills', data.project_skills);
+        setFieldValue('process', data.project_process);
         setLoading(false);
-
-        // ここで画面描画などの処理を行います
-      } catch (error) {
+      })
+      .catch((error) => {
         // エラーハンドリング
         console.error('Error:', error);
-      }
-    };
-    fetchData();
+        onCancel();
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 空の依存リストを指定することで、一度だけ実行されます
+  }, []); // 空の依存リストを指定することで、一度だけ実行される
 
   const CustomerSchema = Yup.object().shape({
     project_title: Yup.string().max(255).required('プロジェクト名は必須です')
@@ -248,16 +209,15 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     setOpenAlert(!openAlert);
     onCancel();
   };
-
   const formik = useFormik({
     initialValues: getInitialValues(customer!, projectSkills, projectProcess),
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
       try {
-        const matchingSkills = skill?.filter((skillItem: SkillType) => values.skills.includes(skillItem.name));
-        const skillIds = matchingSkills?.map((skillItem: SkillType) => skillItem.id);
+        const matchingSkills = skillAll?.filter((skillItem: SkillParameterType) => values.skills?.includes(skillItem));
+        const skillIds = matchingSkills?.map((skillItem: SkillParameterType) => skillItem.id);
 
-        const matchingProcess = process?.filter((processItem: ParameterType) => values.process.includes(processItem.name));
+        const matchingProcess = processAll?.filter((processItem: ParameterType) => values.process?.includes(processItem));
         const processIds = matchingProcess?.map((processItem: ParameterType) => processItem.id);
 
         const newValues = { ...values, skills_id: skillIds, process_id: processIds };
@@ -312,21 +272,27 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
       }
     }
   });
+
+  console.log('formik', formik);
   const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
   let TagsError: boolean | string | undefined = false;
-  if (formik.touched.skills && typeof formik.errors.skills) {
-    if (formik.touched.skills && typeof formik.errors.skills === 'string') {
-      TagsError = formik.errors.skills;
-    } else {
-      formik.errors.skills &&
-        typeof formik.errors.skills !== 'string' &&
-        formik.errors.skills.map((item) => {
-          // @ts-ignore
-          if (typeof item === 'object') TagsError = item.label;
-          return item;
-        });
-    }
-  }
+  // if (formik.touched.skills && typeof formik.errors.skills) {
+  //   // もし formik.errors.skills が文字列の場合
+  //   if (formik.touched.skills && typeof formik.errors.skills === 'string') {
+  //     TagsError = formik.errors.skills;
+  //   } else {
+  //     console.log(formik.errors.skills);
+  //     // formik.errors.skills が文字列でない場合
+  //     formik.errors.skills &&
+  //       typeof formik.errors.skills !== 'string' &&
+  //       formik.errors.skills?.map((item: any) => {
+  //         // @ts-ignore
+  //         // もし item がオブジェクトの場合、その label を TagsError に設定
+  //         if (typeof item === 'object') TagsError = item.label;
+  //         return item;
+  //       });
+  //   }
+  // }
 
   const message = `■フロントエンド開発
   ユーザーインターフェース（UI）の設計と実装。HTML、CSS、JavaScriptを使用して、見栄えの良いウェブページを構築します。
@@ -428,7 +394,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                             onChange={(event: SelectChangeEvent<string>) =>
                               setFieldValue(
                                 'client',
-                                client?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
+                                clientAll?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
                               )
                             }
                             input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
@@ -440,7 +406,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                               return <Typography variant="subtitle2">{selected.name}</Typography>;
                             }}
                           >
-                            {client?.map((column: ParameterType) => (
+                            {clientAll?.map((column: ParameterType) => (
                               <MenuItem key={column.id} value={column.name}>
                                 <ListItemText primary={column.name} />
                               </MenuItem>
@@ -480,7 +446,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                             onChange={(event: SelectChangeEvent<string>) =>
                               setFieldValue(
                                 'contract',
-                                contract?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
+                                contractAll?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
                               )
                             }
                             input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
@@ -492,7 +458,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                               return <Typography variant="subtitle2">{selected.name}</Typography>;
                             }}
                           >
-                            {contract?.map((column: ParameterType) => (
+                            {contractAll?.map((column: ParameterType) => (
                               <MenuItem key={column.id} value={column.name}>
                                 <ListItemText primary={column.name} />
                               </MenuItem>
@@ -587,28 +553,24 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                         )}
                       </Stack>
                     </Grid>
-                    {skill && (
+                    {skillAll && (
                       <Grid item xs={12}>
                         <Stack spacing={1.25}>
-                          <InputLabel htmlFor="customer-orderStatus">スキル</InputLabel>
+                          <InputLabel>スキル</InputLabel>
                           <Autocomplete
                             id="skills"
                             multiple
                             fullWidth
                             autoHighlight
-                            freeSolo
                             disableCloseOnSelect
-                            options={skill?.map((item) => item.name) as string[]}
+                            options={skillAll?.map((item) => {
+                              return { skill: item };
+                            })}
                             {...getFieldProps('skills')}
                             onBlur={formik.handleBlur}
                             getOptionLabel={(option) => option}
                             onChange={(event, newValue) => {
-                              // const jobExist = skill?.map((item) => item.name)?.includes(newValue[newValue.length - 1]);
-                              // if (!jobExist) {
-                              //   setFieldValue('skills', newValue);
-                              // } else {
                               setFieldValue('skills', newValue);
-                              // }
                             }}
                             filterOptions={(options, params) => {
                               const filtered = filterSkills(options, params);
@@ -623,7 +585,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                             renderOption={(props, option) => {
                               return (
                                 <Box component="li" {...props}>
-                                  {!skill?.some((v) => option.includes(v.name)) ? `追加 "${option}"` : option}
+                                  {option.skill.name}
                                 </Box>
                               );
                             }}
@@ -651,7 +613,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                                     color={error ? 'error' : 'secondary'}
                                     label={
                                       <Typography variant="caption" color="secondary.dark">
-                                        {option}
+                                        {option.skill.name}
                                       </Typography>
                                     }
                                     // eslint-disable-next-line react/jsx-no-undef
@@ -669,17 +631,20 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                             sx={{ mt: 1.5, flexWrap: { xs: 'wrap', sm: 'inherit' }, gap: { xs: 1, sm: 0 } }}
                           >
                             <Typography variant="caption">候補:</Typography>
-                            {skill
-                              ?.filter((skill: SkillType) => {
-                                const skillName = skill.name as never;
-                                return skill.candidate_flag && formik.values.skills && !formik.values.skills.includes(skillName);
+                            {skillAll
+                              ?.filter((item) => {
+                                return (
+                                  item.candidate_flag &&
+                                  formik.values.skills &&
+                                  !formik.values.skills.some((skill) => skill.skill.id === item.id)
+                                );
                               })
-                              .slice(0, 5)
+                              ?.slice(0, 5)
                               .map((option, index) => (
                                 <Chip
                                   key={index}
                                   variant="outlined"
-                                  onClick={() => setFieldValue('skills', [...formik.values.skills, option.name])}
+                                  onClick={() => setFieldValue('skills', [...(formik.values.skills || []), { skill: option }])}
                                   label={<Typography variant="caption">{option.name}</Typography>}
                                   size="small"
                                 />
@@ -688,28 +653,24 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                         </Stack>
                       </Grid>
                     )}
-                    {process && (
+                    {processAll && (
                       <Grid item xs={12}>
                         <Stack spacing={1.25}>
-                          <InputLabel htmlFor="customer-orderStatus">担当工程</InputLabel>
+                          <InputLabel>担当工程</InputLabel>
                           <Autocomplete
                             id="process"
                             multiple
                             fullWidth
                             autoHighlight
-                            freeSolo
                             disableCloseOnSelect
-                            options={process?.map((item) => item.name) as string[]}
+                            options={processAll?.map((item) => {
+                              return { process: item };
+                            })}
                             {...getFieldProps('process')}
                             onBlur={formik.handleBlur}
                             getOptionLabel={(option) => option}
                             onChange={(event, newValue) => {
-                              // const jobExist = process.includes(newValue[newValue.length - 1]);
-                              // if (!jobExist) {
-                              //   setFieldValue('process', newValue);
-                              // } else {
                               setFieldValue('process', newValue);
-                              // }
                             }}
                             filterOptions={(options, params) => {
                               const filtered = filterProcess(options, params);
@@ -724,7 +685,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                             renderOption={(props, option) => {
                               return (
                                 <Box component="li" {...props}>
-                                  {!process?.some((v) => option.includes(v.name)) ? `追加 "${option}"` : option}
+                                  {option.sprocesskill.name}
                                 </Box>
                               );
                             }}
@@ -752,7 +713,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                                     color={error ? 'error' : 'secondary'}
                                     label={
                                       <Typography variant="caption" color="secondary.dark">
-                                        {option}
+                                        {option.process.name}
                                       </Typography>
                                     }
                                     // eslint-disable-next-line react/jsx-no-undef
@@ -770,17 +731,16 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                             sx={{ mt: 1.5, flexWrap: { xs: 'wrap', sm: 'inherit' }, gap: { xs: 1, sm: 0 } }}
                           >
                             <Typography variant="caption">候補:</Typography>
-                            {process
-                              .filter((process: ParameterType) => {
-                                const processName = process.name as never;
-                                return formik.values.process && !formik.values.process.map((item) => item).includes(processName);
+                            {processAll
+                              ?.filter((item) => {
+                                return formik.values.process && !formik.values.process.some((process) => process.process.id === item.id);
                               })
-                              .slice(0, 5)
+                              ?.slice(0, 5)
                               .map((option, index) => (
                                 <Chip
                                   key={index}
                                   variant="outlined"
-                                  onClick={() => setFieldValue('process', [...formik.values.process, option.name])}
+                                  onClick={() => setFieldValue('process', [...(formik.values.process || []), { process: option }])}
                                   label={<Typography variant="caption">{option.name}</Typography>}
                                   size="small"
                                 />

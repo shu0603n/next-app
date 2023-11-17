@@ -1,7 +1,10 @@
 import { NextApiResponse, NextApiRequest } from 'next';
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  // デバッグモードを有効にする
+  log: ['query']
+});
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
@@ -14,24 +17,22 @@ export default async function handler(request: NextApiRequest, response: NextApi
         id: id
       }
     });
-    const skill = await prisma.skill.findMany({
+    const project_process = await prisma.project_process.findMany({
       where: {
-        id: id
+        project_id: Number(id)
       },
-      include: {
-        technic: {
+      select: {
+        process: {
           select: {
+            id: true,
             name: true
           }
         }
       }
     });
-    const client = await prisma.client.findMany({ select: { id: true, name: true } });
-    const process = await prisma.process.findMany({ select: { id: true, name: true } });
-    const contract = await prisma.contract.findMany({ select: { id: true, name: true } });
-    const skills_used = await prisma.skills_used.findMany({
+    const project_skills = await prisma.project_skills.findMany({
       where: {
-        employee_skills_id: Number(id)
+        project_id: Number(id)
       },
       select: {
         skill: {
@@ -52,11 +53,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
     response.status(200).json({
       message: 'データを取得しました。',
       data: data,
-      client: client,
-      contract: contract,
-      skill: skill,
-      process: process,
-      skills_used: skills_used
+      project_process: project_process,
+      project_skills: project_skills
     });
   } catch (error) {
     console.error('エラーが発生しました:', error);
