@@ -408,7 +408,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                             }
                             input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
                             renderValue={(selected: any) => {
-                              if (!selected) {
+                              if (!selected.name) {
                                 return <Typography variant="subtitle1">企業を選択</Typography>;
                               }
 
@@ -460,7 +460,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                             }
                             input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
                             renderValue={(selected: any) => {
-                              if (!selected) {
+                              if (!selected.name) {
                                 return <Typography variant="subtitle1">役割を選択</Typography>;
                               }
 

@@ -46,14 +46,15 @@ interface Props {
   handleAdd: () => void;
   getHeaderProps: (column: HeaderGroup) => {};
 }
-function formatDateString(originalDateString, targetFormat) {
+
+function formatDateString(originalDateString: string, targetFormat: string) {
   const originalDate = new Date(originalDateString);
 
   const year = originalDate.getFullYear();
-  const month = (originalDate.getMonth() + 1).toString().padStart(2, "0");
-  const day = originalDate.getDate().toString().padStart(2, "0");
+  const month = (originalDate.getMonth() + 1).toString().padStart(2, '0');
+  const day = originalDate.getDate().toString().padStart(2, '0');
 
-  let formattedDate = targetFormat.replace('YYYY', year.toString());
+  let formattedDate = targetFormat.replace('yyyy', year.toString());
   formattedDate = formattedDate.replace('MM', month);
   formattedDate = formattedDate.replace('DD', day);
 
@@ -102,25 +103,32 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
     if (matchDownSM) {
       setHiddenColumns([
         'description',
-        // 'client',
+        'start_date',
+        'end_date',
+        'client',
         'working_start_time',
         'working_end_time',
-        // 'contract',
+        'contract',
         'working_postal_code',
-        'working_postal_address',
+        'working_address',
         'holiday',
-        'hp_posting_flag'
+        'hp_posting_flag',
+        'price'
       ]);
     } else {
       setHiddenColumns([
         'description',
+        'start_date',
+        'end_date',
+        'client',
         'working_start_time',
         'working_end_time',
-        // 'contract',
+        'contract',
         'working_postal_code',
-        'working_postal_address',
+        // 'working_address',
         'holiday',
-        'hp_posting_flag'
+        'hp_posting_flag',
+        'price'
       ]);
     }
     // eslint-disable-next-line
@@ -272,16 +280,20 @@ const CustomerProjectPage = () => {
       },
       {
         Header: '募集期間',
-        accessor: 'test',
+        accessor: 'start_end',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Stack spacing={0}>
                 {values.start_date && (
-                  <Typography variant="subtitle1">
-                    {formatDateString(values.start_date, 'YYYY/MM/DD') ?? ''}~{formatDateString(values.end_date, 'YYYY/MM/DD') ?? ''}
-                  </Typography>
+                  <>
+                    <Typography variant="subtitle2">{formatDateString(values.start_date, 'yyyy/MM/DD') ?? ''}</Typography>
+                    <Typography variant="subtitle1" align="center">
+                      {'~'}
+                    </Typography>
+                    <Typography variant="subtitle2">{formatDateString(values.end_date, 'yyyy/MM/DD') ?? ''}</Typography>
+                  </>
                 )}
               </Stack>
             </Stack>
@@ -302,6 +314,11 @@ const CustomerProjectPage = () => {
                   </Typography>
                 )}
                 <Typography variant="subtitle1">{values.project_title}</Typography>
+                {values.price && (
+                  <Typography variant="caption" color="textSecondary">
+                    {values.price}
+                  </Typography>
+                )}
               </Stack>
             </Stack>
           );
