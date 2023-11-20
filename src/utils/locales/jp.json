@@ -4,6 +4,7 @@
   "employee": "社員一覧",
   "client": "企業一覧",
   "project": "案件一覧",
+  "home-page": "HP掲載用コンポーネント",
   "parameter": "パラメーター",
   "position": "役職",
   "accordion": "Accordion",

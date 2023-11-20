@@ -44,67 +44,93 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
             <Divider />
           </Grid>
           <Grid item xs={12} md={7}>
-            <Grid item xs={12}>
-              <Typography variant="h5" component="span">
-                業務内容
-              </Typography>
-              <Typography>
-                {customer.description?.split('\r\n').map((val, index) => (
-                  <Fragment key={index}>
-                    {val}
-                    <br />
-                  </Fragment>
-                ))}
-              </Typography>
-            </Grid>
+            {customer.description && (
+              <Grid item xs={12}>
+                <Typography variant="h5" component="span">
+                  業務内容
+                </Typography>
+                <Typography>
+                  {customer.description?.split('\n').map((val, index) => (
+                    <Fragment key={index}>
+                      {val}
+                      <br />
+                    </Fragment>
+                  ))}
+                </Typography>
+              </Grid>
+            )}
+          </Grid>
+          <Grid item xs={12} md={7}>
+            {customer.price && (
+              <Grid item xs={12}>
+                <Typography variant="h5" component="span">
+                  就業場所
+                </Typography>
+                <Typography>{customer.working_address}</Typography>
+              </Grid>
+            )}
+          </Grid>
+          <Grid item xs={12} md={7}>
+            {customer.price && (
+              <Grid item xs={12}>
+                <Typography variant="h5" component="span">
+                  単価
+                </Typography>
+                <Typography>{customer.price}</Typography>
+              </Grid>
+            )}
           </Grid>
           <Grid item xs={12} md={5}>
-            <Grid item xs={12}>
-              <Typography variant="h5" component="span">
-                使用スキル
-              </Typography>
-              <Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    listStyle: 'none',
-                    p: 0.5,
-                    m: 0
-                  }}
-                  component="ul"
-                >
-                  {customer.project_skills.map((skill: any, index: number) => (
-                    <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                      <Chip color="secondary" variant="outlined" size="small" label={skill.skill.name} />
-                    </ListItem>
-                  ))}
+            {customer.project_skills.length !== 0 && (
+              <Grid item xs={12}>
+                <Typography variant="h5" component="span">
+                  使用スキル
+                </Typography>
+                <Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      listStyle: 'none',
+                      p: 0.5,
+                      m: 0
+                    }}
+                    component="ul"
+                  >
+                    {customer.project_skills.map((skill: any, index: number) => (
+                      <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
+                        <Chip color="secondary" variant="outlined" size="small" label={skill.skill.name} />
+                      </ListItem>
+                    ))}
+                  </Box>
                 </Box>
-              </Box>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="h5" component="span">
-                担当工程
-              </Typography>
-              <Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    listStyle: 'none',
-                    p: 0.5,
-                    m: 0
-                  }}
-                  component="ul"
-                >
-                  {customer.project_process.map((process: any, index: number) => (
-                    <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                      <Chip color="secondary" variant="outlined" size="small" label={process.process.name} />
-                    </ListItem>
-                  ))}
+              </Grid>
+            )}
+            {customer.project_process.length !== 0 && (
+              <Grid item xs={12}>
+                <Typography variant="h5" component="span">
+                  担当工程
+                </Typography>
+                <Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      listStyle: 'none',
+                      p: 0.5,
+                      m: 0
+                    }}
+                    component="ul"
+                  >
+                    {customer.project_process.map((process: any, index: number) => (
+                      <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
+                        <Chip color="secondary" variant="outlined" size="small" label={process.process.name} />
+                      </ListItem>
+                    ))}
+                  </Box>
                 </Box>
-              </Box>
-            </Grid>
+              </Grid>
+            )}
           </Grid>
         </Grid>
         {/* <Stack
