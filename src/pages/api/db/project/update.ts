@@ -3,10 +3,16 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  // デバッグモードを有効にする
+  log: ['query']
+});
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
+    // nullまたは空文字列を処理するユーティリティ関数
+    const toNull = (str: string) => (str === null || str === '' ? null : str);
+
     // リクエストボディをデストラクチャリング
     const {
       id,
@@ -29,10 +35,10 @@ export default async function handler(request: NextApiRequest, response: NextApi
 
     console.log('body', request.body);
 
-    const skillIds = skills?.map((skillItem: SkillParameterType) => skillItem.id);
+    const skillIds = skills?.map((skillItem: SkillParameterType) => skillItem?.id) ?? null;
     console.log(skillIds);
 
-    const processIds = process?.map((processItem: ParameterType) => processItem.id);
+    const processIds = process?.map((processItem: ParameterType) => processItem?.id) ?? null;
     console.log(processIds);
 
     // project_title が存在しない場合はエラーをスロー
@@ -48,16 +54,20 @@ export default async function handler(request: NextApiRequest, response: NextApi
           hp_posting_flag,
           start_date,
           end_date,
-          client: { connect: { id: client.id } },
-          contract: { connect: { id: contract.id } },
-          working_postal_code,
-          working_address,
-          working_start_time,
-          working_end_time,
-          holiday,
-          project_title,
-          description,
-          price
+          client: {
+            connect: client ? { id: client.id } : undefined
+          },
+          contract: {
+            connect: contract ? { id: contract.id } : undefined
+          },
+          working_postal_code: toNull(working_postal_code),
+          working_address: toNull(working_address),
+          working_start_time: toNull(working_start_time),
+          working_end_time: toNull(working_end_time),
+          holiday: toNull(holiday),
+          project_title: toNull(project_title),
+          description: toNull(description),
+          price: toNull(price)
         }
       });
 
@@ -100,10 +110,10 @@ export default async function handler(request: NextApiRequest, response: NextApi
           start_date,
           end_date,
           client: {
-            connect: client.id ? { id: client.id } : undefined
+            connect: client ? { id: client.id } : undefined
           },
           contract: {
-            connect: contract.id ? { id: contract.id } : undefined
+            connect: contract ? { id: contract.id } : undefined
           },
           working_postal_code,
           working_address,

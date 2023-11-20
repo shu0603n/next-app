@@ -46,6 +46,19 @@ interface Props {
   handleAdd: () => void;
   getHeaderProps: (column: HeaderGroup) => {};
 }
+function formatDateString(originalDateString, targetFormat) {
+  const originalDate = new Date(originalDateString);
+
+  const year = originalDate.getFullYear();
+  const month = (originalDate.getMonth() + 1).toString().padStart(2, "0");
+  const day = originalDate.getDate().toString().padStart(2, "0");
+
+  let formattedDate = targetFormat.replace('YYYY', year.toString());
+  formattedDate = formattedDate.replace('MM', month);
+  formattedDate = formattedDate.replace('DD', day);
+
+  return formattedDate;
+}
 
 function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
   const theme = useTheme();
@@ -258,6 +271,24 @@ const CustomerProjectPage = () => {
         className: 'cell-center'
       },
       {
+        Header: '募集期間',
+        accessor: 'test',
+        Cell: ({ row }: { row: Row }) => {
+          const { values } = row;
+          return (
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Stack spacing={0}>
+                {values.start_date && (
+                  <Typography variant="subtitle1">
+                    {formatDateString(values.start_date, 'YYYY/MM/DD') ?? ''}~{formatDateString(values.end_date, 'YYYY/MM/DD') ?? ''}
+                  </Typography>
+                )}
+              </Stack>
+            </Stack>
+          );
+        }
+      },
+      {
         Header: 'プロジェクト名',
         accessor: 'project_title',
         Cell: ({ row }: { row: Row }) => {
@@ -265,9 +296,9 @@ const CustomerProjectPage = () => {
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Stack spacing={0}>
-                {values.start_date && (
+                {values.client && values.client.name && (
                   <Typography variant="caption" color="textSecondary">
-                    {values.start_date}~{values.end_date}
+                    {values.client.name}
                   </Typography>
                 )}
                 <Typography variant="subtitle1">{values.project_title}</Typography>
@@ -278,53 +309,43 @@ const CustomerProjectPage = () => {
       },
       {
         Header: '企業名',
-        accessor: 'client',
-        disableSortBy: true
+        accessor: 'client'
       },
       {
         Header: '業務内容',
-        accessor: 'description',
-        disableSortBy: true
+        accessor: 'description'
       },
       {
         Header: '掲載開始日',
-        accessor: 'working_start_time',
-        disableSortBy: true
+        accessor: 'working_start_time'
       },
       {
         Header: '掲載終了日',
-        accessor: 'working_end_time',
-        disableSortBy: true
+        accessor: 'working_end_time'
       },
       {
         Header: '契約区分',
-        accessor: 'contract',
-        disableSortBy: true
+        accessor: 'contract'
       },
       {
         Header: '金額',
-        accessor: 'price',
-        disableSortBy: true
+        accessor: 'price'
       },
       {
         Header: '郵便番号',
-        accessor: 'working_postal_code',
-        disableSortBy: true
+        accessor: 'working_postal_code'
       },
       {
         Header: '住所',
-        accessor: 'working_address',
-        disableSortBy: true
+        accessor: 'working_address'
       },
       {
         Header: '休日',
-        accessor: 'holiday',
-        disableSortBy: true
+        accessor: 'holiday'
       },
       {
         Header: 'HP掲載',
-        accessor: 'hp_posting_flag',
-        disableSortBy: true
+        accessor: 'hp_posting_flag'
       },
       {
         Header: '詳細',
