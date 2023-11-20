@@ -248,6 +248,16 @@ const CustomerProjectPage = () => {
         className: 'cell-center'
       },
       {
+        Header: '掲載開始日',
+        accessor: 'start_date',
+        className: 'cell-center'
+      },
+      {
+        Header: '掲載終了日',
+        accessor: 'end_date',
+        className: 'cell-center'
+      },
+      {
         Header: 'プロジェクト名',
         accessor: 'project_title',
         Cell: ({ row }: { row: Row }) => {

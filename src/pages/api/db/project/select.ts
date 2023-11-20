@@ -8,6 +8,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
     const projects = await prisma.project.findMany({
       select: {
         id: true,
+        start_date: true,
+        end_date: true,
         hp_posting_flag: true,
         client: { select: { id: true, name: true } },
         contract: { select: { id: true, name: true } },

@@ -9,41 +9,48 @@ const prisma = new PrismaClient({
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
     const projects = await prisma.project.findMany({
+      where: {
+        hp_posting_flag: true
+      },
       select: {
         id: true,
         hp_posting_flag: true,
-        client: { select: { id: true, name: true } },
-        contract: { select: { id: true, name: true } },
+        client_id: true,
+        contract_id: true,
         working_postal_code: true,
         working_address: true,
-        working_start_time: true,
-        working_end_time: true,
         holiday: true,
         project_title: true,
         description: true,
-        price: true
+        working_start_time: true,
+        working_end_time: true,
+        price: true,
+        client: true,
+        contract: true,
+        project_process: {
+          select: {
+            process: {
+              select: {
+                name: true
+              }
+            }
+          }
+        },
+        project_skills: {
+          select: {
+            skill: {
+              select: {
+                name: true
+              }
+            }
+          }
+        }
       }
     });
-    const skill = await prisma.skill.findMany({
-      select: {
-        id: true,
-        name: true,
-        technic: { select: { id: true, name: true } },
-        candidate_flag: true
-      }
-    });
-    // const client = await prisma.client.findMany({ select: { id: true, name: true } });
-    // const contract = await prisma.contract.findMany({ select: { id: true, name: true } });
-    // const process = await prisma.process.findMany({ select: { id: true, name: true } });
 
     response.status(200).json({
       message: 'データを取得しました。',
-      project: projects,
-      skill: skill
-      // ,
-      // client: client,
-      // contract: contract,
-      // process: process
+      project: projects
     });
   } catch (error) {
     console.error('エラーが発生しました:', error);

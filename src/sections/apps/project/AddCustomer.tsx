@@ -58,6 +58,8 @@ const getInitialValues = (
 ) => {
   const newCustomer = {
     id: null as number | null,
+    start_date: null as Date | null,
+    end_date: null as Date | null,
     project_title: '',
     description: '',
     client: {
@@ -92,11 +94,13 @@ const getInitialValues = (
       } as ParameterType | null
     ] as ParameterType[] | undefined,
     role: '',
-    price: 0
+    price: ''
   };
 
   if (customer) {
     newCustomer.id = customer.id;
+    newCustomer.start_date = customer.start_date;
+    newCustomer.end_date = customer.end_date;
     newCustomer.project_title = customer.project_title;
     newCustomer.description = customer.description;
     newCustomer.client = customer.client;
@@ -320,13 +324,21 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-working_start_time">掲載開始日</InputLabel>
-                        <DatePicker format="yyyy/MM/dd" />
+                        <DatePicker
+                          format="yyyy/MM/dd"
+                          value={new Date(getFieldProps('start_date').value)}
+                          onChange={(newValue) => setFieldValue('start_date', newValue)}
+                        />
                       </Stack>
                     </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-working_end_time">掲載終了日</InputLabel>
-                        <DatePicker format="yyyy/MM/dd" />
+                        <DatePicker
+                          format="yyyy/MM/dd"
+                          value={new Date(getFieldProps('end_date').value)}
+                          onChange={(newValue) => setFieldValue('end_date', newValue)}
+                        />
                       </Stack>
                     </Grid>
                     <Grid item xs={6}>
@@ -746,7 +758,15 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                           <Typography variant="subtitle1">スキルシートに掲載する</Typography>
                         </Stack>
                         <FormControlLabel
-                          control={<Switch {...getFieldProps('hp_posting_flag')} defaultChecked sx={{ mt: 0 }} />}
+                          control={
+                            <Switch
+                              defaultChecked={getFieldProps('hp_posting_flag').value}
+                              onChange={() => {
+                                setFieldValue('hp_posting_flag', !getFieldProps('hp_posting_flag').value);
+                              }}
+                              sx={{ mt: 0 }}
+                            />
+                          }
                           label=""
                           labelPlacement="start"
                         />

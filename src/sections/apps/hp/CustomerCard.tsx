@@ -1,31 +1,14 @@
 import { Fragment, useState } from 'react';
 
 // material-ui
-import { Box, Chip, Dialog, Divider, Grid, List, ListItem, ListItemText, Stack, Typography } from '@mui/material';
-
-// third-party
-
-// project import
+import { Box, Chip, Dialog, Divider, Grid, List, ListItem, ListItemText, Typography } from '@mui/material';
 
 import AddCustomer from 'sections/apps/customer/AddCustomer';
 import MainCard from 'components/MainCard';
 import { PopupTransition } from 'components/@extended/Transitions';
+import { ProjectCard } from 'types/project/project';
 
 // ==============================|| CUSTOMER - CARD ||============================== //
-
-type ProjectCard = {
-  id: number;
-  start_date: string;
-  end_date: string;
-  people: number;
-  client: string;
-  title: string;
-  description: string;
-  skills: string[];
-  process: string[];
-  time: string;
-};
-
 const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
   const [add, setAdd] = useState<boolean>(false);
   const handleAdd = () => {
@@ -43,15 +26,15 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                   <>
                     <Typography variant="h4" component="span">
                       <Typography variant="h3" component="span" color="primary">
-                        {customer.title}
+                        {customer.project_title}
                       </Typography>
-                      {customer.start_date && `(${customer.start_date}~${customer.end_date})`}
+                      {customer.working_start_time && `(${customer.working_start_time}~${customer.working_end_time})`}
                     </Typography>
                   </>
                 }
                 secondary={
                   <Typography variant="caption" color="secondary">
-                    {customer.client}
+                    {customer.client && customer.client.name}
                   </Typography>
                 }
               />
@@ -66,7 +49,7 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                 業務内容
               </Typography>
               <Typography>
-                {customer.description.split('\r\n').map((val, index) => (
+                {customer.description?.split('\r\n').map((val, index) => (
                   <Fragment key={index}>
                     {val}
                     <br />
@@ -91,9 +74,9 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                   }}
                   component="ul"
                 >
-                  {customer.skills.map((skill: string, index: number) => (
+                  {customer.project_skills.map((skill: any, index: number) => (
                     <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                      <Chip color="secondary" variant="outlined" size="small" label={skill} />
+                      <Chip color="secondary" variant="outlined" size="small" label={skill.skill.name} />
                     </ListItem>
                   ))}
                 </Box>
@@ -114,9 +97,9 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                   }}
                   component="ul"
                 >
-                  {customer.process.map((skill: string, index: number) => (
+                  {customer.project_process.map((process: any, index: number) => (
                     <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                      <Chip color="secondary" variant="outlined" size="small" label={skill} />
+                      <Chip color="secondary" variant="outlined" size="small" label={process.process.name} />
                     </ListItem>
                   ))}
                 </Box>
@@ -124,7 +107,7 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
             </Grid>
           </Grid>
         </Grid>
-        <Stack
+        {/* <Stack
           direction="row"
           className="hideforPDf"
           alignItems="center"
@@ -135,7 +118,7 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
           <Typography variant="caption" color="secondary">
             Updated in {customer.time}
           </Typography>
-        </Stack>
+        </Stack> */}
       </MainCard>
 
       {/* edit customer dialog */}

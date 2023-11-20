@@ -3,19 +3,15 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
 
-const prisma = new PrismaClient({
-  // デバッグモードを有効にする
-  log: ['query']
-});
+const prisma = new PrismaClient();
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    // nullまたは空文字列を処理するユーティリティ関数
-    const toNull = (str: string) => (str === null || str === '' ? null : str);
-
     // リクエストボディをデストラクチャリング
     const {
       id,
+      start_date,
+      end_date,
       hp_posting_flag,
       client,
       contract,
@@ -50,16 +46,18 @@ export default async function handler(request: NextApiRequest, response: NextApi
         where: { id: Number(id) },
         data: {
           hp_posting_flag,
+          start_date,
+          end_date,
           client: { connect: { id: client.id } },
           contract: { connect: { id: contract.id } },
-          working_postal_code: toNull(working_postal_code),
-          working_address: toNull(working_address),
-          working_start_time: toNull(working_start_time),
-          working_end_time: toNull(working_end_time),
-          holiday: toNull(holiday),
-          project_title: toNull(project_title),
-          description: toNull(description),
-          price: Number(price)
+          working_postal_code,
+          working_address,
+          working_start_time,
+          working_end_time,
+          holiday,
+          project_title,
+          description,
+          price
         }
       });
 
@@ -99,6 +97,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
       const res = await prisma.project.create({
         data: {
           hp_posting_flag,
+          start_date,
+          end_date,
           client: {
             connect: client.id ? { id: client.id } : undefined
           },
@@ -112,7 +112,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
           holiday,
           project_title,
           description,
-          price: Number(price)
+          price
         }
       });
 
@@ -143,6 +143,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
     const data = await prisma.project.findMany({
       select: {
         id: true,
+        start_date: true,
+        end_date: true,
         hp_posting_flag: true,
         client: { select: { id: true, name: true } },
         contract: { select: { id: true, name: true } },
