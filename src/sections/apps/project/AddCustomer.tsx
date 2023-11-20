@@ -62,14 +62,8 @@ const getInitialValues = (
     end_date: null as Date | null,
     project_title: '',
     description: '',
-    client: {
-      id: null as number | null,
-      name: ''
-    } as ParameterType | null,
-    contract: {
-      id: null as number | null,
-      name: ''
-    } as ParameterType | null,
+    client: null as ParameterType | null,
+    contract: null as ParameterType | null,
     working_start_time: '',
     working_end_time: '',
     working_postal_code: '',
@@ -408,13 +402,14 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                             }
                             input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
                             renderValue={(selected: any) => {
-                              if (!selected.name) {
+                              if (!selected?.name) {
                                 return <Typography variant="subtitle1">企業を選択</Typography>;
                               }
 
                               return <Typography variant="subtitle2">{selected.name}</Typography>;
                             }}
                           >
+                            <MenuItem value={undefined}>なし</MenuItem>
                             {clientAll?.map((column: ParameterType) => (
                               <MenuItem key={column.id} value={column.name}>
                                 <ListItemText primary={column.name} />
@@ -460,13 +455,14 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                             }
                             input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
                             renderValue={(selected: any) => {
-                              if (!selected.name) {
+                              if (!selected?.name) {
                                 return <Typography variant="subtitle1">役割を選択</Typography>;
                               }
 
                               return <Typography variant="subtitle2">{selected.name}</Typography>;
                             }}
                           >
+                            <MenuItem value={undefined}>なし</MenuItem>
                             {contractAll?.map((column: ParameterType) => (
                               <MenuItem key={column.id} value={column.name}>
                                 <ListItemText primary={column.name} />
@@ -548,6 +544,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                               return <Typography variant="subtitle2">{selected}</Typography>;
                             }}
                           >
+                            <MenuItem value={undefined}>なし</MenuItem>
                             {role.map((column: any) => (
                               <MenuItem key={column} value={column}>
                                 <ListItemText primary={column} />

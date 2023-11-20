@@ -102,8 +102,9 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
   useEffect(() => {
     if (matchDownSM) {
       setHiddenColumns([
+        'id',
         'description',
-        'start_date',
+        // 'start_date',
         'end_date',
         'client',
         'working_start_time',
@@ -117,8 +118,9 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
       ]);
     } else {
       setHiddenColumns([
+        'id',
         'description',
-        'start_date',
+        // 'start_date',
         'end_date',
         'client',
         'working_start_time',
@@ -271,16 +273,7 @@ const CustomerProjectPage = () => {
       {
         Header: '掲載開始日',
         accessor: 'start_date',
-        className: 'cell-center'
-      },
-      {
-        Header: '掲載終了日',
-        accessor: 'end_date',
-        className: 'cell-center'
-      },
-      {
-        Header: '募集期間',
-        accessor: 'start_end',
+        className: 'cell-center',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
@@ -300,6 +293,16 @@ const CustomerProjectPage = () => {
           );
         }
       },
+      {
+        Header: '掲載終了日',
+        accessor: 'end_date',
+        className: 'cell-center'
+      },
+      // {
+      //   Header: '募集期間',
+      //   accessor: 'start_end',
+
+      // },
       {
         Header: 'プロジェクト名',
         accessor: 'project_title',
