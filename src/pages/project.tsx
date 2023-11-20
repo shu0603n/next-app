@@ -298,11 +298,6 @@ const CustomerProjectPage = () => {
         accessor: 'end_date',
         className: 'cell-center'
       },
-      // {
-      //   Header: '募集期間',
-      //   accessor: 'start_end',
-
-      // },
       {
         Header: 'プロジェクト名',
         accessor: 'project_title',
