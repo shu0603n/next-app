@@ -7,7 +7,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
   try {
     const id = request.query.id;
 
-    const project_process = await prisma.project_process.findMany({
+    const projectProcessPromise = prisma.project_process.findMany({
       where: {
         project_id: Number(id)
       },
@@ -20,7 +20,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
         }
       }
     });
-    const project_skills = await prisma.project_skills.findMany({
+    const projectSkillsPromise = prisma.project_skills.findMany({
       where: {
         project_id: Number(id)
       },
@@ -39,6 +39,9 @@ export default async function handler(request: NextApiRequest, response: NextApi
         }
       }
     });
+
+    // 同時に実行して待つ
+    const [project_process, project_skills] = await Promise.all([projectProcessPromise, projectSkillsPromise]);
 
     response.status(200).json({
       message: 'データを取得しました。',

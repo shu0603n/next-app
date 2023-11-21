@@ -32,10 +32,12 @@ import IconButton from 'components/@extended/IconButton';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 import { DeleteFilled } from '@ant-design/icons';
-import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
+import { createFilterOptions, Autocomplete, Chip, CircularProgress } from '@mui/material';
 import { CloseOutlined } from '@ant-design/icons';
 import { ProjectType } from 'types/project/project';
 import { ParameterType, SkillParameterType, SkillArrayType, ProcessArrayType } from 'types/parameter/parameter';
+import Loader from 'components/Loader';
+
 // constant
 const getInitialValues = (
   customer: FormikValues | null,
@@ -244,10 +246,11 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                 close: false
               })
             );
+          })
+          .finally(() => {
+            setSubmitting(false);
+            onCancel();
           });
-
-        setSubmitting(false);
-        onCancel();
       } catch (error) {
         console.error(error);
       }
@@ -269,7 +272,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
   データベースの設計と管理。SQLデータベース（例: MySQL、PostgreSQL）やNoSQLデータベース（例: MongoDB）を使用します。`;
 
   if (loading) {
-    return <div>待機中</div>;
+    return <Loader />;
   }
 
   return (
@@ -754,13 +757,18 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     </Tooltip>
                   )}
                 </Grid>
+                {isSubmitting && (
+                  <Grid item>
+                    <CircularProgress />
+                  </Grid>
+                )}
                 <Grid item>
                   <Stack direction="row" spacing={2} alignItems="center">
                     <Button color="error" onClick={onCancel}>
                       キャンセル
                     </Button>
                     <Button type="submit" variant="contained" disabled={isSubmitting}>
-                      {customer ? '編集' : '追加'}
+                      {customer ? '更新' : '追加'}
                     </Button>
                   </Stack>
                 </Grid>
@@ -769,7 +777,15 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
           </Form>
         </LocalizationProvider>
       </FormikProvider>
-      {!isCreating && <AlertCustomerDelete title={customer.fatherName} open={openAlert} handleClose={handleAlertClose} />}
+      {!isCreating && (
+        <AlertCustomerDelete
+          deleteId={customer.id}
+          title={customer.project_title}
+          open={openAlert}
+          handleClose={handleAlertClose}
+          onReload={onReload}
+        />
+      )}
     </>
   );
 };

@@ -1,23 +1,67 @@
-// material-ui
 import { Button, Dialog, DialogContent, Stack, Typography } from '@mui/material';
-
-// project import
 import Avatar from 'components/@extended/Avatar';
 import { PopupTransition } from 'components/@extended/Transitions';
-
-// assets
+import { dispatch } from 'store';
+import { openSnackbar } from 'store/reducers/snackbar';
 import { DeleteFilled } from '@ant-design/icons';
+import { ProjectType } from 'types/project/project';
 
 // types
 interface Props {
+  deleteId: string;
   title: string;
   open: boolean;
   handleClose: (status: boolean) => void;
+  onReload: (data: Array<ProjectType>) => void;
 }
 
 // ==============================|| 顧客 - 削除 ||============================== //
 
-export default function AlertCustomerDelete({ title, open, handleClose }: Props) {
+export default function AlertCustomerDelete({ deleteId, title, open, handleClose, onReload }: Props) {
+  const handleClick = (isDelete: boolean) => {
+    if (isDelete) {
+      fetch(`/api/db/project/delete?id=${deleteId}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('データの削除に失敗しました。');
+          }
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data);
+          onReload(data.projects);
+          dispatch(
+            openSnackbar({
+              open: true,
+              message: 'パラメーターが正常に削除されました。',
+              variant: 'alert',
+              alert: {
+                color: 'success'
+              },
+              close: false
+            })
+          );
+        })
+        .catch((error) => {
+          console.error('エラー:', error);
+          dispatch(
+            openSnackbar({
+              open: true,
+              message: 'データの削除に失敗しました。',
+              variant: 'alert',
+              alert: {
+                color: 'error'
+              },
+              close: false
+            })
+          );
+        })
+        .finally(() => {
+          handleClose(isDelete);
+        });
+    }
+  };
+
   return (
     <Dialog
       open={open}
@@ -47,10 +91,10 @@ export default function AlertCustomerDelete({ title, open, handleClose }: Props)
           </Stack>
 
           <Stack direction="row" spacing={2} sx={{ width: 1 }}>
-            <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
+            <Button fullWidth onClick={() => handleClick(false)} color="secondary" variant="outlined">
               キャンセル
             </Button>
-            <Button fullWidth color="error" variant="contained" onClick={() => handleClose(true)} autoFocus>
+            <Button fullWidth color="error" variant="contained" onClick={() => handleClick(true)} autoFocus>
               削除
             </Button>
           </Stack>

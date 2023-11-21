@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    const projects = await prisma.project.findMany({
+    const projectsPromise = prisma.project.findMany({
       select: {
         id: true,
         start_date: true,
@@ -23,7 +23,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
         price: true
       }
     });
-    const skill = await prisma.skill.findMany({
+
+    const skillPromise = prisma.skill.findMany({
       select: {
         id: true,
         name: true,
@@ -31,9 +32,19 @@ export default async function handler(request: NextApiRequest, response: NextApi
         candidate_flag: true
       }
     });
-    const client = await prisma.client.findMany({ select: { id: true, name: true } });
-    const contract = await prisma.contract.findMany({ select: { id: true, name: true } });
-    const process = await prisma.process.findMany({ select: { id: true, name: true } });
+
+    const clientPromise = prisma.client.findMany({ select: { id: true, name: true } });
+    const contractPromise = prisma.contract.findMany({ select: { id: true, name: true } });
+    const processPromise = prisma.process.findMany({ select: { id: true, name: true } });
+
+    // 同時に実行して待つ
+    const [projects, skill, client, contract, process] = await Promise.all([
+      projectsPromise,
+      skillPromise,
+      clientPromise,
+      contractPromise,
+      processPromise
+    ]);
 
     response.status(200).json({
       message: 'データを取得しました。',

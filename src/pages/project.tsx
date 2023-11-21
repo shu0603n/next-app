@@ -254,6 +254,7 @@ const CustomerProjectPage = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
   const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
+  const [customerDeleteTitle, setCustomerDeleteTitle] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
 
   const handleAdd = () => {
@@ -390,6 +391,7 @@ const CustomerProjectPage = () => {
                     e.stopPropagation();
                     handleClose();
                     setCustomerDeleteId(row.values.id);
+                    setCustomerDeleteTitle(row.values.project_title);
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -418,7 +420,13 @@ const CustomerProjectPage = () => {
               />
             </ScrollX>
 
-            <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} />
+            <AlertCustomerDelete
+              deleteId={customerDeleteId}
+              title={customerDeleteTitle}
+              open={open}
+              handleClose={handleClose}
+              onReload={setProjectData}
+            />
             {/* add customer dialog */}
             <Dialog
               maxWidth="sm"

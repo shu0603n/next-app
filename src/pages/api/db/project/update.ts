@@ -8,6 +8,24 @@ const prisma = new PrismaClient({
   log: ['query']
 });
 
+const createProjectSkills = async (projectId: number, skillId: number) => {
+  await prisma.project_skills.create({
+    data: {
+      project_id: projectId,
+      skill_id: skillId
+    }
+  });
+};
+
+const createProjectProcess = async (projectId: number, processId: number) => {
+  await prisma.project_process.create({
+    data: {
+      project_id: projectId,
+      process_id: processId
+    }
+  });
+};
+
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
     // nullまたは空文字列を処理するユーティリティ関数
@@ -72,34 +90,23 @@ export default async function handler(request: NextApiRequest, response: NextApi
       });
 
       // 既存データを削除
-      await prisma.project_skills.deleteMany({
-        where: {
-          project_id: Number(id)
-        }
-      });
-      await prisma.project_process.deleteMany({
-        where: {
-          project_id: Number(id)
-        }
-      });
+      await Promise.all([
+        await prisma.project_skills.deleteMany({
+          where: {
+            project_id: Number(id)
+          }
+        }),
+        await prisma.project_process.deleteMany({
+          where: {
+            project_id: Number(id)
+          }
+        })
+      ]);
 
-      // 新規でINSERT
-      for (const skillId of skillIds) {
-        await prisma.project_skills.create({
-          data: {
-            project_id: Number(id),
-            skill_id: skillId
-          }
-        });
-      }
-      for (const processId of processIds) {
-        await prisma.project_process.create({
-          data: {
-            project_id: Number(id),
-            process_id: processId
-          }
-        });
-      }
+      await Promise.all([
+        await Promise.all(skillIds.map((skillId: number) => createProjectSkills(Number(id), skillId))),
+        await Promise.all(processIds.map((processId: number) => createProjectProcess(Number(id), processId)))
+      ]);
 
       // 更新結果を必要に応じて処理
     } else {
@@ -126,25 +133,10 @@ export default async function handler(request: NextApiRequest, response: NextApi
         }
       });
 
-      console.log('res!!!!', res);
-
-      for (const skillId of skillIds) {
-        await prisma.project_skills.create({
-          data: {
-            project_id: Number(res.id),
-            skill_id: skillId
-          }
-        });
-      }
-
-      for (const processId of processIds) {
-        await prisma.project_process.create({
-          data: {
-            project_id: Number(res.id),
-            process_id: processId
-          }
-        });
-      }
+      await Promise.all([
+        await Promise.all(skillIds.map((skillId: number) => createProjectSkills(Number(res.id), skillId))),
+        await Promise.all(processIds.map((processId: number) => createProjectProcess(Number(res.id), processId)))
+      ]);
 
       // 挿入結果を必要に応じて処理
     }
