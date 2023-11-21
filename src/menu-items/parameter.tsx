@@ -76,16 +76,16 @@ const parameter: NavItemType = {
           url: '/parameter/process'
         },
         {
+          id: 'employment',
+          title: <FormattedMessage id="employment" />,
+          type: 'item',
+          url: '/parameter/employment'
+        },
+        {
           id: 'project_type',
           title: <FormattedMessage id="project_type" />,
           type: 'item',
           url: '/parameter/project_type'
-        },
-        {
-          id: 'skill',
-          title: <FormattedMessage id="skill" />,
-          type: 'item',
-          url: '/parameter/skill'
         },
         {
           id: 'technic',
@@ -98,6 +98,12 @@ const parameter: NavItemType = {
           title: <FormattedMessage id="working" />,
           type: 'item',
           url: '/parameter/working'
+        },
+        {
+          id: 'skill',
+          title: <FormattedMessage id="skill" />,
+          type: 'item',
+          url: '/parameter/skill'
         }
       ]
     }

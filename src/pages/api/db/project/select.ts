@@ -23,7 +23,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
         price: true
       }
     });
-
+  
     const skillPromise = prisma.skill.findMany({
       select: {
         id: true,
