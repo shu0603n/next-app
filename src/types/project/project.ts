@@ -18,7 +18,6 @@ export type ProjectType = {
 };
 
 export type ProjectDataList = {
-  project: Array<ProjectType>;
   skill: Array<SkillParameterType>;
   client: Array<ParameterType>;
   contract: Array<ParameterType>;

@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react';
-
-// material-ui
 import {
   Box,
   Button,
@@ -25,28 +23,16 @@ import {
   Typography
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-
-// third-party
 import _ from 'lodash';
 import * as Yup from 'yup';
 import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
-
-// project imports
 import AlertCustomerDelete from './AlertCustomerDelete';
 import IconButton from 'components/@extended/IconButton';
-
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
-
-// assets
 import { DeleteFilled } from '@ant-design/icons';
-
-// material-ui
 import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
-
-// assets
 import { CloseOutlined } from '@ant-design/icons';
 import { ProjectType } from 'types/project/project';
 import { ParameterType, SkillParameterType, SkillArrayType, ProcessArrayType } from 'types/parameter/parameter';
@@ -232,7 +218,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
             return response.json();
           })
           .then((data) => {
-            onReload(data.data.rows);
+            onReload(data.projects);
             dispatch(
               openSnackbar({
                 open: true,
@@ -268,26 +254,8 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
     }
   });
 
-  console.log('formik', formik);
   const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
   let TagsError: boolean | string | undefined = false;
-  // if (formik.touched.skills && typeof formik.errors.skills) {
-  //   // もし formik.errors.skills が文字列の場合
-  //   if (formik.touched.skills && typeof formik.errors.skills === 'string') {
-  //     TagsError = formik.errors.skills;
-  //   } else {
-  //     console.log(formik.errors.skills);
-  //     // formik.errors.skills が文字列でない場合
-  //     formik.errors.skills &&
-  //       typeof formik.errors.skills !== 'string' &&
-  //       formik.errors.skills?.map((item: any) => {
-  //         // @ts-ignore
-  //         // もし item がオブジェクトの場合、その label を TagsError に設定
-  //         if (typeof item === 'object') TagsError = item.label;
-  //         return item;
-  //       });
-  //   }
-  // }
 
   const message = `■フロントエンド開発
   ユーザーインターフェース（UI）の設計と実装。HTML、CSS、JavaScriptを使用して、見栄えの良いウェブページを構築します。
@@ -317,7 +285,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                   <Grid container spacing={3}>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-working_start_time">掲載開始日</InputLabel>
+                        <InputLabel>掲載開始日</InputLabel>
                         <DatePicker
                           format="yyyy/MM/dd"
                           value={new Date(getFieldProps('start_date').value)}
@@ -327,7 +295,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-working_end_time">掲載終了日</InputLabel>
+                        <InputLabel>掲載終了日</InputLabel>
                         <DatePicker
                           format="yyyy/MM/dd"
                           value={new Date(getFieldProps('end_date').value)}
@@ -337,9 +305,9 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-working_start_time">就業開始時刻</InputLabel>
+                        <InputLabel>就業開始時刻</InputLabel>
                         <TextField
-                          id="time"
+                          id="working_start_time"
                           placeholder="Alarm Clock"
                           type="time"
                           InputLabelProps={{
@@ -356,9 +324,9 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-working_end_time">就業終了時刻</InputLabel>
+                        <InputLabel>就業終了時刻</InputLabel>
                         <TextField
-                          id="time"
+                          id="working_end_time"
                           placeholder="Alarm Clock"
                           type="time"
                           InputLabelProps={{
@@ -375,10 +343,10 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-client">プロジェクト名</InputLabel>
+                        <InputLabel>プロジェクト名</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-project_title"
+                          id="project_title"
                           placeholder="企業名を入力"
                           {...getFieldProps('project_title')}
                           error={Boolean(touched.project_title && errors.project_title)}
@@ -388,10 +356,10 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-client">企業名</InputLabel>
+                        <InputLabel>企業名</InputLabel>
                         <FormControl fullWidth>
                           <Select
-                            id="column-hiding"
+                            id="client"
                             displayEmpty
                             {...getFieldProps('client')}
                             onChange={(event: SelectChangeEvent<string>) =>
@@ -426,10 +394,10 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-description">業務内容</InputLabel>
+                        <InputLabel>業務内容</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-description"
+                          id="description"
                           multiline
                           rows={20}
                           placeholder={message}
@@ -441,10 +409,10 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-contract">契約区分</InputLabel>
+                        <InputLabel>契約区分</InputLabel>
                         <FormControl fullWidth>
                           <Select
-                            id="column-hiding"
+                            id="contract"
                             displayEmpty
                             {...getFieldProps('contract')}
                             onChange={(event: SelectChangeEvent<string>) =>
@@ -479,10 +447,10 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-price">金額</InputLabel>
+                        <InputLabel>金額</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-price"
+                          id="price"
                           placeholder="金額を入力"
                           {...getFieldProps('price')}
                           error={Boolean(touched.price && errors.price)}
@@ -492,10 +460,10 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-working_postal_code">郵便番号</InputLabel>
+                        <InputLabel>郵便番号</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-working_postal_code"
+                          id="working_postal_code"
                           {...getFieldProps('working_postal_code')}
                           error={Boolean(touched.working_postal_code && errors.working_postal_code)}
                           helperText={touched.working_postal_code && errors.working_postal_code}
@@ -504,10 +472,10 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-working_address">住所</InputLabel>
+                        <InputLabel>住所</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-working_address"
+                          id="working_address"
                           {...getFieldProps('working_address')}
                           error={Boolean(touched.working_address && errors.working_address)}
                           helperText={touched.working_address && errors.working_address}
@@ -516,7 +484,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-holiday">休日</InputLabel>
+                        <InputLabel>休日</InputLabel>
                         <TextField
                           fullWidth
                           id="customer-holiday"
@@ -528,10 +496,10 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-role">役割</InputLabel>
+                        <InputLabel>役割</InputLabel>
                         <FormControl fullWidth>
                           <Select
-                            id="column-hiding"
+                            id="role"
                             displayEmpty
                             {...getFieldProps('role')}
                             onChange={(event: SelectChangeEvent<string>) => setFieldValue('role', event.target.value as string)}

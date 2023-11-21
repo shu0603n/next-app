@@ -236,12 +236,14 @@ const CustomerProjectPage = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const [tableData, setTableData] = useState<ProjectDataList>(); // データを保持する状態変数
+  const [projectData, setProjectData] = useState<Array<ProjectType>>(); // データを保持する状態変数
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
     fetchTableData()
       .then((data) => {
         setTableData(data); // データを状態に設定
+        setProjectData(data.project);
       })
       .catch((error) => {
         // エラーハンドリング
@@ -405,12 +407,12 @@ const CustomerProjectPage = () => {
   return (
     <Page title="Customer List">
       <MainCard content={false}>
-        {tableData && (
+        {projectData && (
           <Fragment>
             <ScrollX>
               <ReactTable
                 columns={columns}
-                data={tableData.project}
+                data={projectData}
                 handleAdd={handleAdd}
                 getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
               />
@@ -432,11 +434,11 @@ const CustomerProjectPage = () => {
                 <AddCustomer
                   customer={customer}
                   onCancel={handleAdd}
-                  onReload={() => setTableData}
-                  skillAll={tableData.skill}
-                  contractAll={tableData.contract}
-                  clientAll={tableData.client}
-                  processAll={tableData.process}
+                  onReload={setProjectData}
+                  skillAll={tableData?.skill ?? []}
+                  contractAll={tableData?.contract ?? []}
+                  clientAll={tableData?.client ?? []}
+                  processAll={tableData?.process ?? []}
                 />
               )}
             </Dialog>

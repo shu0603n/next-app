@@ -150,7 +150,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
     }
 
     // データを取得
-    const data = await prisma.project.findMany({
+    const projects = await prisma.project.findMany({
       select: {
         id: true,
         start_date: true,
@@ -170,7 +170,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
     });
 
     // レスポンスを送信
-    return response.status(200).json({ data });
+    return response.status(200).json({ projects });
   } catch (error) {
     console.error('エラーが発生しました:', error);
     return response.status(500).json({ error: 'データを取得できませんでした。' });
