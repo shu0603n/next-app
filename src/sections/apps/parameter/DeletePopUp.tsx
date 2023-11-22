@@ -7,43 +7,18 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
-import { ParameterType } from 'types/parameter/parameter';
-import { alertSnackBar } from 'function/alert/alertSnackbar';
 
 // types
 interface Props {
   id: string;
   open: boolean;
   handleClose: (status: boolean) => void;
-  onReload: (data: Array<ParameterType>) => void;
+  handleClick: (isDelete: boolean) => void;
 }
 
 // ==============================|| 顧客 - 削除 ||============================== //
 
-export default function AlertCustomerDelete({ id, open, handleClose, onReload }: Props) {
-  const handleClick = (isDelete: boolean) => {
-    if (isDelete) {
-      fetch(`/api/db/parameter/technic/delete?id=${id}`)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('データの削除に失敗しました。');
-          }
-          return response.json();
-        })
-        .then((data) => {
-          onReload(data.data);
-          alertSnackBar('パラメーターが正常に削除されました。', 'success');
-        })
-        .catch((error) => {
-          console.error('エラー:', error);
-          alertSnackBar('データの削除に失敗しました。', 'error');
-        })
-        .finally(() => {
-          handleClose(isDelete);
-        });
-    }
-  };
-
+export default function DeletePopUp({ id, open, handleClose, handleClick }: Props) {
   return (
     <Dialog
       open={open}

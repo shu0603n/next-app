@@ -1,9 +1,14 @@
-import { sql } from '@vercel/postgres';
 import { NextApiResponse, NextApiRequest } from 'next';
+import { prisma } from '../../prisma';
+
+export const getPositions = () => {
+  const data = prisma.position.findMany();
+  return data;
+};
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    const data = await sql`SELECT * FROM position;`;
+    const data = await getPositions();
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);

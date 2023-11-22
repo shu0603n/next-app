@@ -1,10 +1,6 @@
 import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement } from 'react';
-
-// material-ui
 import { alpha, useTheme } from '@mui/material/styles';
 import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, useMediaQuery } from '@mui/material';
-
-// third-party
 import {
   useFilters,
   useExpanded,
@@ -18,8 +14,6 @@ import {
   Row,
   Cell
 } from 'react-table';
-
-// project import
 import Layout from 'layout';
 import Page from 'components/Page';
 import MainCard from 'components/MainCard';
@@ -27,22 +21,17 @@ import ScrollX from 'components/ScrollX';
 import IconButton from 'components/@extended/IconButton';
 import { PopupTransition } from 'components/@extended/Transitions';
 import { CSVExport, HeaderSort, SortingSelect, TablePagination, TableRowSelection } from 'components/third-party/ReactTable';
-
 import AddCustomer from 'sections/apps/parameter/process/AddCustomer';
 import AlertCustomerDelete from 'sections/apps/parameter/process/AlertCustomerDelete';
-
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
-
-// assets
 import { PlusOutlined, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { dbResponse } from 'types/dbResponse';
+import { ParameterType } from 'types/parameter/parameter';
 
 // ==============================|| REACT TABLE ||============================== //
 
-// Propsインターフェース
 interface Props {
   columns: Column[];
-  data: [];
+  data: Array<ParameterType>;
   handleAdd: () => void;
   getHeaderProps: (column: HeaderGroup) => {};
 }
@@ -174,28 +163,17 @@ async function fetchTableData() {
   }
 }
 
-const defaultRes: dbResponse = {
-  data: {
-    command: '',
-    fields: [],
-    rowAsArray: false,
-    rowCount: 0,
-    rows: [],
-    viaNeonFetch: false
-  }
-};
-
 // ==============================|| CUSTOMER - LIST ||============================== //
 
 // CustomerProcessPageコンポーネント
 const CustomerProcessPage = () => {
-  const [tableData, setTableData] = useState<dbResponse>(defaultRes); // データを保持する状態変数
+  const [tableData, setTableData] = useState<Array<ParameterType>>([]); // データを保持する状態変数
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
     fetchTableData()
       .then((data) => {
-        setTableData(data); // データを状態に設定
+        setTableData(data.data); // データを状態に設定
       })
       .catch((error) => {
         // エラーハンドリング
@@ -270,30 +248,32 @@ const CustomerProcessPage = () => {
   );
 
   return (
-    <Page title="顧客リスト">
-      <MainCard content={false}>
-        <ScrollX>
-          <ReactTable
-            columns={columns}
-            data={tableData.data.rows as []}
-            handleAdd={handleAdd}
-            getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
-          />
-        </ScrollX>
-        <AlertCustomerDelete id={customerDeleteId} open={open} handleClose={handleClose} onReload={setTableData} />
-        <Dialog
-          maxWidth="sm"
-          TransitionComponent={PopupTransition}
-          keepMounted
-          fullWidth
-          onClose={handleAdd}
-          open={add}
-          sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
-          aria-describedby="alert-dialog-slide-description"
-        >
-          <AddCustomer customer={customer} onCancel={handleAdd} onReload={setTableData} />
-        </Dialog>
-      </MainCard>
+    <Page title="契約パラメーター">
+      {tableData && (
+        <MainCard content={false}>
+          <ScrollX>
+            <ReactTable
+              columns={columns}
+              data={tableData}
+              handleAdd={handleAdd}
+              getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+            />
+          </ScrollX>
+          <AlertCustomerDelete id={customerDeleteId} open={open} handleClose={handleClose} onReload={setTableData} />
+          <Dialog
+            maxWidth="sm"
+            TransitionComponent={PopupTransition}
+            keepMounted
+            fullWidth
+            onClose={handleAdd}
+            open={add}
+            sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
+            aria-describedby="alert-dialog-slide-description"
+          >
+            {add && <AddCustomer customer={customer} onCancel={handleAdd} onReload={setTableData} />}
+          </Dialog>
+        </MainCard>
+      )}
     </Page>
   );
 };

@@ -1,14 +1,19 @@
-import { sql } from '@vercel/postgres';
 import { NextApiResponse, NextApiRequest } from 'next';
+import { getProcesses } from './select';
+import { prisma } from '../../prisma';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
     const id = request.query.id as string;
     if (!id) throw new Error('パラメーターが不足しています');
-    console.log(`DELETE FROM process WHERE id = ${Number(id)};`);
-    await sql`DELETE FROM process WHERE id = ${Number(id)};`;
 
-    const data = await sql`SELECT * FROM process;`;
+    await prisma.process.deleteMany({
+      where: {
+        id: Number(id)
+      }
+    });
+
+    const data = await getProcesses();
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);

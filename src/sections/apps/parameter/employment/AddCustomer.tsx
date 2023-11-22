@@ -19,7 +19,7 @@ import { openSnackbar } from 'store/reducers/snackbar';
 
 // アセット
 import { DeleteFilled } from '@ant-design/icons';
-import { dbResponse } from 'types/dbResponse';
+import { ParameterType } from 'types/parameter/parameter';
 
 // 定数
 const getInitialValues = (customer: FormikValues | null) => {
@@ -42,7 +42,7 @@ const getInitialValues = (customer: FormikValues | null) => {
 export interface Props {
   customer?: any;
   onCancel: () => void;
-  onReload: (data: dbResponse) => void;
+  onReload: (data: Array<ParameterType>) => void;
 }
 
 const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
@@ -65,7 +65,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     onSubmit: (values, { setSubmitting }) => {
       try {
         if (customer) {
-          fetch(`/api/db/parameter/working/update?id=${values.id}&name=${values.name}`)
+          fetch(`/api/db/parameter/employment/update?id=${values.id}&name=${values.name}`)
             .then((response) => {
               if (!response.ok) {
                 throw new Error('更新に失敗しました。');
@@ -73,8 +73,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               return response.json();
             })
             .then((data) => {
-              console.log(data);
-              onReload(data);
+              onReload(data.data);
               dispatch(
                 openSnackbar({
                   open: true,
@@ -102,7 +101,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               );
             });
         } else {
-          fetch(`/api/db/parameter/working/insert?name=${values.name}`)
+          fetch(`/api/db/parameter/employment/insert?name=${values.name}`)
             .then((response) => {
               if (!response.ok) {
                 throw new Error('更新に失敗しました。');
@@ -110,7 +109,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               return response.json();
             })
             .then((data) => {
-              onReload(data);
+              onReload(data.data);
               dispatch(
                 openSnackbar({
                   open: true,
@@ -136,11 +135,12 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                   close: false
                 })
               );
+            })
+            .finally(() => {
+              setSubmitting(false);
+              onCancel();
             });
         }
-
-        setSubmitting(false);
-        onCancel();
       } catch (error) {
         console.error(error);
       }

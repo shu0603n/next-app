@@ -7,9 +7,8 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/reducers/snackbar';
 import { ParameterType } from 'types/parameter/parameter';
+import { alertSnackBar } from 'function/alert/alertSnackbar';
 
 // types
 interface Props {
@@ -33,35 +32,16 @@ export default function AlertCustomerDelete({ id, open, handleClose, onReload }:
         })
         .then((data) => {
           onReload(data.data);
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: 'パラメーターが正常に削除されました。',
-              variant: 'alert',
-              alert: {
-                color: 'success'
-              },
-              close: false
-            })
-          );
+          alertSnackBar('パラメーターが正常に削除されました。', 'success');
         })
         .catch((error) => {
           console.error('エラー:', error);
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: 'データの削除に失敗しました。',
-              variant: 'alert',
-              alert: {
-                color: 'error'
-              },
-              close: false
-            })
-          );
+          alertSnackBar('データの削除に失敗しました。', 'error');
+        })
+        .finally(() => {
+          handleClose(isDelete);
         });
     }
-
-    handleClose(isDelete);
   };
 
   return (
@@ -94,7 +74,7 @@ export default function AlertCustomerDelete({ id, open, handleClose, onReload }:
           </Stack>
 
           <Stack direction="row" spacing={2} sx={{ width: 1 }}>
-            <Button fullWidth onClick={() => handleClick(false)} color="secondary" variant="outlined">
+            <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
               キャンセル
             </Button>
             <Button fullWidth color="error" variant="contained" onClick={() => handleClick(true)} autoFocus>

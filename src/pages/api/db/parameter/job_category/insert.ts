@@ -1,14 +1,20 @@
-import { sql } from '@vercel/postgres';
 import { NextApiResponse, NextApiRequest } from 'next';
+import { jobCategories } from './select';
+import { prisma } from '../../prisma';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
     const name = request.query.name as string;
     if (!name) throw new Error('パラメーターが不足しています');
-    await sql`INSERT INTO job_category (Name) VALUES (${name});`;
 
-    const data = await sql`SELECT * FROM job_category;`;
-    console.log(data);
+    await prisma.job_category.create({
+      data: {
+        name: name
+      }
+    });
+
+    const data = await jobCategories();
+
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);

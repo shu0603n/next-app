@@ -1,10 +1,6 @@
 import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement } from 'react';
-
-// material-ui
 import { alpha, useTheme } from '@mui/material/styles';
 import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, useMediaQuery } from '@mui/material';
-
-// third-party
 import {
   useFilters,
   useExpanded,
@@ -18,8 +14,6 @@ import {
   Row,
   Cell
 } from 'react-table';
-
-// project import
 import Layout from 'layout';
 import Page from 'components/Page';
 import MainCard from 'components/MainCard';
@@ -27,19 +21,14 @@ import ScrollX from 'components/ScrollX';
 import IconButton from 'components/@extended/IconButton';
 import { PopupTransition } from 'components/@extended/Transitions';
 import { CSVExport, HeaderSort, SortingSelect, TablePagination, TableRowSelection } from 'components/third-party/ReactTable';
-
 import AddCustomer from 'sections/apps/parameter/contract/AddCustomer';
 import AlertCustomerDelete from 'sections/apps/parameter/contract/AlertCustomerDelete';
-
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
-
-// assets
 import { PlusOutlined, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import { ParameterType } from 'types/parameter/parameter';
 
 // ==============================|| REACT TABLE ||============================== //
 
-// Propsインターフェース
 interface Props {
   columns: Column[];
   data: Array<ParameterType>;
@@ -259,7 +248,7 @@ const CustomerContractPage = () => {
   );
 
   return (
-    <Page title="顧客リスト">
+    <Page title="契約パラメーター">
       {tableData && (
         <MainCard content={false}>
           <ScrollX>

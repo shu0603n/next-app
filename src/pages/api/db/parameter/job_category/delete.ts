@@ -1,14 +1,19 @@
-import { sql } from '@vercel/postgres';
 import { NextApiResponse, NextApiRequest } from 'next';
+import { jobCategories } from './select';
+import { prisma } from '../../prisma';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
     const id = request.query.id as string;
     if (!id) throw new Error('パラメーターが不足しています');
-    console.log(`DELETE FROM job_category WHERE id = ${Number(id)};`);
-    await sql`DELETE FROM job_category WHERE id = ${Number(id)};`;
 
-    const data = await sql`SELECT * FROM job_category;`;
+    await prisma.job_category.deleteMany({
+      where: {
+        id: Number(id)
+      }
+    });
+
+    const data = await jobCategories();
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);

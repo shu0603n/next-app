@@ -1,14 +1,20 @@
-import { sql } from '@vercel/postgres';
 import { NextApiResponse, NextApiRequest } from 'next';
+import { getProcesses } from './select';
+import { prisma } from '../../prisma';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
     const name = request.query.name as string;
     if (!name) throw new Error('パラメーターが不足しています');
-    await sql`INSERT INTO process (Name) VALUES (${name});`;
 
-    const data = await sql`SELECT * FROM process;`;
-    console.log(data);
+    await prisma.process.create({
+      data: {
+        name: name
+      }
+    });
+
+    const data = await getProcesses();
+
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);

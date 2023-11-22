@@ -7,16 +7,15 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/reducers/snackbar';
-import { dbResponse } from 'types/dbResponse';
+import { ParameterType } from 'types/parameter/parameter';
+import { alertSnackBar } from 'function/alert/alertSnackbar';
 
 // types
 interface Props {
   id: string;
   open: boolean;
   handleClose: (status: boolean) => void;
-  onReload: (data: dbResponse) => void;
+  onReload: (data: Array<ParameterType>) => void;
 }
 
 // ==============================|| 顧客 - 削除 ||============================== //
@@ -24,7 +23,7 @@ interface Props {
 export default function AlertCustomerDelete({ id, open, handleClose, onReload }: Props) {
   const handleClick = (isDelete: boolean) => {
     if (isDelete) {
-      fetch(`/api/db/parameter/position/delete?id=${id}`)
+      fetch(`/api/db/parameter/job_category/delete?id=${id}`)
         .then((response) => {
           if (!response.ok) {
             throw new Error('データの削除に失敗しました。');
@@ -32,36 +31,17 @@ export default function AlertCustomerDelete({ id, open, handleClose, onReload }:
           return response.json();
         })
         .then((data) => {
-          onReload(data);
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: 'パラメーターが正常に削除されました。',
-              variant: 'alert',
-              alert: {
-                color: 'success'
-              },
-              close: false
-            })
-          );
+          onReload(data.data);
+          alertSnackBar('パラメーターが正常に削除されました。', 'success');
         })
         .catch((error) => {
           console.error('エラー:', error);
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: 'データの削除に失敗しました。',
-              variant: 'alert',
-              alert: {
-                color: 'error'
-              },
-              close: false
-            })
-          );
+          alertSnackBar('データの削除に失敗しました。', 'error');
+        })
+        .finally(() => {
+          handleClose(isDelete);
         });
     }
-
-    handleClose(isDelete);
   };
 
   return (
@@ -94,7 +74,7 @@ export default function AlertCustomerDelete({ id, open, handleClose, onReload }:
           </Stack>
 
           <Stack direction="row" spacing={2} sx={{ width: 1 }}>
-            <Button fullWidth onClick={() => handleClick(false)} color="secondary" variant="outlined">
+            <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
               キャンセル
             </Button>
             <Button fullWidth color="error" variant="contained" onClick={() => handleClick(true)} autoFocus>

@@ -1,27 +1,16 @@
 import { useState } from 'react';
-
-// material-ui
 import { Button, DialogActions, DialogContent, DialogTitle, Divider, Grid, InputLabel, Stack, TextField, Tooltip } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-
-// サードパーティ
 import _ from 'lodash';
 import * as Yup from 'yup';
 import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
-
-// プロジェクトインポート
 import AlertCustomerDelete from './AlertCustomerDelete';
 import IconButton from 'components/@extended/IconButton';
-
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/reducers/snackbar';
-
-// アセット
 import { DeleteFilled } from '@ant-design/icons';
-import { dbResponse } from 'types/dbResponse';
+import { ParameterType } from 'types/parameter/parameter';
+import { alertSnackBar } from 'function/alert/alertSnackbar';
 
-// 定数
 const getInitialValues = (customer: FormikValues | null) => {
   const newCustomer = {
     id: '',
@@ -42,7 +31,7 @@ const getInitialValues = (customer: FormikValues | null) => {
 export interface Props {
   customer?: any;
   onCancel: () => void;
-  onReload: (data: dbResponse) => void;
+  onReload: (data: Array<ParameterType>) => void;
 }
 
 const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
@@ -65,7 +54,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     onSubmit: (values, { setSubmitting }) => {
       try {
         if (customer) {
-          fetch(`/api/db/parameter/employment/update?id=${values.id}&name=${values.name}`)
+          fetch(`/api/db/parameter/working/update?id=${values.id}&name=${values.name}`)
             .then((response) => {
               if (!response.ok) {
                 throw new Error('更新に失敗しました。');
@@ -73,36 +62,18 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               return response.json();
             })
             .then((data) => {
-              console.log(data);
-              onReload(data);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: '正常に更新されました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'success'
-                  },
-                  close: false
-                })
-              );
+              onReload(data.data);
+              alertSnackBar('正常に更新されました。', 'success');
             })
             .catch((error) => {
               console.error('エラー:', error);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: 'データの更新に失敗しました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'error'
-                  },
-                  close: false
-                })
-              );
+              alertSnackBar('データの更新に失敗しました。', 'error');
+            })
+            .finally(() => {
+              onCancel();
             });
         } else {
-          fetch(`/api/db/parameter/employment/insert?name=${values.name}`)
+          fetch(`/api/db/parameter/working/insert?name=${values.name}`)
             .then((response) => {
               if (!response.ok) {
                 throw new Error('更新に失敗しました。');
@@ -110,37 +81,18 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               return response.json();
             })
             .then((data) => {
-              onReload(data);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: '正常に追加されました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'success'
-                  },
-                  close: false
-                })
-              );
+              onReload(data.data);
+              alertSnackBar('正常に追加されました。', 'success');
             })
             .catch((error) => {
               console.error('エラー:', error);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: 'データの追加に失敗しました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'error'
-                  },
-                  close: false
-                })
-              );
+              alertSnackBar('データの追加に失敗しました。', 'error');
+            })
+            .finally(() => {
+              setSubmitting(false);
+              onCancel();
             });
         }
-
-        setSubmitting(false);
-        onCancel();
       } catch (error) {
         console.error(error);
       }
@@ -164,13 +116,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                       <Grid item xs={12}>
                         <Stack spacing={1.25}>
                           <InputLabel htmlFor="id">ID</InputLabel>
-                          <TextField
-                            fullWidth
-                            id="id"
-                            {...getFieldProps('id')}
-                            placeholder={customer ? customer.id : ''}
-                            // disabled
-                          />
+                          <TextField fullWidth id="id" {...getFieldProps('id')} placeholder={customer ? customer.id : ''} disabled />
                         </Stack>
                       </Grid>
                     )}
