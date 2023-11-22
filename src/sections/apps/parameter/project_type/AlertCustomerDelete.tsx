@@ -8,7 +8,7 @@ import { PopupTransition } from 'components/@extended/Transitions';
 // assets
 import { DeleteFilled } from '@ant-design/icons';
 import { ParameterType } from 'types/parameter/parameter';
-import { alertSnackBar } from 'function/alert/alertSnackbar';
+import { alertSnackBar } from 'function/alert/alertSnackBar';
 
 // types
 interface Props {
