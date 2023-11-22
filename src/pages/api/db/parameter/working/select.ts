@@ -1,14 +1,14 @@
 import { NextApiResponse, NextApiRequest } from 'next';
 import { prisma } from '../../prisma';
 
-export const getTechnicsgetTechnics = () => {
+export const getWorkings = () => {
   const data = prisma.working.findMany();
   return data;
 };
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    const data = await getTechnics();
+    const data = await getWorkings();
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);
