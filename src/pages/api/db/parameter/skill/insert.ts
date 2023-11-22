@@ -1,17 +1,24 @@
-import { sql } from '@vercel/postgres';
 import { NextApiResponse, NextApiRequest } from 'next';
+import { prisma } from '../../prisma';
+import { getSkills } from './select';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    const name = request.query.name as string;
-    const technic_id = request.query.technic_id as string;
-    if (!name || !technic_id) throw new Error('パラメーターが不足しています');
-    await sql`INSERT INTO skill (Name, technic_id) VALUES (${name},${technic_id});`;
+    const { name, technic, candidate_flag } = request.body;
+    if (!name) throw new Error('パラメーターが不足しています');
 
-    const data = await sql`SELECT skill.*, technic.name AS technic_name 
-    FROM skill 
-    LEFT JOIN technic ON skill.technic_id = technic.id;`;
-    console.log(data);
+    await prisma.skill.create({
+      data: {
+        name: name as string,
+        technic: {
+          connect: technic ? { id: technic.id } : undefined
+        },
+        candidate_flag: Boolean(candidate_flag)
+      }
+    });
+
+    const data = await getSkills();
+
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);

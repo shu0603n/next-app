@@ -1,25 +1,28 @@
-import { sql } from '@vercel/postgres';
 import { NextApiResponse, NextApiRequest } from 'next';
+import { prisma } from '../../prisma';
+import { getSkills } from './select';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    const id = request.query.id as string;
-    const name = request.query.name as string;
-    const technic_id = request.query.technic_id as string;
-    if (!id || !name || !technic_id) throw new Error('パラメーターが不足しています');
-    console.log(`UPDATE skill SET name = '${name}', technic_id = '${technic_id}' WHERE id = ${id};`);
-    const result = await sql`UPDATE skill SET name = ${name.toString()}, technic_id = ${technic_id.toString()} WHERE id = ${Number(id)};`;
-    console.log(result);
-    if (result.rowCount === 0) {
-      throw new Error('対象のIDが存在しませんでした');
-    }
-    if (result.rowCount !== 1) {
-      throw new Error('複数のレコードが更新されてしまった可能性があります');
-    }
+    const { id, name, technic, candidate_flag } = request.body;
 
-    const data = await sql`SELECT skill.*, technic.name AS technic_name 
-    FROM skill 
-    LEFT JOIN technic ON skill.technic_id = technic.id;`;
+    if (!id || !name) throw new Error('パラメーターが不足しています');
+
+    await prisma.skill.update({
+      where: {
+        id: Number(id)
+      },
+      data: {
+        name: name as string,
+        // technic_id: Number(technic?.id),
+        technic: {
+          connect: technic ? { id: technic.id } : undefined
+        },
+        candidate_flag: Boolean(candidate_flag)
+      }
+    });
+
+    const data = await getSkills();
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);

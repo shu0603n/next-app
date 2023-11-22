@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement } from 'react';
-
-// material-ui
 import { alpha, useTheme } from '@mui/material/styles';
-import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, useMediaQuery } from '@mui/material';
-
-// third-party
+import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
+import Avatar from 'components/@extended/Avatar';
 import {
   useFilters,
   useExpanded,
@@ -18,8 +15,6 @@ import {
   Row,
   Cell
 } from 'react-table';
-
-// project import
 import Layout from 'layout';
 import Page from 'components/Page';
 import MainCard from 'components/MainCard';
@@ -27,22 +22,17 @@ import ScrollX from 'components/ScrollX';
 import IconButton from 'components/@extended/IconButton';
 import { PopupTransition } from 'components/@extended/Transitions';
 import { CSVExport, HeaderSort, SortingSelect, TablePagination, TableRowSelection } from 'components/third-party/ReactTable';
-
 import AddCustomer from 'sections/apps/parameter/skill/AddCustomer';
 import AlertCustomerDelete from 'sections/apps/parameter/skill/AlertCustomerDelete';
-
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
-
-// assets
-import { PlusOutlined, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { dbResponse } from 'types/dbResponse';
+import { PlusOutlined, EditTwoTone, DeleteTwoTone, PushpinOutlined } from '@ant-design/icons';
+import { ParameterType } from 'types/parameter/parameter';
 
 // ==============================|| REACT TABLE ||============================== //
 
-// Propsインターフェース
 interface Props {
   columns: Column[];
-  data: [];
+  data: Array<ParameterType>;
   handleAdd: () => void;
   getHeaderProps: (column: HeaderGroup) => {};
 }
@@ -183,59 +173,25 @@ async function fetchTableData() {
   }
 }
 
-async function fetchTechnicTableData() {
-  try {
-    const response = await fetch('/api/db/parameter/technic/select');
-    if (!response.ok) {
-      throw new Error('API request failed');
-    }
-    const data = await response.json();
-    return data; // APIから返されたデータを返します
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-}
-
-const defaultRes: dbResponse = {
-  data: {
-    command: '',
-    fields: [],
-    rowAsArray: false,
-    rowCount: 0,
-    rows: [],
-    viaNeonFetch: false
-  }
-};
-
 // ==============================|| CUSTOMER - LIST ||============================== //
 
 // CustomerSkillPageコンポーネント
 const CustomerSkillPage = () => {
-  const [tableData, setTableData] = useState<dbResponse>(defaultRes); // データを保持する状態変数
-  const [technicTableData, setTechnicTableData] = useState<dbResponse>(defaultRes); // データを保持する状態変数
+  const [tableData, setTableData] = useState<Array<ParameterType>>([]); // データを保持する状態変数
+  const [technicTableData, setTechnicTableData] = useState<Array<ParameterType>>([]); // データを保持する状態変数
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
     fetchTableData()
       .then((data) => {
-        setTableData(data); // データを状態に設定
-      })
-      .catch((error) => {
-        // エラーハンドリング
-        console.error('Error:', error);
-      });
-
-    fetchTechnicTableData()
-      .then((data) => {
-        setTechnicTableData(data); // データを状態に設定
+        setTableData(data.data); // データを状態に設定
+        setTechnicTableData(data.technic); // データを状態に設定
       })
       .catch((error) => {
         // エラーハンドリング
         console.error('Error:', error);
       });
   }, []); // 空の依存リストを指定することで、一度だけ実行される
-  console.log(technicTableData);
 
   const theme = useTheme();
 
@@ -264,12 +220,36 @@ const CustomerSkillPage = () => {
         accessor: 'name'
       },
       {
-        Header: '技術ID',
-        accessor: 'technic_id'
+        Header: '技術区分',
+        accessor: 'technic',
+        Cell: ({ row }: { row: Row }) => {
+          const { values } = row;
+          return (
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Stack spacing={0}>
+                <Typography variant="subtitle1">{values.technic?.name}</Typography>
+              </Stack>
+            </Stack>
+          );
+        }
       },
       {
-        Header: '技術区分',
-        accessor: 'technic_name'
+        Header: '候補',
+        accessor: 'candidate_flag',
+        Cell: ({ row }: { row: Row }) => {
+          const { values } = row;
+          return (
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Stack spacing={0}>
+                {values.candidate_flag && (
+                  <Avatar alt="Natacha" size="sm">
+                    <PushpinOutlined />
+                  </Avatar>
+                )}
+              </Stack>
+            </Stack>
+          );
+        }
       },
       {
         Header: 'アクション',
@@ -312,30 +292,32 @@ const CustomerSkillPage = () => {
   );
 
   return (
-    <Page title="顧客リスト">
-      <MainCard content={false}>
-        <ScrollX>
-          <ReactTable
-            columns={columns}
-            data={tableData.data.rows as []}
-            handleAdd={handleAdd}
-            getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
-          />
-        </ScrollX>
-        <AlertCustomerDelete id={customerDeleteId} open={open} handleClose={handleClose} onReload={setTableData} />
-        <Dialog
-          maxWidth="sm"
-          TransitionComponent={PopupTransition}
-          keepMounted
-          fullWidth
-          onClose={handleAdd}
-          open={add}
-          sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
-          aria-describedby="alert-dialog-slide-description"
-        >
-          <AddCustomer customer={customer} onCancel={handleAdd} onReload={setTableData} />
-        </Dialog>
-      </MainCard>
+    <Page title="技術パラメーター">
+      {tableData && (
+        <MainCard content={false}>
+          <ScrollX>
+            <ReactTable
+              columns={columns}
+              data={tableData}
+              handleAdd={handleAdd}
+              getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+            />
+          </ScrollX>
+          <AlertCustomerDelete id={customerDeleteId} open={open} handleClose={handleClose} onReload={setTableData} />
+          <Dialog
+            maxWidth="sm"
+            TransitionComponent={PopupTransition}
+            keepMounted
+            fullWidth
+            onClose={handleAdd}
+            open={add}
+            sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
+            aria-describedby="alert-dialog-slide-description"
+          >
+            {add && <AddCustomer customer={customer} technicAll={technicTableData} onCancel={handleAdd} onReload={setTableData} />}
+          </Dialog>
+        </MainCard>
+      )}
     </Page>
   );
 };

@@ -1,20 +1,25 @@
-import { useEffect, useState } from 'react';
-import { useTheme } from '@mui/material/styles';
-// material-ui
+import { useState } from 'react';
 import {
   Button,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Autocomplete,
+  MenuItem,
+  OutlinedInput,
+  ListItemText,
+  Typography,
   Divider,
   FormHelperText,
   Grid,
   InputLabel,
+  SelectChangeEvent,
   Stack,
   TextField,
   Tooltip,
-  Switch
+  Switch,
+  FormControl,
+  Select,
+  FormControlLabel
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -23,25 +28,18 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import _ from 'lodash';
 import * as Yup from 'yup';
 import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
-
-// プロジェクトインポート
 import AlertCustomerDelete from './AlertCustomerDelete';
 import IconButton from 'components/@extended/IconButton';
-
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/reducers/snackbar';
-
-// アセット
 import { DeleteFilled } from '@ant-design/icons';
-import { dbResponse } from 'types/dbResponse';
+import { ParameterType } from 'types/parameter/parameter';
+import { alertSnackBar } from 'function/alert/alertSnackBar';
 
-// 定数
 const getInitialValues = (customer: FormikValues | null) => {
   const newCustomer = {
     id: '',
     name: '',
     technic_id: '',
-    technic_name: '',
+    technic: '',
     candidate_flag: false
   };
 
@@ -49,7 +47,7 @@ const getInitialValues = (customer: FormikValues | null) => {
     newCustomer.id = customer.id;
     newCustomer.name = customer.name;
     newCustomer.technic_id = customer.technic_id;
-    newCustomer.technic_name = customer.technic_name;
+    newCustomer.technic = customer.technic;
     newCustomer.candidate_flag = customer.candidate_flag;
     return _.merge({}, newCustomer, customer);
   }
@@ -57,68 +55,17 @@ const getInitialValues = (customer: FormikValues | null) => {
   return newCustomer;
 };
 
-async function fetchTableData() {
-  try {
-    const response = await fetch('/api/db/parameter/technic/select');
-    if (!response.ok) {
-      throw new Error('API request failed');
-    }
-    const data = await response.json();
-    return data; // APIから返されたデータを返します
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-}
-
-const defaultRes: dbResponse = {
-  data: {
-    command: '',
-    fields: [],
-    rowAsArray: false,
-    rowCount: 0,
-    rows: [],
-    viaNeonFetch: false
-  }
-};
-
 // ==============================|| 顧客の追加/編集 ||============================== //
 
 export interface Props {
   customer?: any;
+  technicAll: Array<ParameterType>;
   onCancel: () => void;
-  onReload: (data: dbResponse) => void;
+  onReload: (data: Array<ParameterType>) => void;
 }
 
-const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
-  const theme = useTheme();
+const AddCustomer = ({ customer, technicAll, onCancel, onReload }: Props) => {
   const isCreating = !customer;
-
-  const [tableData, setTableData] = useState<dbResponse>(defaultRes); // データを保持する状態変数
-  const [checked, setChecked] = useState(['candidate_flag']);
-  const handleToggle = (value: string) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    setChecked(newChecked);
-  };
-  useEffect(() => {
-    // ページがロードされたときにデータを取得
-    fetchTableData()
-      .then((data) => {
-        setTableData(data); // データを状態に設定
-      })
-      .catch((error) => {
-        // エラーハンドリング
-        console.error('Error:', error);
-      });
-  }, []); // 空の依存リストを指定することで、一度だけ実行される
 
   const CustomerSchema = Yup.object().shape({
     name: Yup.string().max(255).required('パラメーターは必須です')
@@ -137,8 +84,16 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
       try {
+        const requestOptions = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json' // 必要に応じてヘッダーを調整
+          },
+          body: JSON.stringify(values) // valuesをJSON文字列に変換してbodyに設定
+        };
+
         if (customer) {
-          fetch(`/api/db/parameter/skill/update?id=${values.id}&name=${values.name}&technic_id=${values.technic_id}`)
+          fetch('/api/db/parameter/skill/update', requestOptions)
             .then((response) => {
               if (!response.ok) {
                 throw new Error('更新に失敗しました。');
@@ -146,36 +101,18 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               return response.json();
             })
             .then((data) => {
-              console.log(data);
-              onReload(data);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: '正常に更新されました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'success'
-                  },
-                  close: false
-                })
-              );
+              onReload(data.data);
+              alertSnackBar('正常に更新されました。', 'success');
             })
             .catch((error) => {
               console.error('エラー:', error);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: 'データの更新に失敗しました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'error'
-                  },
-                  close: false
-                })
-              );
+              alertSnackBar('データの更新に失敗しました。', 'error');
+            })
+            .finally(() => {
+              onCancel();
             });
         } else {
-          fetch(`/api/db/parameter/skill/insert?name=${values.name}&technic_id=${values.technic_id}`)
+          fetch('/api/db/parameter/skill/insert', requestOptions)
             .then((response) => {
               if (!response.ok) {
                 throw new Error('更新に失敗しました。');
@@ -183,37 +120,19 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               return response.json();
             })
             .then((data) => {
-              onReload(data);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: '正常に追加されました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'success'
-                  },
-                  close: false
-                })
-              );
+              onReload(data.data);
+              alertSnackBar('正常に追加されました。', 'success');
             })
             .catch((error) => {
               console.error('エラー:', error);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: 'データの追加に失敗しました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'error'
-                  },
-                  close: false
-                })
-              );
+              alertSnackBar('データの追加に失敗しました。', 'error');
+            })
+            .finally(() => {
+              resetValues();
+              setSubmitting(false);
+              onCancel();
             });
         }
-        resetValues();
-        setSubmitting(false);
-        onCancel();
       } catch (error) {
         console.error(error);
       }
@@ -226,7 +145,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     setFieldValue('id', '');
     setFieldValue('name', '');
     setFieldValue('technic_id', '');
-    setFieldValue('technic_name', '');
+    setFieldValue('technic', '');
   };
 
   return (
@@ -244,13 +163,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                       <Grid item xs={12}>
                         <Stack spacing={1.25}>
                           <InputLabel htmlFor="id">ID</InputLabel>
-                          <TextField
-                            fullWidth
-                            id="id"
-                            {...getFieldProps('id')}
-                            placeholder={customer ? customer.id : ''}
-                            // disabled
-                          />
+                          <TextField fullWidth id="id" {...getFieldProps('id')} placeholder={customer ? customer.id : ''} disabled />
                         </Stack>
                       </Grid>
                     )}
@@ -272,49 +185,61 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="name">技術区分</InputLabel>
-                        <Autocomplete
-                          id="technic_name"
-                          // value={customer.technic_name}
-                          {...getFieldProps('technic_name')}
-                          onChange={(event: any, newValue: string | null) => {
-                            const technic = tableData.data.rows.find((technic: any) => technic.name === newValue);
-                            setFieldValue('technic_id', technic.id);
-                            setFieldValue('technic_name', technic.name);
-                          }}
-                          options={tableData.data.rows.map((technic: any) => technic.name)}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="技術区分を選択してください"
-                              sx={{ '& .MuiAutocomplete-input.Mui-disabled': { WebkitTextFillColor: theme.palette.text.primary } }}
-                            />
-                          )}
-                        />
-                        {touched.technic_name && errors.technic_name && (
-                          <FormHelperText error id="helper-text-technic_name">
-                            {errors.technic_name}
+                        <FormControl fullWidth>
+                          <Select
+                            id="technic"
+                            displayEmpty
+                            {...getFieldProps('technic')}
+                            onChange={(event: SelectChangeEvent<string>) =>
+                              setFieldValue(
+                                'technic',
+                                technicAll?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
+                              )
+                            }
+                            input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
+                            renderValue={(selected: any) => {
+                              if (!selected?.name) {
+                                return <Typography variant="subtitle1">技術区分を選択</Typography>;
+                              }
+
+                              return <Typography variant="subtitle2">{selected.name}</Typography>;
+                            }}
+                          >
+                            <MenuItem value={undefined}>なし</MenuItem>
+                            {technicAll?.map((column: ParameterType) => (
+                              <MenuItem key={column.id} value={column.name}>
+                                <ListItemText primary={column.name} />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {touched.technic && errors.technic && (
+                          <FormHelperText error id="helper-text-technic">
+                            {errors.technic}
                           </FormHelperText>
                         )}
                       </Stack>
                     </Grid>
-
                     <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="name">候補に表示する</InputLabel>
-                        <Switch
-                          edge="end"
-                          onChange={handleToggle('candidate_flag')}
-                          checked={checked.indexOf('candidate_flag') !== -1}
-                          inputProps={{
-                            'aria-labelledby': 'switch-list-label-candidate_flag'
-                          }}
+                      <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                        <Stack spacing={0.5}>
+                          <Typography variant="subtitle1">スキルシートに掲載する</Typography>
+                        </Stack>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              defaultChecked={getFieldProps('candidate_flag').value}
+                              onChange={() => {
+                                setFieldValue('candidate_flag', !getFieldProps('candidate_flag').value);
+                              }}
+                              sx={{ mt: 0 }}
+                            />
+                          }
+                          label=""
+                          labelPlacement="start"
                         />
-                        {touched.candidate_flag && errors.candidate_flag && (
-                          <FormHelperText error id="helper-text-candidate_flag">
-                            {errors.candidate_flag}
-                          </FormHelperText>
-                        )}
                       </Stack>
+                      <Divider sx={{ my: 2 }} />
                     </Grid>
                   </Grid>
                 </Grid>
