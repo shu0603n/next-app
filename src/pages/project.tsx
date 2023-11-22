@@ -1,12 +1,8 @@
 import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement, useId } from 'react';
-
-// material-ui
 import { alpha, useTheme } from '@mui/material/styles';
 import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
-
 import { PopupTransition } from 'components/@extended/Transitions';
 import { ProjectDataList } from '../types/project/project';
-// third-party
 import {
   useFilters,
   useExpanded,
@@ -20,23 +16,18 @@ import {
   Row,
   Cell
 } from 'react-table';
-
-// project import
 import Layout from 'layout';
 import Page from 'components/Page';
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import IconButton from 'components/@extended/IconButton';
 import { CSVExport, HeaderSort, SortingSelect, TablePagination } from 'components/third-party/ReactTable';
-
 import AddCustomer from 'sections/apps/project/AddCustomer';
 import AlertCustomerDelete from 'sections/apps/project/AlertCustomerDelete';
-
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
-
-// assets
 import { EditTwoTone, PlusOutlined, DeleteTwoTone } from '@ant-design/icons';
 import { ProjectType } from 'types/project/project';
+import Loader from 'components/Loader';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -237,6 +228,7 @@ const CustomerProjectPage = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const [tableData, setTableData] = useState<ProjectDataList>(); // データを保持する状態変数
   const [projectData, setProjectData] = useState<Array<ProjectType>>(); // データを保持する状態変数
+  const [loading, setLoading] = useState(true); // データの読み込み状態を管理
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
@@ -244,6 +236,7 @@ const CustomerProjectPage = () => {
       .then((data) => {
         setTableData(data); // データを状態に設定
         setProjectData(data.project);
+        setLoading(false);
       })
       .catch((error) => {
         // エラーハンドリング
@@ -405,6 +398,10 @@ const CustomerProjectPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [theme]
   );
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <Page title="Customer List">

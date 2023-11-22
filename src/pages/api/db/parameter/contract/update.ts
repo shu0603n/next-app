@@ -1,22 +1,23 @@
-import { sql } from '@vercel/postgres';
 import { NextApiResponse, NextApiRequest } from 'next';
+import { getContracts } from './select';
+import { prisma } from '../../prisma';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    const id = request.query.id as string;
-    const name = request.query.name as string;
-    if (!id || !name) throw new Error('パラメーターが不足しています');
-    console.log(`UPDATE contract SET name = '${name}' WHERE id = ${id};`);
-    const result = await sql`UPDATE contract SET name = ${name.toString()} WHERE id = ${Number(id)};`;
-    console.log(result);
-    if (result.rowCount === 0) {
-      throw new Error('対象のIDが存在しませんでした');
-    }
-    if (result.rowCount !== 1) {
-      throw new Error('複数のレコードが更新されてしまった可能性があります');
-    }
+    const { id, name } = request.query;
 
-    const data = await sql`SELECT * FROM contract;`;
+    if (!id || !name) throw new Error('パラメーターが不足しています');
+
+    await prisma.contract.update({
+      where: {
+        id: Number(id)
+      },
+      data: {
+        name: name as string
+      }
+    });
+
+    const data = await getContracts();
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);

@@ -19,7 +19,7 @@ import { openSnackbar } from 'store/reducers/snackbar';
 
 // アセット
 import { DeleteFilled } from '@ant-design/icons';
-import { dbResponse } from 'types/dbResponse';
+import { ParameterType } from 'types/parameter/parameter';
 
 // 定数
 const getInitialValues = (customer: FormikValues | null) => {
@@ -42,7 +42,7 @@ const getInitialValues = (customer: FormikValues | null) => {
 export interface Props {
   customer?: any;
   onCancel: () => void;
-  onReload: (data: dbResponse) => void;
+  onReload: (data: Array<ParameterType>) => void;
 }
 
 const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
@@ -73,8 +73,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               return response.json();
             })
             .then((data) => {
-              console.log(data);
-              onReload(data);
+              onReload(data.data);
               dispatch(
                 openSnackbar({
                   open: true,
@@ -110,7 +109,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               return response.json();
             })
             .then((data) => {
-              onReload(data);
+              onReload(data.data);
               dispatch(
                 openSnackbar({
                   open: true,

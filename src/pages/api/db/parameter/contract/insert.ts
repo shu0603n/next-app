@@ -1,14 +1,20 @@
-import { sql } from '@vercel/postgres';
 import { NextApiResponse, NextApiRequest } from 'next';
+import { getContracts } from './select';
+import { prisma } from '../../prisma';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
     const name = request.query.name as string;
     if (!name) throw new Error('パラメーターが不足しています');
-    await sql`INSERT INTO contract (Name) VALUES (${name});`;
 
-    const data = await sql`SELECT * FROM contract;`;
-    console.log(data);
+    await prisma.contract.create({
+      data: {
+        name: name
+      }
+    });
+
+    const data = await getContracts();
+
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);

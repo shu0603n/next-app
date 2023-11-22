@@ -9,14 +9,14 @@ import { PopupTransition } from 'components/@extended/Transitions';
 import { DeleteFilled } from '@ant-design/icons';
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
-import { dbResponse } from 'types/dbResponse';
+import { ParameterType } from 'types/parameter/parameter';
 
 // types
 interface Props {
   id: string;
   open: boolean;
   handleClose: (status: boolean) => void;
-  onReload: (data: dbResponse) => void;
+  onReload: (data: Array<ParameterType>) => void;
 }
 
 // ==============================|| 顧客 - 削除 ||============================== //
@@ -32,7 +32,7 @@ export default function AlertCustomerDelete({ id, open, handleClose, onReload }:
           return response.json();
         })
         .then((data) => {
-          onReload(data);
+          onReload(data.data);
           dispatch(
             openSnackbar({
               open: true,

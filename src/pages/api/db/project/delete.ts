@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client';
 import { NextApiResponse, NextApiRequest } from 'next';
-
-const prisma = new PrismaClient();
+import { prisma } from '../prisma';
+import { projectsPromise } from './select';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
@@ -30,24 +29,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
     });
 
     // データを再取得
-    const projects = await prisma.project.findMany({
-      select: {
-        id: true,
-        start_date: true,
-        end_date: true,
-        hp_posting_flag: true,
-        client: { select: { id: true, name: true } },
-        contract: { select: { id: true, name: true } },
-        working_postal_code: true,
-        working_address: true,
-        working_start_time: true,
-        working_end_time: true,
-        holiday: true,
-        project_title: true,
-        description: true,
-        price: true
-      }
-    });
+    const projects = await projectsPromise;
     return response.status(200).json({ projects });
   } catch (error) {
     console.error('エラーが発生しました:', error);

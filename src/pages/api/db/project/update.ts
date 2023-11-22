@@ -1,12 +1,8 @@
 // pages/api/your-api-route.ts
 import { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
 import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
-
-const prisma = new PrismaClient({
-  // デバッグモードを有効にする
-  log: ['query']
-});
+import { prisma } from '../prisma';
+import { projectsPromise } from './select';
 
 const createProjectSkills = async (projectId: number, skillId: number) => {
   await prisma.project_skills.create({
@@ -28,9 +24,6 @@ const createProjectProcess = async (projectId: number, processId: number) => {
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    // nullまたは空文字列を処理するユーティリティ関数
-    const toNull = (str: string) => (str === null || str === '' ? null : str);
-
     // リクエストボディをデストラクチャリング
     const {
       id,
@@ -51,13 +44,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
       process
     } = request.body;
 
-    console.log('body', request.body);
-
     const skillIds = skills?.map((skillItem: SkillParameterType) => skillItem?.id) ?? null;
-    console.log(skillIds);
-
     const processIds = process?.map((processItem: ParameterType) => processItem?.id) ?? null;
-    console.log(processIds);
 
     // project_title が存在しない場合はエラーをスロー
     if (!project_title) {
@@ -78,14 +66,14 @@ export default async function handler(request: NextApiRequest, response: NextApi
           contract: {
             connect: contract ? { id: contract.id } : undefined
           },
-          working_postal_code: toNull(working_postal_code),
-          working_address: toNull(working_address),
-          working_start_time: toNull(working_start_time),
-          working_end_time: toNull(working_end_time),
-          holiday: toNull(holiday),
-          project_title: toNull(project_title),
-          description: toNull(description),
-          price: toNull(price)
+          working_postal_code,
+          working_address,
+          working_start_time,
+          working_end_time,
+          holiday,
+          project_title,
+          description,
+          price
         }
       });
 
@@ -142,24 +130,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
     }
 
     // データを取得
-    const projects = await prisma.project.findMany({
-      select: {
-        id: true,
-        start_date: true,
-        end_date: true,
-        hp_posting_flag: true,
-        client: { select: { id: true, name: true } },
-        contract: { select: { id: true, name: true } },
-        working_postal_code: true,
-        working_address: true,
-        working_start_time: true,
-        working_end_time: true,
-        holiday: true,
-        project_title: true,
-        description: true,
-        price: true
-      }
-    });
+    const projects = await projectsPromise;
 
     // レスポンスを送信
     return response.status(200).json({ projects });

@@ -759,6 +759,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                 </Grid>
                 {isSubmitting && (
                   <Grid item>
+                    <Loader />
                     <CircularProgress />
                   </Grid>
                 )}
