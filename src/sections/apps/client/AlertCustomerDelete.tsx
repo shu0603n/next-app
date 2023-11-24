@@ -1,23 +1,46 @@
-// material-ui
 import { Button, Dialog, DialogContent, Stack, Typography } from '@mui/material';
-
-// project import
 import Avatar from 'components/@extended/Avatar';
 import { PopupTransition } from 'components/@extended/Transitions';
-
-// assets
 import { DeleteFilled } from '@ant-design/icons';
+import { ClientType } from 'types/client/client';
+import { alertSnackBar } from 'function/alert/alertSnackBar';
 
 // types
 interface Props {
-  title: string;
+  deleteId: string;
+  deleteName: string;
   open: boolean;
   handleClose: (status: boolean) => void;
+  onReload: (data: Array<ClientType>) => void;
 }
 
-// ==============================|| CUSTOMER - DELETE ||============================== //
+// ==============================|| 顧客 - 削除 ||============================== //
 
-export default function AlertCustomerDelete({ title, open, handleClose }: Props) {
+export default function AlertCustomerDelete({ deleteId, deleteName, open, handleClose, onReload }: Props) {
+  const handleClick = (isDelete: boolean) => {
+    if (isDelete) {
+      alertSnackBar('処理中…', 'secondary');
+      fetch(`/api/db/client/delete?id=${deleteId}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('データの削除に失敗しました。');
+          }
+          return response.json();
+        })
+        .then((data) => {
+          onReload(data.data);
+          alertSnackBar('データが正常に削除されました。', 'success');
+        })
+        .catch((error) => {
+          console.error('エラー:', error);
+          alertSnackBar('データの削除に失敗しました。', 'error');
+        })
+        .finally(() => {
+          handleClose(isDelete);
+        });
+    }
+  };
+
   return (
     <Dialog
       open={open}
@@ -35,25 +58,23 @@ export default function AlertCustomerDelete({ title, open, handleClose }: Props)
           </Avatar>
           <Stack spacing={2}>
             <Typography variant="h4" align="center">
-              Are you sure you want to delete?
+              削除してもよろしいですか？
             </Typography>
             <Typography align="center">
-              By deleting
+              「
               <Typography variant="subtitle1" component="span">
-                {' "'}
-                {title}
-                {'" '}
+                {deleteName}
               </Typography>
-              user, all task assigned to that user will also be deleted.
+              」ユーザーを削除すると、そのユーザーに割り当てられたすべてのタスクも削除されます。
             </Typography>
           </Stack>
 
           <Stack direction="row" spacing={2} sx={{ width: 1 }}>
-            <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
-              Cancel
+            <Button fullWidth onClick={() => handleClick(false)} color="secondary" variant="outlined">
+              キャンセル
             </Button>
-            <Button fullWidth color="error" variant="contained" onClick={() => handleClose(true)} autoFocus>
-              Delete
+            <Button fullWidth color="error" variant="contained" onClick={() => handleClick(true)} autoFocus>
+              削除
             </Button>
           </Stack>
         </Stack>

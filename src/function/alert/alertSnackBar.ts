@@ -1,7 +1,7 @@
 import { dispatch } from 'store';
 import { openSnackbar } from 'store/reducers/snackbar';
 
-export const alertSnackBar = (message: string, type: 'success' | 'error') => {
+export const alertSnackBar = (message: string, type: 'success' | 'error' | 'secondary') => {
   dispatch(
     openSnackbar({
       open: true,

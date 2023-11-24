@@ -54,6 +54,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     onSubmit: (values, { setSubmitting }) => {
       try {
         if (customer) {
+          alertSnackBar('処理中…', 'secondary');
           fetch(`/api/db/parameter/working/update?id=${values.id}&name=${values.name}`)
             .then((response) => {
               if (!response.ok) {
@@ -73,6 +74,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
               onCancel();
             });
         } else {
+          alertSnackBar('処理中…', 'secondary');
           fetch(`/api/db/parameter/working/insert?name=${values.name}`)
             .then((response) => {
               if (!response.ok) {

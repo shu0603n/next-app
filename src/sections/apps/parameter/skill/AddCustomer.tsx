@@ -93,6 +93,7 @@ const AddCustomer = ({ customer, technicAll, onCancel, onReload }: Props) => {
         };
 
         if (customer) {
+          alertSnackBar('処理中…', 'secondary');
           fetch('/api/db/parameter/skill/update', requestOptions)
             .then((response) => {
               if (!response.ok) {
@@ -112,6 +113,7 @@ const AddCustomer = ({ customer, technicAll, onCancel, onReload }: Props) => {
               onCancel();
             });
         } else {
+          alertSnackBar('処理中…', 'secondary');
           fetch('/api/db/parameter/skill/insert', requestOptions)
             .then((response) => {
               if (!response.ok) {

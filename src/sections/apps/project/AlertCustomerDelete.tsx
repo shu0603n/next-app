@@ -1,10 +1,9 @@
 import { Button, Dialog, DialogContent, Stack, Typography } from '@mui/material';
 import Avatar from 'components/@extended/Avatar';
 import { PopupTransition } from 'components/@extended/Transitions';
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/reducers/snackbar';
 import { DeleteFilled } from '@ant-design/icons';
 import { ProjectType } from 'types/project/project';
+import { alertSnackBar } from 'function/alert/alertSnackBar';
 
 // types
 interface Props {
@@ -20,6 +19,7 @@ interface Props {
 export default function AlertCustomerDelete({ deleteId, title, open, handleClose, onReload }: Props) {
   const handleClick = (isDelete: boolean) => {
     if (isDelete) {
+      alertSnackBar('処理中…', 'secondary');
       fetch(`/api/db/project/delete?id=${deleteId}`)
         .then((response) => {
           if (!response.ok) {
@@ -28,33 +28,12 @@ export default function AlertCustomerDelete({ deleteId, title, open, handleClose
           return response.json();
         })
         .then((data) => {
-          console.log(data);
           onReload(data.projects);
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: 'パラメーターが正常に削除されました。',
-              variant: 'alert',
-              alert: {
-                color: 'success'
-              },
-              close: false
-            })
-          );
+          alertSnackBar('パラメーターが正常に削除されました。', 'success');
         })
         .catch((error) => {
           console.error('エラー:', error);
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: 'データの削除に失敗しました。',
-              variant: 'alert',
-              alert: {
-                color: 'error'
-              },
-              close: false
-            })
-          );
+          alertSnackBar('データの削除に失敗しました。', 'error');
         })
         .finally(() => {
           handleClose(isDelete);

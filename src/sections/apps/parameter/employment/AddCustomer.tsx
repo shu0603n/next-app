@@ -1,25 +1,15 @@
 import { useState } from 'react';
-
-// material-ui
 import { Button, DialogActions, DialogContent, DialogTitle, Divider, Grid, InputLabel, Stack, TextField, Tooltip } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-
-// サードパーティ
 import _ from 'lodash';
 import * as Yup from 'yup';
 import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
-
-// プロジェクトインポート
 import AlertCustomerDelete from './AlertCustomerDelete';
 import IconButton from 'components/@extended/IconButton';
-
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/reducers/snackbar';
-
-// アセット
 import { DeleteFilled } from '@ant-design/icons';
 import { ParameterType } from 'types/parameter/parameter';
+import { alertSnackBar } from 'function/alert/alertSnackBar';
 
 // 定数
 const getInitialValues = (customer: FormikValues | null) => {
@@ -65,6 +55,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     onSubmit: (values, { setSubmitting }) => {
       try {
         if (customer) {
+          alertSnackBar('処理中…', 'secondary');
           fetch(`/api/db/parameter/employment/update?id=${values.id}&name=${values.name}`)
             .then((response) => {
               if (!response.ok) {
@@ -74,33 +65,14 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
             })
             .then((data) => {
               onReload(data.data);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: '正常に更新されました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'success'
-                  },
-                  close: false
-                })
-              );
+              alertSnackBar('正常に更新されました。', 'success');
             })
             .catch((error) => {
               console.error('エラー:', error);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: 'データの更新に失敗しました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'error'
-                  },
-                  close: false
-                })
-              );
+              alertSnackBar('データの更新に失敗しました。', 'error');
             });
         } else {
+          alertSnackBar('処理中…', 'secondary');
           fetch(`/api/db/parameter/employment/insert?name=${values.name}`)
             .then((response) => {
               if (!response.ok) {
@@ -110,31 +82,11 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
             })
             .then((data) => {
               onReload(data.data);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: '正常に追加されました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'success'
-                  },
-                  close: false
-                })
-              );
+              alertSnackBar('正常に追加されました。', 'success');
             })
             .catch((error) => {
               console.error('エラー:', error);
-              dispatch(
-                openSnackbar({
-                  open: true,
-                  message: 'データの追加に失敗しました。',
-                  variant: 'alert',
-                  alert: {
-                    color: 'error'
-                  },
-                  close: false
-                })
-              );
+              alertSnackBar('データの追加に失敗しました。', 'error');
             })
             .finally(() => {
               setSubmitting(false);

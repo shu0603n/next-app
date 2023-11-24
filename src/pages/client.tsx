@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement } from 'react';
+import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement, useId } from 'react';
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
 import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
-
 import { PopupTransition } from 'components/@extended/Transitions';
 
 // third-party
@@ -35,8 +34,7 @@ import AlertCustomerDelete from 'sections/apps/client/AlertCustomerDelete';
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
-import { CloseOutlined, PlusOutlined, EyeTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { useRouter } from 'next/router';
+import { EditTwoTone, PlusOutlined, DeleteTwoTone } from '@ant-design/icons';
 import { ClientType } from 'types/client/client';
 
 // ==============================|| REACT TABLE ||============================== //
@@ -76,7 +74,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['avatar', 'email'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['email'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -88,9 +86,9 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
 
   useEffect(() => {
     if (matchDownSM) {
-      setHiddenColumns(['avatar', 'name_k', 'phone', 'address', 'email']);
+      setHiddenColumns(['name_k', 'phone', 'address', 'email']);
     } else {
-      setHiddenColumns(['avatar', 'name_k']);
+      setHiddenColumns(['name_k']);
     }
     // eslint-disable-next-line
   }, [matchDownSM]);
@@ -114,7 +112,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Customer
+              追加
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
@@ -157,7 +155,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
               );
             })}
             <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-              <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
+              <TableCell sx={{ p: 2, py: 3 }} colSpan={9} key={useId()}>
                 <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
               </TableCell>
             </TableRow>
@@ -193,16 +191,18 @@ const CustomerClientPage = () => {
     // ページがロードされたときにデータを取得
     fetchTableData()
       .then((data) => {
-        setTableData(data.data.rows); // データを状態に設定
+        setTableData(data.data); // データを状態に設定
       })
       .catch((error) => {
         // エラーハンドリング
         console.error('Error:', error);
       });
   }, []); // 空の依存リストを指定することで、一度だけ実行される
+
   const [open, setOpen] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
   const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
+  const [customerDeleteName, setCustomerDeleteName] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
 
   const handleAdd = () => {
@@ -213,12 +213,6 @@ const CustomerClientPage = () => {
   const handleClose = () => {
     setOpen(!open);
   };
-  const router = useRouter();
-
-  const handleChange = (newValue: string) => {
-    router.push(`/client/${newValue}/basic`);
-  };
-
   const columns = useMemo(
     () => [
       {
@@ -268,21 +262,18 @@ const CustomerClientPage = () => {
         className: 'cell-center',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
-          const collapseIcon = row.isExpanded ? (
-            <CloseOutlined style={{ color: theme.palette.error.main }} />
-          ) : (
-            <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
-          );
           return (
             <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
-              <Tooltip title="View">
+              <Tooltip title="編集">
                 <IconButton
-                  color="secondary"
+                  color="primary"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    handleChange(row.values.id);
+                    e.stopPropagation();
+                    setCustomer(row.values);
+                    handleAdd();
                   }}
                 >
-                  {collapseIcon}
+                  <EditTwoTone twoToneColor={theme.palette.primary.main} />
                 </IconButton>
               </Tooltip>
               <Tooltip title="Delete">
@@ -292,6 +283,7 @@ const CustomerClientPage = () => {
                     e.stopPropagation();
                     handleClose();
                     setCustomerDeleteId(row.values.id);
+                    setCustomerDeleteName(row.values.name);
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -310,30 +302,38 @@ const CustomerClientPage = () => {
     <Page title="Customer List">
       <MainCard content={false}>
         {tableData && (
-          <ScrollX>
-            <ReactTable
-              columns={columns}
-              data={tableData}
-              handleAdd={handleAdd}
-              getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
-            />
-          </ScrollX>
-        )}
+          <Fragment>
+            <ScrollX>
+              <ReactTable
+                columns={columns}
+                data={tableData}
+                handleAdd={handleAdd}
+                getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+              />
+            </ScrollX>
 
-        <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} />
-        {/* add customer dialog */}
-        <Dialog
-          maxWidth="sm"
-          TransitionComponent={PopupTransition}
-          keepMounted
-          fullWidth
-          onClose={handleAdd}
-          open={add}
-          sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
-          aria-describedby="alert-dialog-slide-description"
-        >
-          <AddCustomer customer={customer} onCancel={handleAdd} onReload={() => setTableData} />
-        </Dialog>
+            <AlertCustomerDelete
+              deleteId={customerDeleteId}
+              deleteName={customerDeleteName}
+              open={open}
+              handleClose={handleClose}
+              onReload={setTableData}
+            />
+            {/* add customer dialog */}
+            <Dialog
+              maxWidth="sm"
+              TransitionComponent={PopupTransition}
+              keepMounted
+              fullWidth
+              onClose={handleAdd}
+              open={add}
+              sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
+              aria-describedby="alert-dialog-slide-description"
+            >
+              {add && <AddCustomer customer={customer} onCancel={handleAdd} onReload={setTableData} />}
+            </Dialog>
+          </Fragment>
+        )}
       </MainCard>
     </Page>
   );

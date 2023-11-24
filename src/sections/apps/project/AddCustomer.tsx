@@ -29,14 +29,13 @@ import * as Yup from 'yup';
 import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
 import AlertCustomerDelete from './AlertCustomerDelete';
 import IconButton from 'components/@extended/IconButton';
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/reducers/snackbar';
 import { DeleteFilled } from '@ant-design/icons';
 import { createFilterOptions, Autocomplete, Chip, CircularProgress } from '@mui/material';
 import { CloseOutlined } from '@ant-design/icons';
 import { ProjectType } from 'types/project/project';
 import { ParameterType, SkillParameterType, SkillArrayType, ProcessArrayType } from 'types/parameter/parameter';
 import Loader from 'components/Loader';
+import { alertSnackBar } from 'function/alert/alertSnackBar';
 
 // constant
 const getInitialValues = (
@@ -212,6 +211,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
           body: JSON.stringify(values) // valuesをJSON文字列に変換してbodyに設定
         };
 
+        alertSnackBar('処理中…', 'secondary');
         fetch(`/api/db/project/update`, requestOptions)
           .then((response) => {
             if (!response.ok) {
@@ -221,31 +221,11 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
           })
           .then((data) => {
             onReload(data.projects);
-            dispatch(
-              openSnackbar({
-                open: true,
-                message: '正常に更新されました。',
-                variant: 'alert',
-                alert: {
-                  color: 'success'
-                },
-                close: false
-              })
-            );
+            alertSnackBar('正常に更新されました。', 'success');
           })
           .catch((error) => {
             console.error('エラー:', error);
-            dispatch(
-              openSnackbar({
-                open: true,
-                message: 'データの更新に失敗しました。',
-                variant: 'alert',
-                alert: {
-                  color: 'error'
-                },
-                close: false
-              })
-            );
+            alertSnackBar('データの更新に失敗しました。', 'error');
           })
           .finally(() => {
             setSubmitting(false);

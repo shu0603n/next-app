@@ -23,6 +23,7 @@ interface Props {
 export default function AlertCustomerDelete({ id, open, handleClose, onReload }: Props) {
   const handleClick = (isDelete: boolean) => {
     if (isDelete) {
+      alertSnackBar('処理中…', 'secondary');
       fetch(`/api/db/parameter/process/delete?id=${id}`)
         .then((response) => {
           if (!response.ok) {
