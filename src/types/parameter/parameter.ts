@@ -5,7 +5,8 @@ export type ParameterType = {
 
 export type EmployeeParameterType = {
   id: number;
-  name: string;
+  sei: string;
+  mei: string;
 };
 
 export type SkillParameterType = {

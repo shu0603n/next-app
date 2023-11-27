@@ -106,8 +106,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
         'holiday',
         'hp_posting_flag',
         'price',
-        
-        'employee',
+        // 'employee',
         'dispatch_source',
         'fertilizer_type',
         'training_schedule',
@@ -147,8 +146,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
         'holiday',
         'hp_posting_flag',
         'price',
-
-        'employee',
+        // 'employee',
         'dispatch_source',
         'fertilizer_type',
         'training_schedule',
@@ -404,104 +402,116 @@ const CustomerProjectPage = () => {
         Header: '休日',
         accessor: 'holiday'
       },
-      
       {
         Header: '担当者',
-        accessor: 'employee_id'
-      },	
+        accessor: 'employee',
+        Cell: ({ row }: { row: Row }) => {
+          const { values } = row;
+          return (
+            <Stack direction="row" spacing={1.5} alignItems="center">
+              <Stack spacing={0}>
+                {values.employee && (
+                  <>
+                    <Typography variant="subtitle2">{`${values.employee.sei} ${values.employee.mei}`}</Typography>
+                  </>
+                )}
+              </Stack>
+            </Stack>
+          );
+        }
+      },
       {
         Header: '派遣元',
         accessor: 'dispatch_source'
-      },	
+      },
       {
         Header: '最寄り駅',
         accessor: 'fertilizer_type'
-      },	
+      },
       {
         Header: '研修日程',
         accessor: 'training_schedule'
-      },	
+      },
       {
         Header: '試用期間',
         accessor: 'trial_period_duration'
-      },	
+      },
       {
         Header: '研修備考',
         accessor: 'training_memo'
-      },	
+      },
       {
         Header: '就業期間',
         accessor: 'contract_period'
-      },	
+      },
       {
         Header: '勤務日数',
         accessor: 'working_days_count'
-      },	
+      },
       {
         Header: '勤務曜日',
         accessor: 'working_days_list'
-      },	
+      },
       {
         Header: '勤務時間',
         accessor: 'working_hours_per_day'
-      },	
+      },
       {
         Header: '勤務備考',
         accessor: 'work_notes'
-      },	
+      },
       {
         Header: '計算方法',
         accessor: 'price_type'
-      },	
+      },
       {
         Header: '交通費',
         accessor: 'transportation_expenses'
-      },	
+      },
       {
         Header: '時間外労働',
         accessor: 'overtime_hours'
-      },	
+      },
       {
         Header: '福利厚生',
         accessor: 'welfare_programs'
-      },	
+      },
       {
         Header: '職場環境',
         accessor: 'work_environment_description'
-      },	
+      },
       {
         Header: '服装',
         accessor: 'dress_code'
-      },	
+      },
       {
         Header: '男女比',
         accessor: 'gender_ratio'
-      },	
+      },
       {
         Header: '環境備考',
         accessor: 'environmental_notes'
-      },	
+      },
       {
         Header: '特記事項',
         accessor: 'special_notes'
-      },	
+      },
       {
         Header: '人材要件',
         accessor: 'hr_requirements'
-      },	
+      },
       {
         Header: '男女',
         accessor: 'gender_requirements'
-      },	
+      },
       {
         Header: '年齢',
         accessor: 'age_requirements'
-      },	
+      },
       {
         Header: '募集人数',
         accessor: 'recruitment_count'
-      },	
-
+      },
       {
         Header: 'HP掲載',
         accessor: 'hp_posting_flag'
@@ -592,6 +602,7 @@ const CustomerProjectPage = () => {
                   contractAll={tableData?.contract ?? []}
                   clientAll={tableData?.client ?? []}
                   processAll={tableData?.process ?? []}
+                  employeeAll={tableData?.employee ?? []}
                 />
               )}
             </Dialog>

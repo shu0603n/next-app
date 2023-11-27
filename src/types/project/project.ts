@@ -46,6 +46,7 @@ export type ProjectDataList = {
   client: Array<ParameterType>;
   contract: Array<ParameterType>;
   process: Array<ParameterType>;
+  employee: Array<EmployeeParameterType>;
 };
 
 export type ProjectCard = ProjectType & {

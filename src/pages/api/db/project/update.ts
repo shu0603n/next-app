@@ -42,7 +42,6 @@ export default async function handler(request: NextApiRequest, response: NextApi
       price,
       skills,
       process,
-
       employee,
       dispatch_source,
       fertilizer_type,
@@ -67,7 +66,6 @@ export default async function handler(request: NextApiRequest, response: NextApi
       gender_requirements,
       age_requirements,
       recruitment_count
-  
     } = request.body;
 
     const skillIds = skills?.map((skillItem: SkillParameterType) => skillItem?.id) ?? null;
@@ -100,7 +98,6 @@ export default async function handler(request: NextApiRequest, response: NextApi
           project_title,
           description,
           price,
-
           employee: {
             connect: employee ? { id: employee.id } : undefined
           },
@@ -114,7 +111,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
           working_days_list,
           working_hours_per_day,
           work_notes,
-          price_type,
+          price_type: Number(price_type),
           transportation_expenses,
           overtime_hours,
           welfare_programs,
@@ -171,7 +168,6 @@ export default async function handler(request: NextApiRequest, response: NextApi
           project_title,
           description,
           price,
-          
           employee: {
             connect: employee ? { id: employee.id } : undefined
           },
@@ -185,7 +181,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
           working_days_list,
           working_hours_per_day,
           work_notes,
-          price_type,
+          price_type: Number(price_type),
           transportation_expenses,
           overtime_hours,
           welfare_programs,

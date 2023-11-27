@@ -88,7 +88,7 @@ const getInitialValues = (
     working_days_list: '',
     working_hours_per_day: '',
     work_notes: '',
-    price_type: '',
+    price_type: null as null | Number,
     transportation_expenses: '',
     overtime_hours: '',
     welfare_programs: '',
@@ -152,7 +152,16 @@ const getInitialValues = (
   return newCustomer;
 };
 
-const role = ['PG', 'L', 'PL', 'PM'];
+const role = [
+  { id: 1, name: 'PG' },
+  { id: 2, name: 'L' },
+  { id: 3, name: 'PL' },
+  { id: 4, name: 'PM' }
+];
+const price_type = [
+  { id: 1, name: '時給' },
+  { id: 2, name: '単価' }
+];
 
 const filterProcess = createFilterOptions<string>();
 const filterSkills = createFilterOptions<string>();
@@ -161,7 +170,7 @@ const filterSkills = createFilterOptions<string>();
 
 async function fetchAllData(id: number | undefined) {
   try {
-    const response = await fetch(id ? `/api/db/project/update/select?id=${id}` : '/api/db/project/update/select');
+    const response = await fetch(id ? `/api/db/project/params/select?id=${id}` : '/api/db/project/params/select');
     if (!response.ok) {
       throw new Error('API request failed');
     }
@@ -179,11 +188,13 @@ export interface Props {
   contractAll: Array<ParameterType>;
   clientAll: Array<ParameterType>;
   processAll: Array<ParameterType>;
+  employeeAll: Array<EmployeeParameterType>;
   onCancel: () => void;
   onReload: (data: Array<ProjectType>) => void;
 }
-const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, onCancel, onReload }: Props) => {
+const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, employeeAll, onCancel, onReload }: Props) => {
   const isCreating = !customer;
+  console.log(customer);
 
   const [projectSkills, setProjectSkills] = useState<Array<SkillParameterType>>();
   const [projectProcess, setProjectProcess] = useState<Array<ParameterType>>();
@@ -401,7 +412,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                                 clientAll?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
                               )
                             }
-                            input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
+                            input={<OutlinedInput placeholder="ソート" />}
                             renderValue={(selected: any) => {
                               if (!selected?.name) {
                                 return <Typography variant="subtitle1">企業を選択</Typography>;
@@ -454,7 +465,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                                 contractAll?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
                               )
                             }
-                            input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
+                            input={<OutlinedInput placeholder="ソート" />}
                             renderValue={(selected: any) => {
                               if (!selected?.name) {
                                 return <Typography variant="subtitle1">役割を選択</Typography>;
@@ -530,14 +541,80 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
 
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
+                        <InputLabel>契約区分</InputLabel>
+                        <FormControl fullWidth>
+                          <Select
+                            id="contract"
+                            displayEmpty
+                            {...getFieldProps('contract')}
+                            onChange={(event: SelectChangeEvent<string>) =>
+                              setFieldValue(
+                                'contract',
+                                contractAll?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
+                              )
+                            }
+                            input={<OutlinedInput placeholder="ソート" />}
+                            renderValue={(selected: any) => {
+                              if (!selected?.name) {
+                                return <Typography variant="subtitle1">役割を選択</Typography>;
+                              }
+
+                              return <Typography variant="subtitle2">{selected.name}</Typography>;
+                            }}
+                          >
+                            <MenuItem value={undefined}>なし</MenuItem>
+                            {contractAll?.map((column: ParameterType) => (
+                              <MenuItem key={column.id} value={column.name}>
+                                <ListItemText primary={column.name} />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {touched.contract && errors.contract && (
+                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
+                            {errors.contract}
+                          </FormHelperText>
+                        )}
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
                         <InputLabel>担当者</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="employee"
-                          {...getFieldProps('employee')}
-                          error={Boolean(touched.employee && errors.employee)}
-                          helperText={touched.employee && errors.employee}
-                        />
+                        {JSON.stringify(employeeAll)}
+                        {JSON.stringify(getFieldProps('employee'))}
+                        <FormControl fullWidth>
+                          <Select
+                            id="employee"
+                            displayEmpty
+                            {...getFieldProps('employee')}
+                            onChange={(event: SelectChangeEvent<string>) =>
+                              setFieldValue(
+                                'employee',
+                                employeeAll?.find((item: EmployeeParameterType) => item.sei === (event.target.value as string)) ?? null
+                              )
+                            }
+                            input={<OutlinedInput placeholder="ソート" />}
+                            renderValue={(selected: any) => {
+                              if (!selected?.sei) {
+                                return <Typography variant="subtitle1">担当者を選択</Typography>;
+                              }
+
+                              return <Typography variant="subtitle2">{selected.sei}</Typography>;
+                            }}
+                          >
+                            <MenuItem value={undefined}>なし</MenuItem>
+                            {employeeAll?.map((column: EmployeeParameterType) => (
+                              <MenuItem key={column.id} value={column.sei}>
+                                <ListItemText primary={column.sei} />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {touched.employee && errors.employee && (
+                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
+                            {errors.employee}
+                          </FormHelperText>
+                        )}
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
@@ -663,13 +740,39 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel>計算方法</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="price_type"
-                          {...getFieldProps('price_type')}
-                          error={Boolean(touched.price_type && errors.price_type)}
-                          helperText={touched.price_type && errors.price_type}
-                        />
+                        <FormControl fullWidth>
+                          <Select
+                            id="price_type"
+                            displayEmpty
+                            {...getFieldProps('price_type')}
+                            onChange={(event: SelectChangeEvent<string>) =>
+                              setFieldValue(
+                                'price_type',
+                                price_type?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
+                              )
+                            }
+                            input={<OutlinedInput placeholder="ソート" />}
+                            renderValue={(selected: any) => {
+                              if (!selected?.name) {
+                                return <Typography variant="subtitle1">計算方法を選択</Typography>;
+                              }
+
+                              return <Typography variant="subtitle2">{selected.name}</Typography>;
+                            }}
+                          >
+                            <MenuItem value={undefined}>なし</MenuItem>
+                            {price_type?.map((column: ParameterType) => (
+                              <MenuItem key={column.id} value={column.name}>
+                                <ListItemText primary={column.name} />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {touched.price_type && errors.price_type && (
+                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
+                            {errors.price_type}
+                          </FormHelperText>
+                        )}
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
@@ -816,7 +919,6 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                         />
                       </Stack>
                     </Grid>
-
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel>役割</InputLabel>
@@ -825,27 +927,32 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                             id="role"
                             displayEmpty
                             {...getFieldProps('role')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('role', event.target.value as string)}
-                            input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
-                            renderValue={(selected) => {
-                              if (!selected) {
+                            onChange={(event: SelectChangeEvent<string>) =>
+                              setFieldValue(
+                                'role',
+                                role?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
+                              )
+                            }
+                            input={<OutlinedInput placeholder="ソート" />}
+                            renderValue={(selected: any) => {
+                              if (!selected?.name) {
                                 return <Typography variant="subtitle1">役割を選択</Typography>;
                               }
 
-                              return <Typography variant="subtitle2">{selected}</Typography>;
+                              return <Typography variant="subtitle2">{selected.name}</Typography>;
                             }}
                           >
                             <MenuItem value={undefined}>なし</MenuItem>
-                            {role.map((column: any) => (
-                              <MenuItem key={column} value={column}>
-                                <ListItemText primary={column} />
+                            {role?.map((column: ParameterType) => (
+                              <MenuItem key={column.id} value={column.name}>
+                                <ListItemText primary={column.name} />
                               </MenuItem>
                             ))}
                           </Select>
                         </FormControl>
-                        {touched.role && errors.role && (
+                        {touched.price_type && errors.price_type && (
                           <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.role}
+                            {errors.price_type}
                           </FormHelperText>
                         )}
                       </Stack>

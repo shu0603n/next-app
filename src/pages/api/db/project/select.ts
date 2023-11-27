@@ -58,14 +58,22 @@ export default async function handler(request: NextApiRequest, response: NextApi
     const clientPromise = prisma.client.findMany({ select: { id: true, name: true } });
     const contractPromise = prisma.contract.findMany({ select: { id: true, name: true } });
     const processPromise = prisma.process.findMany({ select: { id: true, name: true } });
+    const employeePromise = prisma.employee.findMany({
+      select: {
+        id: true,
+        sei: true,
+        mei: true
+      }
+    });
 
     // 同時に実行して待つ
-    const [projects, skill, client, contract, process] = await Promise.all([
+    const [projects, skill, client, contract, process, employee] = await Promise.all([
       projectsPromise,
       skillPromise,
       clientPromise,
       contractPromise,
-      processPromise
+      processPromise,
+      employeePromise
     ]);
 
     response.status(200).json({
@@ -74,7 +82,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
       skill: skill,
       client: client,
       contract: contract,
-      process: process
+      process: process,
+      employee: employee
     });
   } catch (error) {
     console.error('エラーが発生しました:', error);
