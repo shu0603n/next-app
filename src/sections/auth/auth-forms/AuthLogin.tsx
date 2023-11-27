@@ -69,6 +69,7 @@ const AuthLogin = ({ providers, csrfToken }: any) => {
           password: Yup.string().max(255).required('Password is required')
         })}
         onSubmit={(values, { setErrors, setSubmitting }) => {
+          console.log('ログイン処理開始', values.email, values.password);
           signIn('login', {
             redirect: false,
             email: values.email,

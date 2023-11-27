@@ -1,4 +1,4 @@
-import { ParameterType, SkillParameterType } from '../parameter/parameter';
+import { ParameterType, SkillParameterType, EmployeeParameterType } from '../parameter/parameter';
 
 export type ProjectType = {
   id: number;
@@ -15,6 +15,30 @@ export type ProjectType = {
   project_title: string;
   description: string;
   price: string;
+  employee: EmployeeParameterType;
+  dispatch_source: string;
+  fertilizer_type: string;
+  training_schedule: string;
+  trial_period_duration: string;
+  training_memo: string;
+  contract_period: string;
+  working_days_count: string;
+  working_days_list: string;
+  working_hours_per_day: string;
+  work_notes: string;
+  price_type: string;
+  transportation_expenses: string;
+  overtime_hours: string;
+  welfare_programs: string;
+  work_environment_description: string;
+  dress_code: string;
+  gender_ratio: string;
+  environmental_notes: string;
+  special_notes: string;
+  hr_requirements: string;
+  gender_requirements: string;
+  age_requirements: string;
+  recruitment_count: string;
 };
 
 export type ProjectDataList = {

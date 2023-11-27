@@ -73,11 +73,14 @@ export default NextAuth({
       },
       async authorize(credentials) {
         try {
+          console.log(JSON.stringify(credentials));
+          console.log(credentials?.password, credentials?.email);
           const user = await axios.post('/api/account/register', {
             name: credentials?.name,
             password: credentials?.password,
             email: credentials?.email
           });
+          console.log(user);
 
           if (user) {
             users.push(user.data);

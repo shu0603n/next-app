@@ -41,7 +41,33 @@ export default async function handler(request: NextApiRequest, response: NextApi
       description,
       price,
       skills,
-      process
+      process,
+
+      employee,
+      dispatch_source,
+      fertilizer_type,
+      training_schedule,
+      trial_period_duration,
+      training_memo,
+      contract_period,
+      working_days_count,
+      working_days_list,
+      working_hours_per_day,
+      work_notes,
+      price_type,
+      transportation_expenses,
+      overtime_hours,
+      welfare_programs,
+      work_environment_description,
+      dress_code,
+      gender_ratio,
+      environmental_notes,
+      special_notes,
+      hr_requirements,
+      gender_requirements,
+      age_requirements,
+      recruitment_count
+  
     } = request.body;
 
     const skillIds = skills?.map((skillItem: SkillParameterType) => skillItem?.id) ?? null;
@@ -73,7 +99,34 @@ export default async function handler(request: NextApiRequest, response: NextApi
           holiday,
           project_title,
           description,
-          price
+          price,
+
+          employee: {
+            connect: employee ? { id: employee.id } : undefined
+          },
+          dispatch_source,
+          fertilizer_type,
+          training_schedule,
+          trial_period_duration,
+          training_memo,
+          contract_period,
+          working_days_count,
+          working_days_list,
+          working_hours_per_day,
+          work_notes,
+          price_type,
+          transportation_expenses,
+          overtime_hours,
+          welfare_programs,
+          work_environment_description,
+          dress_code,
+          gender_ratio,
+          environmental_notes,
+          special_notes,
+          hr_requirements,
+          gender_requirements,
+          age_requirements,
+          recruitment_count
         }
       });
 
@@ -117,7 +170,34 @@ export default async function handler(request: NextApiRequest, response: NextApi
           holiday,
           project_title,
           description,
-          price
+          price,
+          
+          employee: {
+            connect: employee ? { id: employee.id } : undefined
+          },
+          dispatch_source,
+          fertilizer_type,
+          training_schedule,
+          trial_period_duration,
+          training_memo,
+          contract_period,
+          working_days_count,
+          working_days_list,
+          working_hours_per_day,
+          work_notes,
+          price_type,
+          transportation_expenses,
+          overtime_hours,
+          welfare_programs,
+          work_environment_description,
+          dress_code,
+          gender_ratio,
+          environmental_notes,
+          special_notes,
+          hr_requirements,
+          gender_requirements,
+          age_requirements,
+          recruitment_count
         }
       });
 

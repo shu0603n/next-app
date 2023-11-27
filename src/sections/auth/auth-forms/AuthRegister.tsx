@@ -1,17 +1,13 @@
 import React from 'react';
 
 // next
-import Image from 'next/legacy/image';
 import NextLink from 'next/link';
 import { signIn } from 'next-auth/react';
 
 // material-ui
-import { Theme } from '@mui/material/styles';
 import {
   Box,
-  useMediaQuery,
   Button,
-  Divider,
   FormHelperText,
   FormControl,
   Grid,
@@ -28,7 +24,6 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 
 // project import
-import FirebaseSocial from './FirebaseSocial';
 import { APP_DEFAULT_PATH } from 'config';
 import IconButton from 'components/@extended/IconButton';
 import AnimateButton from 'components/@extended/AnimateButton';
@@ -40,15 +35,9 @@ import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 // types
 import { StringColorProps } from 'types/password';
 
-const Auth0 = '/assets/images/icons/auth0.svg';
-const Cognito = '/assets/images/icons/aws-cognito.svg';
-const Google = '/assets/images/icons/google.svg';
-
 // ============================|| AWS CONNITO - LOGIN ||============================ //
 
 const AuthRegister = ({ providers, csrfToken }: any) => {
-  const matchDownSM = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
-
   const [level, setLevel] = React.useState<StringColorProps>();
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {
@@ -103,7 +92,7 @@ const AuthRegister = ({ providers, csrfToken }: any) => {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Stack spacing={1}>
-                  <InputLabel htmlFor="name-login">Name</InputLabel>
+                  <InputLabel htmlFor="name-login">名前</InputLabel>
                   <OutlinedInput
                     id="name-login"
                     type="text"
@@ -124,7 +113,7 @@ const AuthRegister = ({ providers, csrfToken }: any) => {
               </Grid>
               <Grid item xs={12}>
                 <Stack spacing={1}>
-                  <InputLabel htmlFor="email-login">Email Address</InputLabel>
+                  <InputLabel htmlFor="email-login">メールアドレス</InputLabel>
                   <OutlinedInput
                     id="email-login"
                     type="email"
@@ -145,7 +134,7 @@ const AuthRegister = ({ providers, csrfToken }: any) => {
               </Grid>
               <Grid item xs={12}>
                 <Stack spacing={1}>
-                  <InputLabel htmlFor="password-login">Password</InputLabel>
+                  <InputLabel htmlFor="password-login">パスワード</InputLabel>
                   <OutlinedInput
                     fullWidth
                     error={Boolean(touched.password && errors.password)}
@@ -213,7 +202,7 @@ const AuthRegister = ({ providers, csrfToken }: any) => {
               <Grid item xs={12}>
                 <AnimateButton>
                   <Button disableElevation disabled={isSubmitting} fullWidth size="large" type="submit" variant="contained" color="primary">
-                    Create Account
+                    アカウント作成
                   </Button>
                 </AnimateButton>
               </Grid>
@@ -221,65 +210,6 @@ const AuthRegister = ({ providers, csrfToken }: any) => {
           </form>
         )}
       </Formik>
-      <Divider sx={{ mt: 2 }}>
-        <Typography variant="caption"> Sign up with</Typography>
-      </Divider>
-      {providers && (
-        <Stack
-          direction="row"
-          spacing={matchDownSM ? 1 : 2}
-          justifyContent={matchDownSM ? 'space-around' : 'space-between'}
-          sx={{ mt: 3, '& .MuiButton-startIcon': { mr: matchDownSM ? 0 : 1, ml: matchDownSM ? 0 : -0.5 } }}
-        >
-          {Object.values(providers).map((provider: any) => {
-            if (provider.id === 'login' || provider.id === 'register') {
-              return;
-            }
-            return (
-              <Box key={provider.name} sx={{ width: '100%' }}>
-                {provider.id === 'google' && (
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    fullWidth={!matchDownSM}
-                    startIcon={<Image src={Google} alt="Twitter" width={16} height={16} />}
-                    onClick={() => signIn(provider.id, { callbackUrl: APP_DEFAULT_PATH })}
-                  >
-                    {!matchDownSM && 'Google'}
-                  </Button>
-                )}
-                {provider.id === 'auth0' && (
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    fullWidth={!matchDownSM}
-                    startIcon={<Image src={Auth0} alt="Twitter" width={16} height={16} />}
-                    onClick={() => signIn(provider.id, { callbackUrl: APP_DEFAULT_PATH })}
-                  >
-                    {!matchDownSM && 'Auth0'}
-                  </Button>
-                )}
-                {provider.id === 'cognito' && (
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    fullWidth={!matchDownSM}
-                    startIcon={<Image src={Cognito} alt="Twitter" width={16} height={16} />}
-                    onClick={() => signIn(provider.id, { callbackUrl: APP_DEFAULT_PATH })}
-                  >
-                    {!matchDownSM && 'Cognito'}
-                  </Button>
-                )}
-              </Box>
-            );
-          })}
-        </Stack>
-      )}
-      {!providers && (
-        <Box sx={{ mt: 3 }}>
-          <FirebaseSocial />
-        </Box>
-      )}
     </>
   );
 };

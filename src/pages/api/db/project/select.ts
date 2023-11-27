@@ -16,7 +16,32 @@ export const projectsPromise = prisma.project.findMany({
     holiday: true,
     project_title: true,
     description: true,
-    price: true
+    price: true,
+
+    employee: { select: { id: true, sei: true, mei: true } },
+    dispatch_source: true,
+    fertilizer_type: true,
+    training_schedule: true,
+    trial_period_duration: true,
+    training_memo: true,
+    contract_period: true,
+    working_days_count: true,
+    working_days_list: true,
+    working_hours_per_day: true,
+    work_notes: true,
+    price_type: true,
+    transportation_expenses: true,
+    overtime_hours: true,
+    welfare_programs: true,
+    work_environment_description: true,
+    dress_code: true,
+    gender_ratio: true,
+    environmental_notes: true,
+    special_notes: true,
+    hr_requirements: true,
+    gender_requirements: true,
+    age_requirements: true,
+    recruitment_count: true
   }
 });
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {

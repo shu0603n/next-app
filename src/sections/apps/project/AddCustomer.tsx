@@ -33,7 +33,7 @@ import { DeleteFilled } from '@ant-design/icons';
 import { createFilterOptions, Autocomplete, Chip, CircularProgress } from '@mui/material';
 import { CloseOutlined } from '@ant-design/icons';
 import { ProjectType } from 'types/project/project';
-import { ParameterType, SkillParameterType, SkillArrayType, ProcessArrayType } from 'types/parameter/parameter';
+import { ParameterType, SkillParameterType, SkillArrayType, ProcessArrayType, EmployeeParameterType } from 'types/parameter/parameter';
 import Loader from 'components/Loader';
 import { alertSnackBar } from 'function/alert/alertSnackBar';
 
@@ -75,7 +75,32 @@ const getInitialValues = (
       } as ParameterType | null
     ] as ParameterType[] | undefined,
     role: '',
-    price: ''
+    price: '',
+
+    employee: null as EmployeeParameterType | null,
+    dispatch_source: '',
+    fertilizer_type: '',
+    training_schedule: '',
+    trial_period_duration: '',
+    training_memo: '',
+    contract_period: '',
+    working_days_count: '',
+    working_days_list: '',
+    working_hours_per_day: '',
+    work_notes: '',
+    price_type: '',
+    transportation_expenses: '',
+    overtime_hours: '',
+    welfare_programs: '',
+    work_environment_description: '',
+    dress_code: '',
+    gender_ratio: '',
+    environmental_notes: '',
+    special_notes: '',
+    hr_requirements: '',
+    gender_requirements: '',
+    age_requirements: '',
+    recruitment_count: ''
   };
 
   if (customer) {
@@ -96,6 +121,31 @@ const getInitialValues = (
     newCustomer.process = projectProcess;
     newCustomer.role = customer.role;
     newCustomer.price = customer.price;
+
+    newCustomer.employee = customer.employee;
+    newCustomer.dispatch_source = customer.dispatch_source;
+    newCustomer.fertilizer_type = customer.fertilizer_type;
+    newCustomer.training_schedule = customer.training_schedule;
+    newCustomer.trial_period_duration = customer.trial_period_duration;
+    newCustomer.training_memo = customer.training_memo;
+    newCustomer.contract_period = customer.contract_period;
+    newCustomer.working_days_count = customer.working_days_count;
+    newCustomer.working_days_list = customer.working_days_list;
+    newCustomer.working_hours_per_day = customer.working_hours_per_day;
+    newCustomer.work_notes = customer.work_notes;
+    newCustomer.price_type = customer.price_type;
+    newCustomer.transportation_expenses = customer.transportation_expenses;
+    newCustomer.overtime_hours = customer.overtime_hours;
+    newCustomer.welfare_programs = customer.welfare_programs;
+    newCustomer.work_environment_description = customer.work_environment_description;
+    newCustomer.dress_code = customer.dress_code;
+    newCustomer.gender_ratio = customer.gender_ratio;
+    newCustomer.environmental_notes = customer.environmental_notes;
+    newCustomer.special_notes = customer.special_notes;
+    newCustomer.hr_requirements = customer.hr_requirements;
+    newCustomer.gender_requirements = customer.gender_requirements;
+    newCustomer.age_requirements = customer.age_requirements;
+    newCustomer.recruitment_count = customer.recruitment_count;
     return _.merge({}, newCustomer, customer);
   }
 
@@ -477,6 +527,296 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, o
                         />
                       </Stack>
                     </Grid>
+
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>担当者</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="employee"
+                          {...getFieldProps('employee')}
+                          error={Boolean(touched.employee && errors.employee)}
+                          helperText={touched.employee && errors.employee}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>派遣元</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="dispatch_source"
+                          {...getFieldProps('dispatch_source')}
+                          error={Boolean(touched.dispatch_source && errors.dispatch_source)}
+                          helperText={touched.dispatch_source && errors.dispatch_source}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>最寄り駅</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="fertilizer_type"
+                          {...getFieldProps('fertilizer_type')}
+                          error={Boolean(touched.fertilizer_type && errors.fertilizer_type)}
+                          helperText={touched.fertilizer_type && errors.fertilizer_type}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>研修日程</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="training_schedule"
+                          {...getFieldProps('training_schedule')}
+                          error={Boolean(touched.training_schedule && errors.training_schedule)}
+                          helperText={touched.training_schedule && errors.training_schedule}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>試用期間</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="trial_period_duration"
+                          {...getFieldProps('trial_period_duration')}
+                          error={Boolean(touched.trial_period_duration && errors.trial_period_duration)}
+                          helperText={touched.trial_period_duration && errors.trial_period_duration}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>研修備考</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="training_memo"
+                          {...getFieldProps('training_memo')}
+                          error={Boolean(touched.training_memo && errors.training_memo)}
+                          helperText={touched.training_memo && errors.training_memo}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>就業期間</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="contract_period"
+                          {...getFieldProps('contract_period')}
+                          error={Boolean(touched.contract_period && errors.contract_period)}
+                          helperText={touched.contract_period && errors.contract_period}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>勤務日数</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="working_days_count"
+                          {...getFieldProps('working_days_count')}
+                          error={Boolean(touched.working_days_count && errors.working_days_count)}
+                          helperText={touched.working_days_count && errors.working_days_count}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>勤務曜日</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="working_days_list"
+                          {...getFieldProps('working_days_list')}
+                          error={Boolean(touched.working_days_list && errors.working_days_list)}
+                          helperText={touched.working_days_list && errors.working_days_list}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>勤務時間</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="working_hours_per_day"
+                          {...getFieldProps('working_hours_per_day')}
+                          error={Boolean(touched.working_hours_per_day && errors.working_hours_per_day)}
+                          helperText={touched.working_hours_per_day && errors.working_hours_per_day}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>勤務備考</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="work_notes"
+                          {...getFieldProps('work_notes')}
+                          error={Boolean(touched.work_notes && errors.work_notes)}
+                          helperText={touched.work_notes && errors.work_notes}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>計算方法</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="price_type"
+                          {...getFieldProps('price_type')}
+                          error={Boolean(touched.price_type && errors.price_type)}
+                          helperText={touched.price_type && errors.price_type}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>交通費</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="transportation_expenses"
+                          {...getFieldProps('transportation_expenses')}
+                          error={Boolean(touched.transportation_expenses && errors.transportation_expenses)}
+                          helperText={touched.transportation_expenses && errors.transportation_expenses}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>時間外労働</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="overtime_hours"
+                          {...getFieldProps('overtime_hours')}
+                          error={Boolean(touched.overtime_hours && errors.overtime_hours)}
+                          helperText={touched.overtime_hours && errors.overtime_hours}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>福利厚生</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="welfare_programs"
+                          {...getFieldProps('welfare_programs')}
+                          error={Boolean(touched.welfare_programs && errors.welfare_programs)}
+                          helperText={touched.welfare_programs && errors.welfare_programs}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>職場環境</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="work_environment_description"
+                          {...getFieldProps('work_environment_description')}
+                          error={Boolean(touched.work_environment_description && errors.work_environment_description)}
+                          helperText={touched.work_environment_description && errors.work_environment_description}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>服装</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="dress_code"
+                          {...getFieldProps('dress_code')}
+                          error={Boolean(touched.dress_code && errors.dress_code)}
+                          helperText={touched.dress_code && errors.dress_code}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>男女比</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="gender_ratio"
+                          {...getFieldProps('gender_ratio')}
+                          error={Boolean(touched.gender_ratio && errors.gender_ratio)}
+                          helperText={touched.gender_ratio && errors.gender_ratio}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>環境備考</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="environmental_notes"
+                          {...getFieldProps('environmental_notes')}
+                          error={Boolean(touched.environmental_notes && errors.environmental_notes)}
+                          helperText={touched.environmental_notes && errors.environmental_notes}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>特記事項</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="special_notes"
+                          {...getFieldProps('special_notes')}
+                          error={Boolean(touched.special_notes && errors.special_notes)}
+                          helperText={touched.special_notes && errors.special_notes}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>人材要件</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="hr_requirements"
+                          {...getFieldProps('hr_requirements')}
+                          error={Boolean(touched.hr_requirements && errors.hr_requirements)}
+                          helperText={touched.hr_requirements && errors.hr_requirements}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>男女</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="gender_requirements"
+                          {...getFieldProps('gender_requirements')}
+                          error={Boolean(touched.gender_requirements && errors.gender_requirements)}
+                          helperText={touched.gender_requirements && errors.gender_requirements}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>年齢</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="age_requirements"
+                          {...getFieldProps('age_requirements')}
+                          error={Boolean(touched.age_requirements && errors.age_requirements)}
+                          helperText={touched.age_requirements && errors.age_requirements}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>募集人数</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="recruitment_count"
+                          {...getFieldProps('recruitment_count')}
+                          error={Boolean(touched.recruitment_count && errors.recruitment_count)}
+                          helperText={touched.recruitment_count && errors.recruitment_count}
+                        />
+                      </Stack>
+                    </Grid>
+
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel>役割</InputLabel>
