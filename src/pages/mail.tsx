@@ -1,4 +1,5 @@
-import { ReactElement, useState } from 'react';
+import { Fragment, ReactElement, useState } from 'react';
+import SyntaxHighlight from 'utils/SyntaxHighlight';
 // material-ui
 import { FormHelperText, Grid, Stack, Typography } from '@mui/material';
 
@@ -18,22 +19,14 @@ import { useMemo } from 'react';
 import { Button, Chip, Dialog, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 
 // third-party
-import { useTable, useFilters, useGlobalFilter, Column, Row, HeaderGroup, Cell } from 'react-table';
+import { useTable, useFilters, usePagination, useRowSelect, useGlobalFilter, Column, Row, HeaderGroup, Cell } from 'react-table';
 
 // project import
 import ScrollX from 'components/ScrollX';
-import { CSVExport, EmptyTable } from 'components/third-party/ReactTable';
+import { CSVExport, EmptyTable, IndeterminateCheckbox, TablePagination, TableRowSelection } from 'components/third-party/ReactTable';
 import { PlusOutlined } from '@ant-design/icons';
 
-import {
-  GlobalFilter,
-  DefaultColumnFilter,
-  SelectColumnFilter,
-  // SliderColumnFilter,
-  NumberRangeColumnFilter,
-  renderFilterTypes,
-  // filterGreaterThan
-} from 'utils/react-table';
+import { GlobalFilter, DefaultColumnFilter, SelectColumnFilter, NumberRangeColumnFilter, renderFilterTypes } from 'utils/react-table';
 import AddCustomer from 'sections/apps/mail/AddCustomer';
 
 // ==============================|| SAMPLE PAGE ||============================== //
@@ -53,27 +46,67 @@ interface Props {
 function ReactTable({ columns, data }: Props) {
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const defaultColumn = useMemo(() => ({ Filter: DefaultColumnFilter }), []);
-  const initialState = useMemo(() => ({ filters: [{ id: 'status', value: '' }] }), []);
+  const initialState = useMemo(
+    () => ({ pageIndex: 0, pageSize: 10, selectedRowIds: { 0: true, 5: true, 7: true }, filters: [{ id: 'status', value: '' }] }),
+    []
+  );
+
+  // const initialState = useMemo(
+  //   () => ({ pageIndex: 0, pageSize: 100, selectedRowIds: { 0: true, 5: true, 7: true }, filters: [{ id: 'status', value: '' }] }),
+  //   []
+  // );
   const [add, setAdd] = useState<boolean>(false);
   const handleAdd = () => {
     setAdd(!add);
   };
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, state, preGlobalFilteredRows, setGlobalFilter } = useTable(
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    page,
+    prepareRow,
+    state,
+    preGlobalFilteredRows,
+    setGlobalFilter,
+    gotoPage,
+    setPageSize,
+    state: { selectedRowIds, pageIndex, pageSize },
+    selectedFlatRows
+  } = useTable(
     {
       columns,
       data,
       defaultColumn,
-      initialState,
-      filterTypes
+      filterTypes,
+      initialState
     },
     useGlobalFilter,
-    useFilters
+    useFilters,
+    usePagination,
+    useRowSelect,
+    (hooks) => {
+      hooks.allColumns.push((columns: Column[]) => [
+        {
+          id: 'row-selection-chk',
+          accessor: 'Selection',
+          Header: ({ getToggleAllPageRowsSelectedProps }) => (
+            <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
+          ),
+          disableSortBy: true,
+          disableFilters: true,
+          Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+        },
+        ...columns
+      ]);
+    }
   );
 
   const sortingRow = rows.slice(0, 10);
 
   return (
     <>
+      <TableRowSelection selected={Object.keys(selectedRowIds).length} />
       <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ padding: 2 }}>
         <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={state.globalFilter} setGlobalFilter={setGlobalFilter} />
         <CSVExport data={rows.map((d: Row) => d.original)} filename={'filtering-table.csv'} />
@@ -104,8 +137,8 @@ function ReactTable({ columns, data }: Props) {
               ))}
             </TableRow>
           ))}
-          {sortingRow.length > 0 ? (
-            sortingRow.map((row, i) => {
+          {page.length > 0 ? (
+            page.map((row, i) => {
               prepareRow(row);
               return (
                 <TableRow {...row.getRowProps()} key={i}>
@@ -120,8 +153,23 @@ function ReactTable({ columns, data }: Props) {
           ) : (
             <EmptyTable msg="No Data" colSpan={7} />
           )}
+          <TableRow>
+            <TableCell sx={{ p: 2, pb: 0 }} colSpan={8}>
+              <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
+            </TableCell>
+          </TableRow>
         </TableBody>
       </Table>
+      <SyntaxHighlight>
+        {JSON.stringify(
+          {
+            selectedRowIndices: selectedRowIds,
+            'selectedFlatRows[].original': selectedFlatRows.map((d: Row) => d.original)
+          },
+          null,
+          2
+        )}
+      </SyntaxHighlight>
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}
@@ -146,7 +194,8 @@ const Mail = () => {
         {
           Header: 'ID',
           accessor: 'id',
-          Filter: NumberRangeColumnFilter
+          Filter: NumberRangeColumnFilter,
+          filter: 'between'
         },
         {
           Header: '氏名',
@@ -159,7 +208,8 @@ const Mail = () => {
         {
           Header: '年齢',
           accessor: 'age',
-          Filter: NumberRangeColumnFilter
+          Filter: NumberRangeColumnFilter,
+          filter: 'between'
         },
         {
           Header: 'ステータス',
@@ -168,22 +218,22 @@ const Mail = () => {
           filter: 'includes',
           Cell: ({ value }: { value: string | undefined }) => {
             switch (value) {
-              case '1':
+              case '新規':
                 return <Chip color="success" label="新規" size="small" variant="light" />;
-              case '2':
+              case '既存':
                 return <Chip color="primary" label="既存" size="small" variant="light" />;
-              case '3':
+              case '稼働中':
                 return <Chip color="primary" label="稼働中" size="small" variant="light" />;
-              case '4':
+              case 'BL':
                 return <Chip color="primary" label="BL" size="small" variant="light" />;
-              case '5':
+              case '抹消':
                 return <Chip color="error" label="抹消" size="small" variant="light" />;
-              case '6':
+              case '配信停止':
                 return <Chip color="error" label="配信停止" size="small" variant="light" />;
-              case '-1':
+              case '空白':
                 return <Chip color="error" label="空白" size="small" variant="light" />;
               default:
-                return <Chip color="info" label="Single" size="small" variant="light" />;
+                return <Chip color="info" label="None" size="small" variant="light" />;
             }
           }
         }

@@ -33,6 +33,7 @@ const getInitialValues = (customer: FormikValues | null) => {
     id: null as number | null,
     title: '',
     description: '',
+    user: '',
     employee: null as EmployeeParameterType | null
   };
 
@@ -40,6 +41,7 @@ const getInitialValues = (customer: FormikValues | null) => {
     newCustomer.id = customer.id;
     newCustomer.title = customer.title;
     newCustomer.description = customer.description;
+    newCustomer.user = customer.user;
     newCustomer.employee = customer.employee;
     return _.merge({}, newCustomer, customer);
   }
@@ -54,15 +56,9 @@ export interface Props {
   onCancel: () => void;
 }
 const AddCustomer = ({ customer, onCancel }: Props) => {
-  const employeeAll: EmployeeParameterType[] = [
-    { id: 1, sei: 'アカウント1', mei: 'アカウント1' },
-    { id: 2, sei: 'アカウント2', mei: 'アカウント2' }
-  ];
-  console.log(customer);
-
   const CustomerSchema = Yup.object().shape({
     title: Yup.string().max(255).required('プロジェクト名は必須です'),
-    description: Yup.string().max(1000).required('本文は必須です。')
+    description: Yup.string().max(1000).required('本文は必須です。'),
     // employee: Yup.string().trim().required('役割の選択は必須です')
   });
 
@@ -107,6 +103,26 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
   const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
 
   const message = ``;
+  const users = [
+    {
+      user: 's.murai@tribe-group.jp'
+    },
+    {
+      user: 'k.maura@tribe-group.jp'
+    },
+    {
+      user: 's.kitagaito@tribe-group.jp'
+    },
+    {
+      user: 'y.nanma@tribe-group.jp'
+    },
+    {
+      user: 'm.suzuki@tribe-group.jp'
+    },
+    // {
+    //   user: 'm.iida@tribe-group.jp'
+    // }
+  ];
 
   return (
     <>
@@ -124,35 +140,31 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                         <InputLabel>担当者</InputLabel>
                         <FormControl fullWidth>
                           <Select
-                            id="employee"
+                            id="user"
                             displayEmpty
-                            {...getFieldProps('employee')}
-                            onChange={(event: SelectChangeEvent<string>) =>
-                              setFieldValue(
-                                'employee',
-                                employeeAll?.find((item: EmployeeParameterType) => item.sei === (event.target.value as string)) ?? null
-                              )
-                            }
+                            {...getFieldProps('user')}
+                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('user', event.target.value as string)}
                             input={<OutlinedInput placeholder="ソート" />}
                             renderValue={(selected: any) => {
-                              if (!selected?.sei) {
+                              if (!selected) {
                                 return <Typography variant="subtitle1">担当者を選択</Typography>;
                               }
 
-                              return <Typography variant="subtitle2">{selected.sei}</Typography>;
+                              return <Typography variant="subtitle2">{selected}</Typography>;
                             }}
                           >
                             <MenuItem value={undefined}>なし</MenuItem>
-                            {employeeAll?.map((column: EmployeeParameterType) => (
-                              <MenuItem key={column.id} value={column.sei}>
-                                <ListItemText primary={column.sei} />
+
+                            {users?.map((column: any) => (
+                              <MenuItem key={column.user} value={column.user}>
+                                <ListItemText primary={column.user} />
                               </MenuItem>
                             ))}
                           </Select>
                         </FormControl>
-                        {touched.employee && errors.employee && (
+                        {touched.user && errors.user && (
                           <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.employee}
+                            {errors.user}
                           </FormHelperText>
                         )}
                       </Stack>
@@ -206,9 +218,6 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                 )}
                 <Grid item>
                   <Stack direction="row" spacing={2} alignItems="center">
-                    <Button color="error" onClick={onCancel}>
-                      キャンセル
-                    </Button>
                     <Button type="submit" variant="contained" disabled={isSubmitting}>
                       {'送信'}
                     </Button>

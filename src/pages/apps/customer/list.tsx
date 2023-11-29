@@ -224,7 +224,8 @@ const CustomerListPage = () => {
         ),
         accessor: 'selection',
         Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
-        disableSortBy: true
+        disableSortBy: true,
+        disableFilters: true
       },
       {
         Header: '#',

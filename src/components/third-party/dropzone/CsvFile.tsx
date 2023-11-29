@@ -53,6 +53,27 @@ function calculateAge(value: string) {
   return age;
 }
 
+function getStatus(value: string) {
+  switch (value) {
+    case '1':
+      return '新規';
+    case '2':
+      return '既存';
+    case '3':
+      return '稼働中';
+    case '4':
+      return 'BL';
+    case '5':
+      return '抹消';
+    case '6':
+      return '配信停止';
+    case '-1':
+      return '空白';
+    default:
+      return '';
+  }
+}
+
 const CsvFile = ({ error, file, setFieldValue, onRelode, sx, ...other }: CsvUploadProps) => {
   const theme = useTheme();
 
@@ -67,7 +88,7 @@ const CsvFile = ({ error, file, setFieldValue, onRelode, sx, ...other }: CsvUplo
             name: value['スタッフ氏名'] as string,
             email: value['メールアドレス１'] as string,
             age: Number(calculateAge(value['生年月日'])),
-            status: value['ステータス'] ?? ('' as string)
+            status: getStatus(value['ステータス']) as string
           };
         });
         onRelode(newData);

@@ -3,10 +3,9 @@ import nodemailer from 'nodemailer';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    const body = request.body;
     const title = request.body.title;
     const description = request.body.description;
-    const shomei = `<br/>
+    const shomei = `
     ――――――――――――――――――――<br/>
     トライブ株式会社<br/>
     E-mail：saiyo-hokkaido@tribe-group.jp<br/>
@@ -19,18 +18,43 @@ export default async function handler(request: NextApiRequest, response: NextApi
     送信したメールには、個人情報や機密情報が含まれている場合がございます。<br/>
     誠に恐れ入りますが、誤って送信したメールを受信された際には、このメールのコピー・使用・公開等をなさらず、<br/>
     速やかに送信元にご連絡いただくとともに、このメールを削除いただきますようお願い申し上げます。<br/>`
+
+    const users = [
+      {
+        user: 's.murai@tribe-group.jp',
+        pass: 'wqdp ewpg vovh auzu'
+      },
+      {
+        user: 'k.maura@tribe-group.jp',
+        pass: 'jhgf lwvn bvey yogs'
+      },
+      {
+        user: 's.kitagaito@tribe-group.jp',
+        pass: 'cqeb gijx werr crsb'
+      },
+      {
+        user: 'y.nanma@tribe-group.jp',
+        pass: 'cqsq sila dwad fzlk'
+      },
+      {
+        user: 'm.suzuki@tribe-group.jp',
+        pass: 'pyok bdtk ywal rvnc'
+      },
+      {
+        user: 'm.iida@tribe-group.jp',
+        pass: ''
+      }
+    ];
+    const user = users.find((user) => user.user === request.body.user);
     const sendEmailToUser = async (userData: any): Promise<void> => {
       // nodemailerの設定
       const transporter = nodemailer.createTransport({
         service: 'gmail',
-        auth: {
-          user: 's.murai@tribe-group.jp', // 送信元のメールアドレス
-          pass: 'wqdp ewpg vovh auzu' // 送信元のメールアドレスのパスワード
-        }
+        auth: user
       });
 
       // データのプロパティが数値のキーを持つものだけを取り出す
-      const items = Object.values(body).filter((item) => typeof item === 'object');
+      const items = Object.values(request.body).filter((item) => typeof item === 'object');
 
       // map を使用して処理
       const mappedData = items.map((item: any) => {
@@ -44,12 +68,13 @@ export default async function handler(request: NextApiRequest, response: NextApi
         for (const item of mappedData) {
           // メールのオプション
           const mailOptions: nodemailer.SendMailOptions = {
-            // from: 'saiyo-hokkaido@tribe-group.jp', // 送信元のメールアドレス
-            to: 'shu0603n@gmail.com',
-            // to: item.email,
+            to: item.email,
+            from: '"トライブ株式会社 北海道支店" <saiyo-hokkaido@tribe-group.jp>',
             subject: title, // メールの件名
-            html: `<p>${item.name}様</p><p>${item.email}宛</p><p>${description}</p><p>${shomei}</p>`,
-            from: '"トライブ株式会社 北海道支店" <saiyo-hokkaido@tribe-group.jp>'
+            html: `
+            <p>${item.name}様</p>
+            <p>${description}</p>
+            <p>${shomei}</p>`
           };
           if (item.email && item.email.length !== 0) {
             await transporter.sendMail(mailOptions);
@@ -62,7 +87,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
       }
     };
 
-    await sendEmailToUser(body);
+    await sendEmailToUser(request.body);
     return response.status(200).json({ message: '正常に処理が完了しました。' });
   } catch (error) {
     console.error('エラーが発生しました:', error);
