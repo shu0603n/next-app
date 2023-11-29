@@ -7,7 +7,7 @@ import { DropzopType } from 'types/dropzone';
 
 const UploadCover = '/assets/images/upload/upload.svg';
 
-// ==============================|| UPLOAD - PLACEHOLDER ||============================== //
+// ==============================|| アップロード - プレースホルダー ||============================== //
 
 export default function PlaceholderContent({ type }: { type?: string }) {
   return (
@@ -22,14 +22,14 @@ export default function PlaceholderContent({ type }: { type?: string }) {
         >
           <CardMedia component="img" image={UploadCover} sx={{ width: 150 }} />
           <Stack sx={{ p: 3 }} spacing={1}>
-            <Typography variant="h5">Drag & Drop or Select file</Typography>
+            <Typography variant="h5">ファイルをドラッグ＆ドロップまたは選択してください</Typography>
 
             <Typography color="secondary">
-              Drop files here or click&nbsp;
+              ファイルをここにドロップするか、
               <Typography component="span" color="primary" sx={{ textDecoration: 'underline' }}>
-                browse
+                クリック
               </Typography>
-              &nbsp;thorough your machine
+              &nbsp;してください
             </Typography>
           </Stack>
         </Stack>
