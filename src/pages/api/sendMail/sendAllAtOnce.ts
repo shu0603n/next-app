@@ -5,20 +5,6 @@ export default async function handler(request: NextApiRequest, response: NextApi
   try {
     const title = request.body.title;
     const description = request.body.description;
-    const shomei = `
-    ――――――――――――――――――――<br/>
-    トライブ株式会社<br/>
-    E-mail：saiyo-hokkaido@tribe-group.jp<br/>
-    ●北海道支店<br/>
-    〒060-0031<br/>
-    北海道札幌市中央区北1条東1丁目4番地1 サン経成ビル6F<br/>
-    Tel：011-590-4888 Fax：011-590-4887<br/>
-    ――――――――――――――――――――<br/>
-    【秘密保持のお願い】<br/>
-    送信したメールには、個人情報や機密情報が含まれている場合がございます。<br/>
-    誠に恐れ入りますが、誤って送信したメールを受信された際には、このメールのコピー・使用・公開等をなさらず、<br/>
-    速やかに送信元にご連絡いただくとともに、このメールを削除いただきますようお願い申し上げます。<br/>`
-
     const users = [
       {
         user: 's.murai@tribe-group.jp',
@@ -72,9 +58,23 @@ export default async function handler(request: NextApiRequest, response: NextApi
             from: '"トライブ株式会社 北海道支店" <saiyo-hokkaido@tribe-group.jp>',
             subject: title, // メールの件名
             html: `
-            <p>${item.name}様</p>
-            <p>${description}</p>
-            <p>${shomei}</p>`
+            <p>${item.name} 様</p>
+            <br />
+            <p>${description}</p><br />
+            <p>
+            ――――――――――――――――――――<br/>
+            トライブ株式会社<br/>
+            E-mail：saiyo-hokkaido@tribe-group.jp<br/>
+            ●北海道支店<br/>
+            〒060-0031<br/>
+            北海道札幌市中央区北1条東1丁目4番地1 サン経成ビル6F<br/>
+            Tel：011-590-4888 Fax：011-590-4887<br/>
+            ――――――――――――――――――――<br/>
+            【秘密保持のお願い】<br/>
+            送信したメールには、個人情報や機密情報が含まれている場合がございます。<br/>
+            誠に恐れ入りますが、誤って送信したメールを受信された際には、このメールのコピー・使用・公開等をなさらず、<br/>
+            速やかに送信元にご連絡いただくとともに、このメールを削除いただきますようお願い申し上げます。<br/>
+            </p>`
           };
           if (item.email && item.email.length !== 0) {
             await transporter.sendMail(mailOptions);

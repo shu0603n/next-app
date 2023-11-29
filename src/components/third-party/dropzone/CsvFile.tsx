@@ -79,22 +79,26 @@ const CsvFile = ({ error, file, setFieldValue, onRelode, sx, ...other }: CsvUplo
 
   const handleCsvFile = (acceptedFiles: File[]) => {
     const csvFile: File = acceptedFiles[0];
-
     Papa.parse(csvFile, {
       complete: (result: any) => {
-        const newData = result.data.map((value: any) => {
-          return {
-            id: Number(value['スタッフNO']),
-            name: value['スタッフ氏名'] as string,
-            email: value['メールアドレス１'] as string,
-            age: Number(calculateAge(value['生年月日'])),
-            status: getStatus(value['ステータス']) as string
-          };
-        });
+        const newData = result.data.reduce((accumulator: any, value: any) => {
+          const id = Number(value['スタッフNO']);
+          // 既に同じidが存在する場合はスキップ
+          if (!accumulator.find((item: any) => item.id === id)) {
+            accumulator.push({
+              id,
+              name: value['スタッフ氏名'] as string,
+              email: value['メールアドレス１'] as string,
+              age: Number(calculateAge(value['生年月日'])),
+              status: getStatus(value['ステータス']) as string
+            });
+          }
+          return accumulator;
+        }, []);
         onRelode(newData);
       },
-      header: true, // CSVにヘッダーがある場合は true に設定
-      encoding: 'SJIS' // SJISでエンコードされたCSVファイルを読み込む
+      header: true,
+      encoding: 'SJIS'
     });
   };
 

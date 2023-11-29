@@ -26,6 +26,12 @@ import { CircularProgress } from '@mui/material';
 import { EmployeeParameterType } from 'types/parameter/parameter';
 import Loader from 'components/Loader';
 import { alertSnackBar } from 'function/alert/alertSnackBar';
+import 'react-quill/dist/quill.snow.css';
+import dynamic from 'next/dynamic';
+import { useState } from 'react';
+const ReactQuill = dynamic(() => import('react-quill'), {
+  ssr: false
+});
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
@@ -58,7 +64,7 @@ export interface Props {
 const AddCustomer = ({ customer, onCancel }: Props) => {
   const CustomerSchema = Yup.object().shape({
     title: Yup.string().max(255).required('プロジェクト名は必須です'),
-    description: Yup.string().max(1000).required('本文は必須です。'),
+    // description: Yup.string().max(1000).required('本文は必須です。'),
     // employee: Yup.string().trim().required('役割の選択は必須です')
   });
 
@@ -102,27 +108,36 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
 
   const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
 
-  const message = ``;
   const users = [
     {
+      name: '村井',
       user: 's.murai@tribe-group.jp'
     },
     {
+      name: '真浦',
       user: 'k.maura@tribe-group.jp'
     },
     {
+      name: '北垣戸',
       user: 's.kitagaito@tribe-group.jp'
     },
     {
+      name: '南間',
       user: 'y.nanma@tribe-group.jp'
     },
     {
+      name: '鈴木',
       user: 'm.suzuki@tribe-group.jp'
-    },
+    }
     // {
     //   user: 'm.iida@tribe-group.jp'
     // }
   ];
+  const [text, setText] = useState<string>(customer.description);
+  const handleChange = (value: string) => {
+    setText(value);
+    setFieldValue('description', value);
+  };
 
   return (
     <>
@@ -157,7 +172,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
 
                             {users?.map((column: any) => (
                               <MenuItem key={column.user} value={column.user}>
-                                <ListItemText primary={column.user} />
+                                <ListItemText primary={column.name} />
                               </MenuItem>
                             ))}
                           </Select>
@@ -185,17 +200,14 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel>本文</InputLabel>
-                        <TextField
-                          fullWidth
+                        <InputLabel>メール本文</InputLabel>
+                        {/* <ReactQuill
                           id="description"
-                          multiline
-                          rows={20}
-                          placeholder={message}
+                          placeholder="メール本文を入力"
                           {...getFieldProps('description')}
-                          error={Boolean(touched.description && errors.description)}
-                          helperText={touched.description && errors.description}
-                        />
+                          onChange={(newValue) => setFieldValue('description', newValue)}
+                        /> */}
+                        <ReactQuill id="description" placeholder="メール本文を入力" value={text} onChange={handleChange} />
                       </Stack>
                     </Grid>
                   </Grid>

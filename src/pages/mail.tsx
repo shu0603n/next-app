@@ -1,5 +1,4 @@
-import { Fragment, ReactElement, useState } from 'react';
-import SyntaxHighlight from 'utils/SyntaxHighlight';
+import { ReactElement, useState } from 'react';
 // material-ui
 import { FormHelperText, Grid, Stack, Typography } from '@mui/material';
 
@@ -23,7 +22,8 @@ import { useTable, useFilters, usePagination, useRowSelect, useGlobalFilter, Col
 
 // project import
 import ScrollX from 'components/ScrollX';
-import { CSVExport, EmptyTable, IndeterminateCheckbox, TablePagination, TableRowSelection } from 'components/third-party/ReactTable';
+import { CSVExport, EmptyTable, TablePagination } from 'components/third-party/ReactTable';
+// import { IndeterminateCheckbox, TableRowSelection } from 'components/third-party/ReactTable';
 import { PlusOutlined } from '@ant-design/icons';
 
 import { GlobalFilter, DefaultColumnFilter, SelectColumnFilter, NumberRangeColumnFilter, renderFilterTypes } from 'utils/react-table';
@@ -51,10 +51,6 @@ function ReactTable({ columns, data }: Props) {
     []
   );
 
-  // const initialState = useMemo(
-  //   () => ({ pageIndex: 0, pageSize: 100, selectedRowIds: { 0: true, 5: true, 7: true }, filters: [{ id: 'status', value: '' }] }),
-  //   []
-  // );
   const [add, setAdd] = useState<boolean>(false);
   const handleAdd = () => {
     setAdd(!add);
@@ -71,8 +67,9 @@ function ReactTable({ columns, data }: Props) {
     setGlobalFilter,
     gotoPage,
     setPageSize,
-    state: { selectedRowIds, pageIndex, pageSize },
-    selectedFlatRows
+    state: { pageIndex, pageSize }
+    // state: { selectedRowIds, pageIndex, pageSize },
+    // selectedFlatRows
   } = useTable(
     {
       columns,
@@ -84,29 +81,27 @@ function ReactTable({ columns, data }: Props) {
     useGlobalFilter,
     useFilters,
     usePagination,
-    useRowSelect,
-    (hooks) => {
-      hooks.allColumns.push((columns: Column[]) => [
-        {
-          id: 'row-selection-chk',
-          accessor: 'Selection',
-          Header: ({ getToggleAllPageRowsSelectedProps }) => (
-            <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
-          ),
-          disableSortBy: true,
-          disableFilters: true,
-          Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
-        },
-        ...columns
-      ]);
-    }
+    useRowSelect
+    // (hooks) => {
+    //   hooks.allColumns.push((columns: Column[]) => [
+    //     {
+    //       id: 'row-selection-chk',
+    //       accessor: 'Selection',
+    //       Header: ({ getToggleAllPageRowsSelectedProps }) => (
+    //         <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
+    //       ),
+    //       disableSortBy: true,
+    //       disableFilters: true,
+    //       Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
+    //     },
+    //     ...columns
+    //   ]);
+    // }
   );
-
-  const sortingRow = rows.slice(0, 10);
 
   return (
     <>
-      <TableRowSelection selected={Object.keys(selectedRowIds).length} />
+      {/* <TableRowSelection selected={Object.keys(selectedRowIds).length} /> */}
       <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ padding: 2 }}>
         <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={state.globalFilter} setGlobalFilter={setGlobalFilter} />
         <CSVExport data={rows.map((d: Row) => d.original)} filename={'filtering-table.csv'} />
@@ -160,16 +155,6 @@ function ReactTable({ columns, data }: Props) {
           </TableRow>
         </TableBody>
       </Table>
-      <SyntaxHighlight>
-        {JSON.stringify(
-          {
-            selectedRowIndices: selectedRowIds,
-            'selectedFlatRows[].original': selectedFlatRows.map((d: Row) => d.original)
-          },
-          null,
-          2
-        )}
-      </SyntaxHighlight>
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}
