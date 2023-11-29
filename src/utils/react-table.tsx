@@ -167,7 +167,7 @@ export function NumberRangeColumnFilter({ column: { filterValue = [], preFiltere
         type="number"
         onChange={(e) => {
           const val = e.target.value;
-          setFilter((old = []) => [val ? parseInt(val, 10) : undefined, old[1]]);
+          setFilter((old = []) => [val !== '' ? parseInt(val, 10) : undefined, old[1]]);
         }}
         placeholder={`Min (${min})`}
         size="small"
@@ -179,7 +179,7 @@ export function NumberRangeColumnFilter({ column: { filterValue = [], preFiltere
         type="number"
         onChange={(e) => {
           const val = e.target.value;
-          setFilter((old = []) => [old[0], val ? parseInt(val, 10) : undefined]);
+          setFilter((old = []) => [old[0], val !== '' ? parseInt(val, 10) : undefined]);
         }}
         placeholder={`Max (${max})`}
         size="small"

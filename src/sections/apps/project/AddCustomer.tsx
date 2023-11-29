@@ -86,7 +86,7 @@ const getInitialValues = (
     contract_period: '',
     working_days_count: '',
     working_days_list: '',
-    working_hours_per_day: '',
+    working_hours_per_day: [''],
     work_notes: '',
     price_type: null as null | Number,
     transportation_expenses: '',
@@ -131,7 +131,7 @@ const getInitialValues = (
     newCustomer.contract_period = customer.contract_period;
     newCustomer.working_days_count = customer.working_days_count;
     newCustomer.working_days_list = customer.working_days_list;
-    newCustomer.working_hours_per_day = customer.working_hours_per_day;
+    newCustomer.working_hours_per_day = [customer.working_hours_per_day];
     newCustomer.work_notes = customer.work_notes;
     newCustomer.price_type = customer.price_type;
     newCustomer.transportation_expenses = customer.transportation_expenses;
@@ -165,6 +165,7 @@ const price_type = [
 
 const filterProcess = createFilterOptions<string>();
 const filterSkills = createFilterOptions<string>();
+// const filterworking_hours_per_day = createFilterOptions<string>();
 
 // ==============================|| 顧客の追加/編集 ||============================== //
 
@@ -398,7 +399,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
                         />
                       </Stack>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel>企業名</InputLabel>
                         <FormControl fullWidth>
@@ -436,152 +437,9 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
                         )}
                       </Stack>
                     </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel>業務内容</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="description"
-                          multiline
-                          rows={20}
-                          placeholder={message}
-                          {...getFieldProps('description')}
-                          error={Boolean(touched.description && errors.description)}
-                          helperText={touched.description && errors.description}
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel>契約区分</InputLabel>
-                        <FormControl fullWidth>
-                          <Select
-                            id="contract"
-                            displayEmpty
-                            {...getFieldProps('contract')}
-                            onChange={(event: SelectChangeEvent<string>) =>
-                              setFieldValue(
-                                'contract',
-                                contractAll?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
-                              )
-                            }
-                            input={<OutlinedInput placeholder="ソート" />}
-                            renderValue={(selected: any) => {
-                              if (!selected?.name) {
-                                return <Typography variant="subtitle1">役割を選択</Typography>;
-                              }
-
-                              return <Typography variant="subtitle2">{selected.name}</Typography>;
-                            }}
-                          >
-                            <MenuItem value={undefined}>なし</MenuItem>
-                            {contractAll?.map((column: ParameterType) => (
-                              <MenuItem key={column.id} value={column.name}>
-                                <ListItemText primary={column.name} />
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                        {touched.contract && errors.contract && (
-                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.contract}
-                          </FormHelperText>
-                        )}
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel>金額</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="price"
-                          placeholder="金額を入力"
-                          {...getFieldProps('price')}
-                          error={Boolean(touched.price && errors.price)}
-                          helperText={touched.price && errors.price}
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel>郵便番号</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="working_postal_code"
-                          {...getFieldProps('working_postal_code')}
-                          error={Boolean(touched.working_postal_code && errors.working_postal_code)}
-                          helperText={touched.working_postal_code && errors.working_postal_code}
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel>住所</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="working_address"
-                          {...getFieldProps('working_address')}
-                          error={Boolean(touched.working_address && errors.working_address)}
-                          helperText={touched.working_address && errors.working_address}
-                        />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel>休日</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="customer-holiday"
-                          {...getFieldProps('holiday')}
-                          error={Boolean(touched.holiday && errors.holiday)}
-                          helperText={touched.holiday && errors.holiday}
-                        />
-                      </Stack>
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel>契約区分</InputLabel>
-                        <FormControl fullWidth>
-                          <Select
-                            id="contract"
-                            displayEmpty
-                            {...getFieldProps('contract')}
-                            onChange={(event: SelectChangeEvent<string>) =>
-                              setFieldValue(
-                                'contract',
-                                contractAll?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
-                              )
-                            }
-                            input={<OutlinedInput placeholder="ソート" />}
-                            renderValue={(selected: any) => {
-                              if (!selected?.name) {
-                                return <Typography variant="subtitle1">役割を選択</Typography>;
-                              }
-
-                              return <Typography variant="subtitle2">{selected.name}</Typography>;
-                            }}
-                          >
-                            <MenuItem value={undefined}>なし</MenuItem>
-                            {contractAll?.map((column: ParameterType) => (
-                              <MenuItem key={column.id} value={column.name}>
-                                <ListItemText primary={column.name} />
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                        {touched.contract && errors.contract && (
-                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.contract}
-                          </FormHelperText>
-                        )}
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel>担当者</InputLabel>
-                        {JSON.stringify(employeeAll)}
-                        {JSON.stringify(getFieldProps('employee'))}
                         <FormControl fullWidth>
                           <Select
                             id="employee"
@@ -617,7 +475,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
                         )}
                       </Stack>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel>派遣元</InputLabel>
                         <TextField
@@ -629,7 +487,58 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
                         />
                       </Stack>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>契約区分</InputLabel>
+                        <FormControl fullWidth>
+                          <Select
+                            id="contract"
+                            displayEmpty
+                            {...getFieldProps('contract')}
+                            onChange={(event: SelectChangeEvent<string>) =>
+                              setFieldValue(
+                                'contract',
+                                contractAll?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
+                              )
+                            }
+                            input={<OutlinedInput placeholder="ソート" />}
+                            renderValue={(selected: any) => {
+                              if (!selected?.name) {
+                                return <Typography variant="subtitle1">役割を選択</Typography>;
+                              }
+
+                              return <Typography variant="subtitle2">{selected.name}</Typography>;
+                            }}
+                          >
+                            <MenuItem value={undefined}>なし</MenuItem>
+                            {contractAll?.map((column: ParameterType) => (
+                              <MenuItem key={column.id} value={column.name}>
+                                <ListItemText primary={column.name} />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {touched.contract && errors.contract && (
+                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
+                            {errors.contract}
+                          </FormHelperText>
+                        )}
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>郵便番号</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="working_postal_code"
+                          {...getFieldProps('working_postal_code')}
+                          error={Boolean(touched.working_postal_code && errors.working_postal_code)}
+                          helperText={touched.working_postal_code && errors.working_postal_code}
+                        />
+                      </Stack>
+                    </Grid>
+
+                    <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel>最寄り駅</InputLabel>
                         <TextField
@@ -638,6 +547,45 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
                           {...getFieldProps('fertilizer_type')}
                           error={Boolean(touched.fertilizer_type && errors.fertilizer_type)}
                           helperText={touched.fertilizer_type && errors.fertilizer_type}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>住所</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="working_address"
+                          {...getFieldProps('working_address')}
+                          error={Boolean(touched.working_address && errors.working_address)}
+                          helperText={touched.working_address && errors.working_address}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>休日</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="customer-holiday"
+                          {...getFieldProps('holiday')}
+                          error={Boolean(touched.holiday && errors.holiday)}
+                          helperText={touched.holiday && errors.holiday}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>業務内容</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="description"
+                          multiline
+                          rows={20}
+                          placeholder={message}
+                          {...getFieldProps('description')}
+                          error={Boolean(touched.description && errors.description)}
+                          helperText={touched.description && errors.description}
                         />
                       </Stack>
                     </Grid>
@@ -677,6 +625,46 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
                         />
                       </Stack>
                     </Grid>
+
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>契約区分</InputLabel>
+                        <FormControl fullWidth>
+                          <Select
+                            id="contract"
+                            displayEmpty
+                            {...getFieldProps('contract')}
+                            onChange={(event: SelectChangeEvent<string>) =>
+                              setFieldValue(
+                                'contract',
+                                contractAll?.find((item: ParameterType) => item.name === (event.target.value as string)) ?? null
+                              )
+                            }
+                            input={<OutlinedInput placeholder="ソート" />}
+                            renderValue={(selected: any) => {
+                              if (!selected?.name) {
+                                return <Typography variant="subtitle1">役割を選択</Typography>;
+                              }
+
+                              return <Typography variant="subtitle2">{selected.name}</Typography>;
+                            }}
+                          >
+                            <MenuItem value={undefined}>なし</MenuItem>
+                            {contractAll?.map((column: ParameterType) => (
+                              <MenuItem key={column.id} value={column.name}>
+                                <ListItemText primary={column.name} />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {touched.contract && errors.contract && (
+                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
+                            {errors.contract}
+                          </FormHelperText>
+                        )}
+                      </Stack>
+                    </Grid>
+
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel>就業期間</InputLabel>
@@ -689,7 +677,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
                         />
                       </Stack>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel>勤務日数</InputLabel>
                         <TextField
@@ -701,7 +689,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
                         />
                       </Stack>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel>勤務曜日</InputLabel>
                         <TextField
@@ -737,7 +725,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
                         />
                       </Stack>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel>計算方法</InputLabel>
                         <FormControl fullWidth>
@@ -775,7 +763,22 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
                         )}
                       </Stack>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>金額</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="price"
+                          type="number"
+                          placeholder="金額を入力"
+                          {...getFieldProps('price')}
+                          error={Boolean(touched.price && errors.price)}
+                          helperText={touched.price && errors.price}
+                        />
+                      </Stack>
+                    </Grid>
+
+                    <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel>交通費</InputLabel>
                         <TextField
@@ -787,7 +790,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
                         />
                       </Stack>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel>時間外労働</InputLabel>
                         <TextField
