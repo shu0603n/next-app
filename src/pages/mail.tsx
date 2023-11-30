@@ -255,7 +255,7 @@ const Mail = () => {
                         />
                         {touched.files && errors.files && (
                           <FormHelperText error id="standard-weight-helper-text-password-login">
-                            {values.errors.files}
+                            {errors.files}
                           </FormHelperText>
                         )}
                       </Stack>
