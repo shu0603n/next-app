@@ -36,14 +36,16 @@ type mailListType = {
   mail: string;
   age: number;
   status: string;
+  flag: string;
 };
 
 interface Props {
   columns: Column[];
   data: Array<mailListType>;
+  onReload: (data: Array<any>) => void;
 }
 
-function ReactTable({ columns, data }: Props) {
+function ReactTable({ columns, data, onReload }: Props) {
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const defaultColumn = useMemo(() => ({ Filter: DefaultColumnFilter }), []);
   const initialState = useMemo(
@@ -165,7 +167,7 @@ function ReactTable({ columns, data }: Props) {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        {add && <AddCustomer customer={rows.map((d: Row) => d.original)} onCancel={handleAdd} />}
+        {add && <AddCustomer customer={rows.map((d: Row) => d.original)} onCancel={handleAdd} onReload={onReload} />}
       </Dialog>
     </>
   );
@@ -173,6 +175,10 @@ function ReactTable({ columns, data }: Props) {
 
 const Mail = () => {
   const [data, setData] = useState<Array<any> | undefined>();
+
+  const handleRelod = (newData: Array<any>) => {
+    setData(newData);
+  };
   const columns = useMemo(
     () =>
       [
@@ -221,6 +227,22 @@ const Mail = () => {
                 return <Chip color="info" label="None" size="small" variant="light" />;
             }
           }
+        },
+        {
+          Header: 'フラグ',
+          accessor: 'flag',
+          Filter: SelectColumnFilter,
+          filter: 'includes',
+          Cell: ({ value }: { value: string | undefined }) => {
+            switch (value) {
+              case '送信済み':
+                return <Chip color="success" label="送信済み" size="small" variant="light" />;
+              case 'エラー':
+                return <Chip color="error" label="エラー" size="small" variant="light" />;
+              default:
+                return <Chip color="info" label="未送信" size="small" variant="light" />;
+            }
+          }
         }
       ] as Column[],
     []
@@ -234,9 +256,7 @@ const Mail = () => {
             <Formik
               initialValues={{ files: null }}
               onSubmit={(values: any) => {
-                console.log(values);
-                alert(JSON.stringify(values));
-                setData(values);
+                setData({ ...values, flag: '未送信' });
               }}
               validationSchema={yup.object().shape({
                 files: yup.mixed().required('Avatar is a required.')
@@ -269,7 +289,7 @@ const Mail = () => {
         {data && (
           <MainCard content={false}>
             <ScrollX>
-              <ReactTable columns={columns} data={data} />
+              <ReactTable columns={columns} data={data} onReload={handleRelod} />
             </ScrollX>
           </MainCard>
         )}

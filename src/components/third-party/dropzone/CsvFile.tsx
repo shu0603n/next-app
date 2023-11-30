@@ -91,7 +91,8 @@ const CsvFile = ({ error, file, setFieldValue, onRelode, sx, ...other }: CsvUplo
               name: replace(value['スタッフ氏名'], ' ', '') as string,
               email: value['メールアドレス１'] as string,
               age: Number(calculateAge(value['生年月日'])),
-              status: getStatus(value['ステータス']) as string
+              status: getStatus(value['ステータス']) as string,
+              flag: '未送信' as string
             });
           }
           return accumulator;

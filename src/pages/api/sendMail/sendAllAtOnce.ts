@@ -25,22 +25,18 @@ export default async function handler(request: NextApiRequest, response: NextApi
       {
         user: 'm.suzuki@tribe-group.jp',
         pass: 'pyok bdtk ywal rvnc'
-      },
-      {
-        user: 'm.iida@tribe-group.jp',
-        pass: ''
       }
+      // {
+      //   user: 'm.iida@tribe-group.jp',
+      //   pass: ''
+      // }
     ];
     const user = users.find((user) => user.user === request.body.user);
-    const sendEmailToUser = async (userData: any): Promise<void> => {
-      // nodemailerの設定
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: user
-      });
+    const sendEmailToUser = async (userData: any): Promise<any> => {
+      const newArray = [];
 
       // データのプロパティが数値のキーを持つものだけを取り出す
-      const items = Object.values(request.body).filter((item) => typeof item === 'object');
+      const items = Object.values(userData).filter((item) => typeof item === 'object');
 
       // map を使用して処理
       const mappedData = items.map((item: any) => {
@@ -52,6 +48,11 @@ export default async function handler(request: NextApiRequest, response: NextApi
       try {
         // メールを送信
         for (const item of mappedData) {
+          // nodemailerの設定
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: user
+          });
           // メールのオプション
           const mailOptions: nodemailer.SendMailOptions = {
             to: item.email,
@@ -76,19 +77,27 @@ export default async function handler(request: NextApiRequest, response: NextApi
             速やかに送信元にご連絡いただくとともに、このメールを削除いただきますようお願い申し上げます。<br/>
             </p>`
           };
+
           if (item.email && item.email.length !== 0) {
-            await transporter.sendMail(mailOptions);
+            try {
+              await transporter.sendMail(mailOptions);
+              newArray.push({ ...item, flag: '送信済み' });
+              console.log('メール送信完了:', { ...item, flag: '送信済み' });
+            } catch (error) {
+              newArray.push({ ...item, flag: 'エラー' });
+              console.error('メールの送信エラー:', { ...item, flag: 'エラー' }, error);
+            }
           }
         }
-        console.log('メールを送信しました');
       } catch (error) {
-        console.error('メールの送信エラー:', error);
+        console.error('メールの送信処理が失敗しました:', items, error);
         throw error;
       }
+      return newArray;
     };
 
-    await sendEmailToUser(request.body);
-    return response.status(200).json({ message: '正常に処理が完了しました。' });
+    const data = await sendEmailToUser(request.body);
+    return response.status(200).json({ message: '正常に処理が完了しました。', data: data });
   } catch (error) {
     console.error('エラーが発生しました:', error);
     return response.status(500).json({ error: 'データを取得できませんでした。' });

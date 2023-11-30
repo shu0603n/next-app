@@ -5,8 +5,8 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 // third-party
 import axios from 'utils/axios';
 
-import { PrismaClient } from '@prisma/client';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
+import { prisma } from '../db/prisma';
 
 export let users = [
   // {
@@ -22,7 +22,6 @@ export let users = [
     password: '123456'
   }
 ];
-const prisma = new PrismaClient();
 
 export default NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -87,6 +86,7 @@ export default NextAuth({
             return user.data;
           }
         } catch (e: any) {
+          console.log('error', e);
           const errorMessage = e?.response.data.message;
           throw new Error(errorMessage);
         }

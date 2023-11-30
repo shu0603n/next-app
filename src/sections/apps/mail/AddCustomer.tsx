@@ -60,8 +60,9 @@ const getInitialValues = (customer: FormikValues | null) => {
 export interface Props {
   customer?: any;
   onCancel: () => void;
+  onReload: (data: Array<any>) => void;
 }
-const AddCustomer = ({ customer, onCancel }: Props) => {
+const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
   const CustomerSchema = Yup.object().shape({
     title: Yup.string().max(255).required('プロジェクト名は必須です'),
     // description: Yup.string().max(1000).required('本文は必須です。'),
@@ -90,6 +91,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             return response.json();
           })
           .then((data) => {
+            onReload(data.data);
             alertSnackBar('正常に送信されました。', 'success');
           })
           .catch((error) => {
@@ -231,7 +233,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                 <Grid item>
                   <Stack direction="row" spacing={2} alignItems="center">
                     <Button type="submit" variant="contained" disabled={isSubmitting}>
-                      {'送信'}
+                      {`全${customer.length}件に一斉送信`}
                     </Button>
                   </Stack>
                 </Grid>
