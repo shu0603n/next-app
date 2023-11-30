@@ -12,6 +12,7 @@ import PlaceholderContent from './PlaceholderContent';
 // types
 import { CustomFile } from 'types/dropzone';
 import Papa from 'papaparse';
+import { replace } from 'lodash';
 
 const DropzoneWrapper = styled('div')(({ theme }) => ({
   outline: 'none',
@@ -87,7 +88,7 @@ const CsvFile = ({ error, file, setFieldValue, onRelode, sx, ...other }: CsvUplo
           if (!accumulator.find((item: any) => item.id === id)) {
             accumulator.push({
               id,
-              name: value['スタッフ氏名'] as string,
+              name: replace(value['スタッフ氏名'], ' ', '') as string,
               email: value['メールアドレス１'] as string,
               age: Number(calculateAge(value['生年月日'])),
               status: getStatus(value['ステータス']) as string
