@@ -300,7 +300,8 @@ model VerificationToken {
 }
 
 model mail_account {
-  name String @id(map: "mailaccount_pkey") @db.VarChar(255)
-  user String @db.VarChar(255)
-  pass String @db.VarChar(255)
+  id   Int     @id @default(autoincrement())
+  name String? @db.VarChar(255)
+  user String? @db.VarChar(255)
+  pass String? @db.VarChar(255)
 }
