@@ -13,12 +13,14 @@ import { alertSnackBar } from 'function/alert/alertSnackBar';
 
 const getInitialValues = (customer: FormikValues | null) => {
   const newCustomer = {
+    id: null as null | number,
     name: '',
     user: '',
     pass: ''
   };
 
   if (customer) {
+    newCustomer.id = customer.id;
     newCustomer.name = customer.name;
     newCustomer.user = customer.user;
     newCustomer.pass = customer.pass;
@@ -57,7 +59,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
       try {
         if (customer) {
           alertSnackBar('処理中…', 'secondary');
-          fetch(`/api/db/parameter/mail_account/update?name=${values.name}&user=${values.user}&pass=${values.pass}`)
+          fetch(`/api/db/parameter/mail_account/update?id=${values.id}&name=${values.name}&user=${values.user}&pass=${values.pass}`)
             .then((response) => {
               if (!response.ok) {
                 throw new Error('更新に失敗しました。');

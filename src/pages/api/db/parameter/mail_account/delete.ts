@@ -4,12 +4,12 @@ import { prisma } from '../../prisma';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    const name = request.query.name as string;
-    if (!name) throw new Error('パラメーターが不足しています');
+    const id = request.query.id as string;
+    if (!id) throw new Error('パラメーターが不足しています');
 
     await prisma.mail_account.deleteMany({
       where: {
-        name
+        id: Number(id)
       }
     });
 

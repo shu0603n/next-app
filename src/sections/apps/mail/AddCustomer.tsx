@@ -39,7 +39,7 @@ const getInitialValues = (customer: FormikValues | null) => {
     id: null as number | null,
     title: '',
     description: '',
-    user: '',
+    user: null as MailAccountParameterType | null,
     employee: null as EmployeeParameterType | null
   };
 
@@ -171,7 +171,12 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                             id="user"
                             displayEmpty
                             {...getFieldProps('user')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('user', event.target.value as string)}
+                            onChange={(event: SelectChangeEvent<string>) =>
+                              setFieldValue(
+                                'client',
+                                mailAccount?.find((item: MailAccountParameterType) => item.name === (event.target.value as string)) ?? null
+                              )
+                            }
                             input={<OutlinedInput placeholder="ソート" />}
                             renderValue={(selected: any) => {
                               if (!selected) {
@@ -183,8 +188,8 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                           >
                             <MenuItem value={undefined}>なし</MenuItem>
 
-                            {mailAccount?.map((column: any) => (
-                              <MenuItem key={column.name} value={column.name}>
+                            {mailAccount?.map((column: MailAccountParameterType) => (
+                              <MenuItem key={column.id} value={column.name}>
                                 <ListItemText primary={column.name} />
                               </MenuItem>
                             ))}

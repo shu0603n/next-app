@@ -4,15 +4,16 @@ import { prisma } from '../../prisma';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
+    const id = request.query.id as string;
     const name = request.query.name as string;
     const user = request.query.user as string;
     const pass = request.query.pass as string;
 
-    if (!name || !user || !pass) throw new Error('パラメーターが不足しています');
+    if (!id || !name || !user || !pass) throw new Error('パラメーターが不足しています');
 
     await prisma.mail_account.update({
       where: {
-        name
+        id: Number(id)
       },
       data: {
         name,

@@ -42,7 +42,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: 'name', desc: false };
+  const sortBy = { id: 'id', desc: false };
 
   const {
     getTableProps,
@@ -200,6 +200,10 @@ const CustomerMailAccountPage = () => {
   const columns = useMemo(
     () => [
       {
+        Header: 'ID',
+        accessor: 'id'
+      },
+      {
         Header: '名前',
         accessor: 'name'
       },
@@ -236,7 +240,7 @@ const CustomerMailAccountPage = () => {
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
                     handleClose();
-                    setCustomerDeleteId(row.values.name);
+                    setCustomerDeleteId(row.values.id);
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />

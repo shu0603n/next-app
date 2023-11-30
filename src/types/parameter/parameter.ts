@@ -10,7 +10,8 @@ export type EmployeeParameterType = {
 };
 
 export type MailAccountParameterType = {
-  name: number;
+  id: number;
+  name: string;
   user: string;
   pass: string;
 };
