@@ -298,3 +298,9 @@ model VerificationToken {
   @@unique([identifier, token])
   @@map("verificationtokens")
 }
+
+model mail_account {
+  name String @id(map: "mailaccount_pkey") @db.VarChar(255)
+  user String @db.VarChar(255)
+  pass String @db.VarChar(255)
+}

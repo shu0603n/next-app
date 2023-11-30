@@ -23,12 +23,12 @@ import _ from 'lodash';
 import * as Yup from 'yup';
 import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
 import { CircularProgress } from '@mui/material';
-import { EmployeeParameterType } from 'types/parameter/parameter';
+import { EmployeeParameterType, MailAccountParameterType } from 'types/parameter/parameter';
 import Loader from 'components/Loader';
 import { alertSnackBar } from 'function/alert/alertSnackBar';
 import 'react-quill/dist/quill.snow.css';
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 const ReactQuill = dynamic(() => import('react-quill'), {
   ssr: false
 });
@@ -55,6 +55,19 @@ const getInitialValues = (customer: FormikValues | null) => {
   return newCustomer;
 };
 
+async function fetchMailAccountData() {
+  try {
+    const response = await fetch('/api/db/parameter/mail_account/select');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
 // ==============================|| 顧客の追加/編集 ||============================== //
 
 export interface Props {
@@ -63,6 +76,25 @@ export interface Props {
   onReload: (data: Array<any>) => void;
 }
 const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
+  const [loading, setLoading] = useState(true); // データの読み込み状態を管理
+  const [mailAccount, setMailAccount] = useState<Array<MailAccountParameterType>>();
+
+  useEffect(() => {
+    // ページがロードされたときにデータを取得
+    fetchMailAccountData()
+      .then((data) => {
+        console.log(data.data);
+        setMailAccount(data.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        // エラーハンドリング
+        console.error('Error:', error);
+        onCancel();
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 空の依存リストを指定することで、一度だけ実行される
+
   const CustomerSchema = Yup.object().shape({
     title: Yup.string().max(255).required('プロジェクト名は必須です'),
     // description: Yup.string().max(1000).required('本文は必須です。'),
@@ -110,36 +142,15 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
 
   const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
 
-  const users = [
-    {
-      name: '村井',
-      user: 's.murai@tribe-group.jp'
-    },
-    {
-      name: '真浦',
-      user: 'k.maura@tribe-group.jp'
-    },
-    {
-      name: '北垣戸',
-      user: 's.kitagaito@tribe-group.jp'
-    },
-    {
-      name: '南間',
-      user: 'y.nanma@tribe-group.jp'
-    },
-    {
-      name: '鈴木',
-      user: 'm.suzuki@tribe-group.jp'
-    }
-    // {
-    //   user: 'm.iida@tribe-group.jp'
-    // }
-  ];
   const [text, setText] = useState<string>(customer.description);
   const handleChange = (value: string) => {
     setText(value);
     setFieldValue('description', value);
   };
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <>
@@ -172,8 +183,8 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                           >
                             <MenuItem value={undefined}>なし</MenuItem>
 
-                            {users?.map((column: any) => (
-                              <MenuItem key={column.user} value={column.user}>
+                            {mailAccount?.map((column: any) => (
+                              <MenuItem key={column.name} value={column.name}>
                                 <ListItemText primary={column.name} />
                               </MenuItem>
                             ))}
@@ -203,12 +214,6 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel>メール本文</InputLabel>
-                        {/* <ReactQuill
-                          id="description"
-                          placeholder="メール本文を入力"
-                          {...getFieldProps('description')}
-                          onChange={(newValue) => setFieldValue('description', newValue)}
-                        /> */}
                         <ReactQuill id="description" placeholder="メール本文を入力" value={text} onChange={handleChange} />
                       </Stack>
                     </Grid>
@@ -233,7 +238,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                 <Grid item>
                   <Stack direction="row" spacing={2} alignItems="center">
                     <Button type="submit" variant="contained" disabled={isSubmitting}>
-                      {`全${customer.length}件に一斉送信`}
+                      {`一斉送信(全${customer.length}件)`}
                     </Button>
                   </Stack>
                 </Grid>

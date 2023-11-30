@@ -9,6 +9,12 @@ export type EmployeeParameterType = {
   mei: string;
 };
 
+export type MailAccountParameterType = {
+  name: number;
+  user: string;
+  pass: string;
+};
+
 export type SkillParameterType = {
   id: number;
   name: string;

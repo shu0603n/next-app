@@ -104,6 +104,12 @@ const parameter: NavItemType = {
           title: <FormattedMessage id="skill" />,
           type: 'item',
           url: '/parameter/skill'
+        },
+        {
+          id: 'mail_account',
+          title: <FormattedMessage id="mail_account" />,
+          type: 'item',
+          url: '/parameter/mail_account'
         }
       ]
     }

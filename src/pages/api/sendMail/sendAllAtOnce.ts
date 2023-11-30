@@ -1,37 +1,24 @@
 import { NextApiResponse, NextApiRequest } from 'next';
 import nodemailer from 'nodemailer';
+import { prisma } from '../db/prisma';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
     const title = request.body.title;
     const description = request.body.description;
-    const users = [
-      {
-        user: 's.murai@tribe-group.jp',
-        pass: 'wqdp ewpg vovh auzu'
+    const name = request.body.user;
+    const account = await prisma.mail_account.findMany({
+      where: {
+        name
       },
-      {
-        user: 'k.maura@tribe-group.jp',
-        pass: 'jhgf lwvn bvey yogs'
-      },
-      {
-        user: 's.kitagaito@tribe-group.jp',
-        pass: 'cqeb gijx werr crsb'
-      },
-      {
-        user: 'y.nanma@tribe-group.jp',
-        pass: 'cqsq sila dwad fzlk'
-      },
-      {
-        user: 'm.suzuki@tribe-group.jp',
-        pass: 'pyok bdtk ywal rvnc'
+      select: {
+        user: true,
+        pass: true
       }
-      // {
-      //   user: 'm.iida@tribe-group.jp',
-      //   pass: ''
-      // }
-    ];
-    const user = users.find((user) => user.user === request.body.user);
+    });
+
+    const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
     const sendEmailToUser = async (userData: any): Promise<any> => {
       const newArray = [];
 
@@ -51,7 +38,10 @@ export default async function handler(request: NextApiRequest, response: NextApi
           // nodemailerの設定
           const transporter = nodemailer.createTransport({
             service: 'gmail',
-            auth: user
+            auth: {
+              user: account[0].user,
+              pass: account[0].pass
+            }
           });
           // メールのオプション
           const mailOptions: nodemailer.SendMailOptions = {
@@ -80,7 +70,13 @@ export default async function handler(request: NextApiRequest, response: NextApi
 
           if (item.email && item.email.length !== 0) {
             try {
-              await transporter.sendMail(mailOptions);
+              // メール送信処理
+              const sendEmailPromise = transporter.sendMail(mailOptions);
+              // 最低でも1秒の遅延
+              const minimumDelay = sleep(1000);
+              // メール送信が完了するのを待機し、最低でも0.2秒の遅延を確保
+              await Promise.all([sendEmailPromise, minimumDelay]);
+
               newArray.push({ ...item, flag: '送信済み' });
               console.log('メール送信完了:', { ...item, flag: '送信済み' });
             } catch (error) {
