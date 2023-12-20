@@ -64,4 +64,7 @@ DATABASE="verceldb"
 dbからprismaファイルを生成
 `yarn prisma db pull`
 prismaファイルを元にローカルprismaを更新
+（※DBの内容が初期化されるため、本番環境には行わないこと。）
 `yarn prisma generate`
+`yarn prisma generate <テーブル名>`
+
