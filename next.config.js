@@ -16,6 +16,17 @@ const withTM = require('next-transpile-modules')([
 
 module.exports = withTM({
   reactStrictMode: true,
+  //▽追加
+  webpackDevMiddleware: config => {
+    config.watchOptions = {
+      //小さな値にすると、ポーリングの頻度が上がるので、重くなるっぽい。
+      //poll: 800,
+      poll: 5000,
+      aggregateTimeout: 300,
+    }
+    return config
+  },
+  //△追加
   images: {
     domains: ['flagcdn.com']
   },
