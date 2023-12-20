@@ -39,6 +39,16 @@ node.jsをインストールするとnpmが入っているはずなので以下�
 next-app直下で以下コマンドを実施
 `yarn`
 
+# pgAdmin設定
+HOST="ep-late-queen-16733624-pooler.us-east-1.postgres.vercel-storage.com"
+USER="default"
+PASSWORD="6RqIonDQNgY8"
+DATABASE="verceldb"
+
+![image](https://github.com/shu0603n/next-app/assets/61679407/a997e497-1bd5-46c1-a0e3-48633e5caa21)
+![image](https://github.com/shu0603n/next-app/assets/61679407/cafa4439-0f24-40c9-afba-88b16c7cee33)
+
+
 # 起動方法
 `yarn dev`
 [http://localhost:8081/](http://localhost:8081/)
