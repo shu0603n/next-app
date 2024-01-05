@@ -82,6 +82,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
             } catch (error) {
               newArray.push({ ...item, flag: 'エラー' });
               console.error('メールの送信エラー:', { ...item, flag: 'エラー' }, error);
+              // エラーが発生してもループを続行
+              continue;
             }
           }
         }
