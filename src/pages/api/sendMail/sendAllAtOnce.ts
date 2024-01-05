@@ -2,6 +2,9 @@ import { NextApiResponse, NextApiRequest } from 'next';
 import nodemailer, { TransportOptions } from 'nodemailer';
 import { prisma } from '../db/prisma';
 
+// 非同期処理の遅延関数
+const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
     const { title, description, user: name } = request.body;
@@ -22,7 +25,6 @@ export default async function handler(request: NextApiRequest, response: NextApi
 
     // map を使用して処理
     const mappedData = items.map((item: any) => {
-      // ここで各アイテムに対する処理を行う
       const { id, name, email, age, status } = item;
       return { id, name, email, age, status };
     });
@@ -67,17 +69,32 @@ export default async function handler(request: NextApiRequest, response: NextApi
           try {
             // メール送信処理
             await transporter.sendMail(mailOptions);
-            newArray.push({ ...item, flag: '送信済み' });
-            console.log('メール送信完了:', { ...item, flag: '送信済み' });
+            newArray.push({ id: item.id, name: item.name, email: item.email, age: item.age, status: item.status, flag: '送信済み' });
+            console.log('メール送信完了:', {
+              id: item.id,
+              name: item.name,
+              email: item.email,
+              age: item.age,
+              status: item.status,
+              flag: '送信済み'
+            });
           } catch (error) {
-            newArray.push({ ...item, flag: 'エラー' });
-            console.error('メールの送信エラー:', { ...item, flag: 'エラー' }, error);
-            // エラーが発生してもループを続行
-            return { ...item, flag: 'エラー' };
+            // if(error.responseCode && error.responseCode === 454 ){
+
+            // }
+            newArray.push({ id: item.id, name: item.name, email: item.email, age: item.age, status: item.status, flag: 'エラー' });
+            console.error(
+              'メールの送信エラー:',
+              { id: item.id, name: item.name, email: item.email, age: item.age, status: item.status, flag: 'エラー' },
+              error
+            );
           }
         }
 
-        return { ...item, flag: '送信済み' };
+        // 3秒の遅延
+        await sleep(10000);
+
+        return { id: item.id, name: item.name, email: item.email, age: item.age, status: item.status, flag: '送信済み' };
       });
 
       // 全ての非同期処理が完了するのを待つ
