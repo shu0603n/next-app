@@ -28,16 +28,9 @@ import { PlusOutlined } from '@ant-design/icons';
 
 import { GlobalFilter, DefaultColumnFilter, SelectColumnFilter, NumberRangeColumnFilter, renderFilterTypes } from 'utils/react-table';
 import AddCustomer from 'sections/apps/mail/AddCustomer';
+import { mailListType } from 'types/mail/mail';
 
 // ==============================|| SAMPLE PAGE ||============================== //
-type mailListType = {
-  id: number;
-  name: string;
-  mail: string;
-  age: number;
-  status: string;
-  flag: string;
-};
 
 interface Props {
   columns: Column[];
@@ -167,7 +160,7 @@ function ReactTable({ columns, data, onReload }: Props) {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        {add && <AddCustomer customer={rows.map((d: Row) => d.original)} onCancel={handleAdd} onReload={onReload} />}
+        {add && <AddCustomer old={data} customer={rows.map((d: Row) => d.original)} onCancel={handleAdd} onReload={onReload} />}
       </Dialog>
     </>
   );

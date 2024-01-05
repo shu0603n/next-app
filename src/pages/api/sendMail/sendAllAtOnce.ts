@@ -70,6 +70,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
 
           if (item.email && item.email.length !== 0) {
             try {
+              Error();
               // メール送信処理
               const sendEmailPromise = transporter.sendMail(mailOptions);
               // 最低でも1秒の遅延

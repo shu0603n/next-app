@@ -29,6 +29,8 @@ import { alertSnackBar } from 'function/alert/alertSnackBar';
 import 'react-quill/dist/quill.snow.css';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
+import { mailListType } from 'types/mail/mail';
+
 const ReactQuill = dynamic(() => import('react-quill'), {
   ssr: false
 });
@@ -71,11 +73,12 @@ async function fetchMailAccountData() {
 // ==============================|| 顧客の追加/編集 ||============================== //
 
 export interface Props {
+  old: Array<mailListType>;
   customer?: any;
   onCancel: () => void;
   onReload: (data: Array<any>) => void;
 }
-const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
+const AddCustomer = ({ old, customer, onCancel, onReload }: Props) => {
   const [loading, setLoading] = useState(true); // データの読み込み状態を管理
   const [mailAccount, setMailAccount] = useState<Array<MailAccountParameterType>>();
 
@@ -111,8 +114,13 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
           headers: {
             'Content-Type': 'application/json' // 必要に応じてヘッダーを調整
           },
-          body: JSON.stringify(values) // valuesをJSON文字列に変換してbodyに設定
+          body: JSON.stringify(values), // valuesをJSON文字列に変換してbodyに設定
+          old: JSON.stringify(old)
         };
+        console.log("-----values");
+        console.log(values);
+        console.log("------old");
+        console.log(old);
 
         alertSnackBar('処理中…', 'secondary');
         fetch(`/api/sendMail/sendAllAtOnce`, requestOptions)
@@ -123,7 +131,17 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
             return response.json();
           })
           .then((data) => {
-            onReload(data.data);
+            const updatedOld = old.map((oldItem) => {
+              const matchingData = data.data.find((dataItem: any) => dataItem.id === oldItem.id);
+
+              if (matchingData) {
+                return { ...oldItem, flag: matchingData.flag };
+              }
+
+              return oldItem;
+            });
+
+            onReload(updatedOld);
             alertSnackBar('正常に送信されました。', 'success');
           })
           .catch((error) => {
