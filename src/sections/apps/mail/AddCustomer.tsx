@@ -115,12 +115,7 @@ const AddCustomer = ({ old, customer, onCancel, onReload }: Props) => {
             'Content-Type': 'application/json' // 必要に応じてヘッダーを調整
           },
           body: JSON.stringify(values), // valuesをJSON文字列に変換してbodyに設定
-          old: JSON.stringify(old)
         };
-        console.log("-----values");
-        console.log(values);
-        console.log("------old");
-        console.log(old);
 
         alertSnackBar('処理中…', 'secondary');
         fetch(`/api/sendMail/sendAllAtOnce`, requestOptions)
