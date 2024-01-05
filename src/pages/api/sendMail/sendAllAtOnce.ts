@@ -1,5 +1,5 @@
 import { NextApiResponse, NextApiRequest } from 'next';
-import nodemailer from 'nodemailer';
+import nodemailer, { TransportOptions } from 'nodemailer';
 import { prisma } from '../db/prisma';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
@@ -42,7 +42,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
               user: account[0].user,
               pass: account[0].pass
             }
-          });
+          } as TransportOptions);
           // メールのオプション
           const mailOptions: nodemailer.SendMailOptions = {
             to: item.email,
