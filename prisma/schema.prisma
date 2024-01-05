@@ -148,7 +148,6 @@ model project {
   working_end_time             String?           @db.VarChar(10)
   start_date                   DateTime?         @db.Date
   end_date                     DateTime?         @db.Date
-  price                        String?           @db.VarChar(40)
   dispatch_source              String?           @default("株式会社トライブ") @db.VarChar(255)
   fertilizer_type              String?           @db.VarChar(255)
   training_schedule            String?           @db.VarChar(255)
@@ -173,6 +172,7 @@ model project {
   age_requirements             String?           @db.VarChar(255)
   recruitment_count            String?           @db.VarChar(255)
   employee_id                  Int?
+  price                        Int?
   invoice                      invoice[]
   client                       client?           @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "example_table_client_id_fkey")
   contract                     contract?         @relation(fields: [contract_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "example_table_contract_id_fkey")

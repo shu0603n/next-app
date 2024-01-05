@@ -333,7 +333,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
                         <InputLabel>掲載開始日</InputLabel>
                         <DatePicker
                           format="yyyy/MM/dd"
-                          value={new Date(getFieldProps('start_date').value)}
+                          value={getFieldProps('start_date').value ? new Date(getFieldProps('start_date').value) : null}
                           onChange={(newValue) => setFieldValue('start_date', newValue)}
                         />
                       </Stack>
@@ -343,7 +343,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
                         <InputLabel>掲載終了日</InputLabel>
                         <DatePicker
                           format="yyyy/MM/dd"
-                          value={new Date(getFieldProps('end_date').value)}
+                          value={getFieldProps('end_date').value ? new Date(getFieldProps('end_date').value) : null}
                           onChange={(newValue) => setFieldValue('end_date', newValue)}
                         />
                       </Stack>

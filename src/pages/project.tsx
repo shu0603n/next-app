@@ -325,11 +325,13 @@ const CustomerProjectPage = () => {
               <Stack spacing={0}>
                 {values.start_date && (
                   <>
-                    <Typography variant="subtitle2">{formatDateString(values.start_date, 'yyyy/MM/DD') ?? ''}</Typography>
+                    <Typography variant="subtitle2">
+                      {values.start_date ? formatDateString(values.start_date, 'yyyy/MM/DD') : ''}
+                    </Typography>
                     <Typography variant="subtitle1" align="center">
                       {'~'}
                     </Typography>
-                    <Typography variant="subtitle2">{formatDateString(values.end_date, 'yyyy/MM/DD') ?? ''}</Typography>
+                    <Typography variant="subtitle2">{values.end_date ? formatDateString(values.end_date, 'yyyy/MM/DD') : ''}</Typography>
                   </>
                 )}
               </Stack>

@@ -70,11 +70,10 @@ export default async function handler(request: NextApiRequest, response: NextApi
 
           if (item.email && item.email.length !== 0) {
             try {
-              Error();
               // メール送信処理
               const sendEmailPromise = transporter.sendMail(mailOptions);
               // 最低でも1秒の遅延
-              const minimumDelay = sleep(1000);
+              const minimumDelay = sleep(3000);
               // メール送信が完了するのを待機し、最低でも0.2秒の遅延を確保
               await Promise.all([sendEmailPromise, minimumDelay]);
 
