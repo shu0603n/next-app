@@ -270,6 +270,36 @@ const SkillSheet = () => {
       skills: ['TypeScript', 'React', 'Next.js', 'node.js', 'WSL', 'docker', 'postgreSQL', 'Material-UI', 'Vercel'],
       process: ['基本設計', '詳細設計', '製造'],
       time: ''
+    },
+    {
+      id: 10,
+      title: '半導体管理システムの改修',
+      start_date: '2023/11',
+      end_date: '',
+      people: 4,
+      client: '富士ソフト株式会社',
+      description: `
+      ①半導体シミュレーションシステム\r\n
+        既存システムの追加処理の実装。\r\n
+        主にVue.js、Element Plusを使用し、画面に表示されるグラフの動きを実装を担当。\r\n
+      \r\n
+      ②半導体ログ分析システムの改修\r\n
+        ・新規チーム立ち上げにつき、主にメンバー３人へ実装方法の伝授\r\n
+        ・以下がdockerコンテナとして作成されており、環境構築の手順がない状態で動作する環境の作成。\r\n
+            メインWEBアプリ\r\n
+              画面上からデータ登録や各種APIへのリクエストを行うアプリ。\r\n
+              フロントエンド:JavaScript、jQuery\r\n
+              バックエンド:Java(Play Framework)\r\n
+            API①\r\n
+              DigDagにpythonコードをワークフローとして登録し、定期実行\r\n
+            API②\r\n
+            　C#で作成されたAPIがSwaggerで一覧として登録してある。\r\n
+              主にRedis serverからのデータや取得や、データ変換を行う。\r\n
+      \r\n
+      スクラム開発で業務を行い、各種ドキュメントや要件定義も担当`,
+      skills: ['JavaScript', 'Vue.js', 'jQuery', 'node.js', 'WSL', 'docker', 'postgreSQL', 'Element Plus', 'python', 'Java', 'Play Framework', 'C#', 'DigDag' ,'Redis server' ,'Swagger'],
+      process: ['要件定義', '調査・分析', '詳細設計', '製造', 'テスト', 'レビュー'],
+      time: ''
     }
   ];
   const [sortBy] = useState('Default');
