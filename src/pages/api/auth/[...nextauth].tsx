@@ -1,17 +1,54 @@
 // next
 import NextAuth from 'next-auth';
+import Auth0Provider from 'next-auth/providers/auth0';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import CognitoProvider from 'next-auth/providers/cognito';
+import GoogleProvider from 'next-auth/providers/google';
 
 // third-party
 import axios from 'utils/axios';
 
-import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import { prisma } from '../db/prisma';
+export let users = [
+  {
+    id: 1,
+    name: 'Jone Doe',
+    email: 'info@codedthemes.com',
+    password: '123456'
+  }
+];
 
 export default NextAuth({
-  adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET_KEY,
   providers: [
+    Auth0Provider({
+      name: 'Auth0',
+      clientId: process.env.REACT_APP_AUTH0_CLIENT_ID!,
+      clientSecret: process.env.REACT_APP_AUTH0_CLIENT_SECRET!,
+      issuer: `https://${process.env.REACT_APP_AUTH0_DOMAIN}`
+    }),
+    CognitoProvider({
+      name: 'Cognito',
+      clientId: process.env.REACT_APP_COGNITO_CLIENT_ID!,
+      clientSecret: process.env.REACT_APP_COGNITO_CLIENT_SECRET!,
+      issuer: `https://cognito-idp.${process.env.REACT_APP_COGNITO_REGION}.amazonaws.com/${process.env.REACT_APP_COGNITO_POOL_ID}`
+    }),
+    GoogleProvider({
+      name: 'Google',
+      clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.REACT_APP_GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: 'consent',
+          access_type: 'offline',
+          response_type: 'code'
+        }
+      }
+    }),
+    // functionality provided for credentials based authentication is intentionally limited to discourage use of passwords due to the
+    // inherent security risks associated with them and the additional complexity associated with supporting usernames and passwords.
+    // We recommend to ignore credential based auth unless its super necessary
+    // Ref: https://next-auth.js.org/providers/credentials
+    // https://github.com/nextauthjs/next-auth/issues/3562
     CredentialsProvider({
       id: 'login',
       name: 'Login',
@@ -21,26 +58,26 @@ export default NextAuth({
       },
       async authorize(credentials) {
         try {
-          console.log(JSON.stringify(credentials));
-          console.log(credentials?.password, credentials?.email);
           const user = await axios.post('/api/account/login', {
             password: credentials?.password,
             email: credentials?.email
           });
 
-          console.log('res', user);
-
-          if (user && user.data && user.data.user) {
+          if (user) {
             user.data.user['accessToken'] = user.data.serviceToken;
             return user.data.user;
           }
         } catch (e: any) {
-          console.log('error', e);
-          const errorMessage = e?.response?.data?.message || 'Failed to login';
+          const errorMessage = e?.response.data.message;
           throw new Error(errorMessage);
         }
       }
     }),
+    // functionality provided for credentials based authentication is intentionally limited to discourage use of passwords due to the
+    // inherent security risks associated with them and the additional complexity associated with supporting usernames and passwords.
+    // We recommend to ignore credential based auth unless its super necessary
+    // Ref: https://next-auth.js.org/providers/credentials
+    // https://github.com/nextauthjs/next-auth/issues/3562
     CredentialsProvider({
       id: 'register',
       name: 'Register',
@@ -51,23 +88,18 @@ export default NextAuth({
       },
       async authorize(credentials) {
         try {
-          console.log(process.env.REACT_APP_AUTH0_DOMAIN);
-          console.log(JSON.stringify(credentials));
-          console.log("リクエスト",credentials?.password, credentials?.email);
           const user = await axios.post('/api/account/register', {
             name: credentials?.name,
             password: credentials?.password,
             email: credentials?.email
           });
 
-          console.log("レスポンス", user);
-
-          if (user && user.data && user.data.user) {
-            return user.data.user;
+          if (user) {
+            users.push(user.data);
+            return user.data;
           }
         } catch (e: any) {
-          console.log('error', e);
-          const errorMessage = e?.response?.data?.message || 'Failed to register';
+          const errorMessage = e?.response.data.message;
           throw new Error(errorMessage);
         }
       }
@@ -75,7 +107,8 @@ export default NextAuth({
   ],
   callbacks: {
     jwt: async ({ token, user, account }) => {
-      if (user && 'accessToken' in user) {
+      if (user) {
+        // @ts-ignore
         token.accessToken = user.accessToken;
         token.id = user.id;
         token.provider = account?.provider;
@@ -86,7 +119,7 @@ export default NextAuth({
       if (token) {
         session.id = token.id;
         session.provider = token.provider;
-        session.token = token;
+        session.tocken = token;
       }
       return session;
     }
