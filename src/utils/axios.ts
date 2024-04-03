@@ -8,8 +8,8 @@ const axiosServices = axios.create({ baseURL: process.env.REACT_APP_API_URL || '
 axiosServices.interceptors.request.use(
   async (config) => {
     const session = await getSession();
-    if (session?.tocken.accessToken) {
-      config.headers['Authorization'] = `Bearer ${session?.tocken.accessToken}`;
+    if (session?.token.accessToken) {
+      config.headers['Authorization'] = `Bearer ${session?.token.accessToken}`;
     }
     return config;
   },

@@ -8,6 +8,6 @@ declare module 'next-auth' {
   interface Session {
     id: any;
     provider: any;
-    tocken: any;
+    token: any;
   }
 }

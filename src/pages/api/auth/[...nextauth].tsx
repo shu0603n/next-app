@@ -8,21 +8,6 @@ import axios from 'utils/axios';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { prisma } from '../db/prisma';
 
-export let users = [
-  // {
-  //   id: 1,
-  //   name: 'Jone Doe',
-  //   email: 'info@codedthemes.com',
-  //   password: '123456'
-  // },
-  {
-    id: 1,
-    name: '村井',
-    email: 'murai@codedthemes.com',
-    password: '123456'
-  }
-];
-
 export default NextAuth({
   adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET_KEY,
@@ -41,27 +26,21 @@ export default NextAuth({
           const user = await axios.post('/api/account/login', {
             password: credentials?.password,
             email: credentials?.email
-            // password: '123456',
-            // email: 'murai@codedthemes.com'
           });
+
           console.log('res', user);
 
-          if (user) {
+          if (user && user.data && user.data.user) {
             user.data.user['accessToken'] = user.data.serviceToken;
             return user.data.user;
           }
         } catch (e: any) {
           console.log('error', e);
-          const errorMessage = e?.response.data.message;
+          const errorMessage = e?.response?.data?.message || 'Failed to login';
           throw new Error(errorMessage);
         }
       }
     }),
-    // 資格情報ベースの認証に提供される機能は、パスワードの使用を妨げるために意図的に制限されています。
-    // それに伴う固有のセキュリティ リスクと、ユーザー名とパスワードのサポートに伴う複雑さ。
-    // 特に必要な場合を除き、資格情報ベースの認証を無視することをお勧めします
-    // 参照: https://next-auth.js.org/providers/credentials
-    // https://github.com/nextauthjs/next-auth/issues/3562
     CredentialsProvider({
       id: 'register',
       name: 'Register',
@@ -72,22 +51,23 @@ export default NextAuth({
       },
       async authorize(credentials) {
         try {
+          console.log(process.env.REACT_APP_AUTH0_DOMAIN);
           console.log(JSON.stringify(credentials));
-          console.log(credentials?.password, credentials?.email);
+          console.log("リクエスト",credentials?.password, credentials?.email);
           const user = await axios.post('/api/account/register', {
             name: credentials?.name,
             password: credentials?.password,
             email: credentials?.email
           });
-          console.log(user);
 
-          if (user) {
-            users.push(user.data);
-            return user.data;
+          console.log("レスポンス", user);
+
+          if (user && user.data && user.data.user) {
+            return user.data.user;
           }
         } catch (e: any) {
           console.log('error', e);
-          const errorMessage = e?.response.data.message;
+          const errorMessage = e?.response?.data?.message || 'Failed to register';
           throw new Error(errorMessage);
         }
       }
@@ -95,8 +75,7 @@ export default NextAuth({
   ],
   callbacks: {
     jwt: async ({ token, user, account }) => {
-      if (user) {
-        // @ts-ignore
+      if (user && 'accessToken' in user) {
         token.accessToken = user.accessToken;
         token.id = user.id;
         token.provider = account?.provider;
@@ -107,7 +86,7 @@ export default NextAuth({
       if (token) {
         session.id = token.id;
         session.provider = token.provider;
-        session.tocken = token;
+        session.token = token;
       }
       return session;
     }
