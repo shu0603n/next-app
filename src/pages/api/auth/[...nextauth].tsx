@@ -1,11 +1,11 @@
 // next
 import NextAuth from 'next-auth';
 import Auth0Provider from 'next-auth/providers/auth0';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import GoogleProvider from 'next-auth/providers/google';
+// import CredentialsProvider from 'next-auth/providers/credentials';
+// import GoogleProvider from 'next-auth/providers/google';
 
 // third-party
-import axios from 'utils/axios';
+// import axios from 'utils/axios';
 
 export let users = [
   {
