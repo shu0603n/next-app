@@ -38,7 +38,6 @@ import AnimateButton from 'components/@extended/AnimateButton';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 
 const Auth0 = '/assets/images/icons/auth0.svg';
-const Cognito = '/assets/images/icons/aws-cognito.svg';
 const Google = '/assets/images/icons/google.svg';
 
 // ============================|| AWS CONNITO - LOGIN ||============================ //
@@ -66,7 +65,7 @@ const AuthLogin = ({ providers, csrfToken }: any) => {
       setCapsWarning(false);
     }
   };
-
+  
   return (
     <>
       <Formik
@@ -238,17 +237,6 @@ const AuthLogin = ({ providers, csrfToken }: any) => {
                     onClick={() => signIn(provider.id, { callbackUrl: APP_DEFAULT_PATH })}
                   >
                     {!matchDownSM && 'Auth0'}
-                  </Button>
-                )}
-                {provider.id === 'cognito' && (
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    fullWidth={!matchDownSM}
-                    startIcon={<Image src={Cognito} alt="Twitter" width={16} height={16} />}
-                    onClick={() => signIn(provider.id, { callbackUrl: APP_DEFAULT_PATH })}
-                  >
-                    {!matchDownSM && 'Cognito'}
                   </Button>
                 )}
               </Box>

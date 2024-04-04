@@ -2,7 +2,6 @@
 import NextAuth from 'next-auth';
 import Auth0Provider from 'next-auth/providers/auth0';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import CognitoProvider from 'next-auth/providers/cognito';
 import GoogleProvider from 'next-auth/providers/google';
 
 // third-party
@@ -26,12 +25,6 @@ export default NextAuth({
       clientSecret: process.env.REACT_APP_AUTH0_CLIENT_SECRET!,
       issuer: `https://${process.env.REACT_APP_AUTH0_DOMAIN}`
     }),
-    CognitoProvider({
-      name: 'Cognito',
-      clientId: process.env.REACT_APP_COGNITO_CLIENT_ID!,
-      clientSecret: process.env.REACT_APP_COGNITO_CLIENT_SECRET!,
-      issuer: `https://cognito-idp.${process.env.REACT_APP_COGNITO_REGION}.amazonaws.com/${process.env.REACT_APP_COGNITO_POOL_ID}`
-    }),
     GoogleProvider({
       name: 'Google',
       clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID!,
@@ -44,11 +37,6 @@ export default NextAuth({
         }
       }
     }),
-    // functionality provided for credentials based authentication is intentionally limited to discourage use of passwords due to the
-    // inherent security risks associated with them and the additional complexity associated with supporting usernames and passwords.
-    // We recommend to ignore credential based auth unless its super necessary
-    // Ref: https://next-auth.js.org/providers/credentials
-    // https://github.com/nextauthjs/next-auth/issues/3562
     CredentialsProvider({
       id: 'login',
       name: 'Login',
@@ -58,26 +46,23 @@ export default NextAuth({
       },
       async authorize(credentials) {
         try {
+          console.log("login-",JSON.stringify(credentials))
           const user = await axios.post('/api/account/login', {
             password: credentials?.password,
             email: credentials?.email
           });
+          console.log("login-",user)
 
           if (user) {
             user.data.user['accessToken'] = user.data.serviceToken;
             return user.data.user;
           }
         } catch (e: any) {
-          const errorMessage = e?.response.data.message;
-          throw new Error(errorMessage);
+          console.log("login-Error",e)
+          throw new Error(e?.message);
         }
       }
     }),
-    // functionality provided for credentials based authentication is intentionally limited to discourage use of passwords due to the
-    // inherent security risks associated with them and the additional complexity associated with supporting usernames and passwords.
-    // We recommend to ignore credential based auth unless its super necessary
-    // Ref: https://next-auth.js.org/providers/credentials
-    // https://github.com/nextauthjs/next-auth/issues/3562
     CredentialsProvider({
       id: 'register',
       name: 'Register',
@@ -88,18 +73,20 @@ export default NextAuth({
       },
       async authorize(credentials) {
         try {
+          console.log("register",credentials)
           const user = await axios.post('/api/account/register', {
             name: credentials?.name,
             password: credentials?.password,
             email: credentials?.email
           });
+          console.log("register",user)
 
           if (user) {
             users.push(user.data);
             return user.data;
           }
         } catch (e: any) {
-          const errorMessage = e?.response.data.message;
+                    const errorMessage = e?.response.data.message;
           throw new Error(errorMessage);
         }
       }
@@ -119,7 +106,7 @@ export default NextAuth({
       if (token) {
         session.id = token.id;
         session.provider = token.provider;
-        session.tocken = token;
+        session.token = token;
       }
       return session;
     }
