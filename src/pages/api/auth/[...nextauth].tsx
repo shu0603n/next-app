@@ -92,32 +92,32 @@ export default NextAuth({
   //     }
   //   })
   ],
-  // callbacks: {
-  //   jwt: async ({ token, user, account }) => {
-  //     if (user) {
-  //       // @ts-ignore
-  //       token.accessToken = user.accessToken;
-  //       token.id = user.id;
-  //       token.provider = account?.provider;
-  //     }
-  //     return token;
-  //   },
-  //   session: ({ session, token }) => {
-  //     if (token) {
-  //       session.id = token.id;
-  //       session.provider = token.provider;
-  //       session.token = token;
-  //     }
-  //     return session;
-  //   }
-  // },
+  callbacks: {
+    jwt: async ({ token, user, account }) => {
+      if (user) {
+        // @ts-ignore
+        token.accessToken = user.accessToken;
+        token.id = user.id;
+        token.provider = account?.provider;
+      }
+      return token;
+    },
+    session: ({ session, token }) => {
+      if (token) {
+        session.id = token.id;
+        session.provider = token.provider;
+        session.token = token;
+      }
+      return session;
+    }
+  },
   session: {
     strategy: 'jwt',
     maxAge: Number(process.env.REACT_APP_JWT_TIMEOUT!)
   },
-  // jwt: {
-  //   secret: process.env.REACT_APP_JWT_SECRET
-  // },
+  jwt: {
+    secret: process.env.REACT_APP_JWT_SECRET
+  },
   // pages: {
   //   signIn: '/login',
   //   newUser: '/register'
