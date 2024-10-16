@@ -28,6 +28,14 @@ node.jsをインストールするとnpmが入っているはずなので以下�
 ### yarnのバージョンを確認
 `yarn -v`
 
+### vsCodeでyarnが使えない場合
+powerShellを管理者モードで開き以下を実行
+`Set-ExecutionPolicy RemoteSigned`
+
+### vsCodeでGit操作ができない場合
+`git config --global user.name "shunsuke murai"`
+`git config --global user.email shu0603n@gmail.com`
+
 # 環境構築手順
 
 ## リポジトリのクローン
