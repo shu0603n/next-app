@@ -309,11 +309,6 @@ const CustomerEmployeePage = () => {
         className: 'cell-center',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
-          const collapseIcon = row.isExpanded ? (
-            <CloseOutlined style={{ color: theme.palette.error.main }} />
-          ) : (
-            <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
-          );
           return (
             <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
               <Tooltip title="スキルシート">
