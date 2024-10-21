@@ -161,7 +161,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
                 <Fragment key={i}>
                   <TableRow
                     {...row.getRowProps()}
-                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                    onClick={(e: MouseEvent<HTMLTableRowElement>) => {
                       handleChangeDetail(row.values.id);
                     }}
                     sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
