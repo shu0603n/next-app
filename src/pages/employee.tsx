@@ -48,7 +48,7 @@ import AlertCustomerDelete from 'sections/apps/employee/AlertCustomerDelete';
 
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 // assets
-import { CloseOutlined, PlusOutlined, EyeTwoTone, DeleteTwoTone, FileTextOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteTwoTone, FileTextOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import { EmployeeType } from 'types/employee/employee';
 
@@ -67,6 +67,8 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: 'id', desc: false };
+
+  const router = useRouter();
 
   const {
     getTableProps,
@@ -107,6 +109,10 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
     }
     // eslint-disable-next-line
   }, [matchDownSM]);
+
+  const handleChangeDetail = (newValue: string) => {
+    router.push(`/employee/detail/${newValue}/basic`);
+  };
 
   return (
     <>
@@ -155,8 +161,8 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
                 <Fragment key={i}>
                   <TableRow
                     {...row.getRowProps()}
-                    onClick={() => {
-                      row.toggleRowSelected();
+                    onClick={(e: MouseEvent<HTMLTableRowElement>) => {
+                      handleChangeDetail(row.values.id);
                     }}
                     sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                   >
@@ -229,9 +235,6 @@ const CustomerEmployeePage = () => {
   };
   const router = useRouter();
 
-  const handleChangeDetail = (newValue: string) => {
-    router.push(`/employee/detail/${newValue}/basic`);
-  };
   const handleChangeDetailSkill = (newValue: string) => {
     router.push(`/employee/skill-sheet/${newValue}`);
   };
@@ -306,23 +309,8 @@ const CustomerEmployeePage = () => {
         className: 'cell-center',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
-          const collapseIcon = row.isExpanded ? (
-            <CloseOutlined style={{ color: theme.palette.error.main }} />
-          ) : (
-            <EyeTwoTone twoToneColor={theme.palette.secondary.main} />
-          );
           return (
             <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
-              <Tooltip title="詳細">
-                <IconButton
-                  color="secondary"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    handleChangeDetail(row.values.id);
-                  }}
-                >
-                  {collapseIcon}
-                </IconButton>
-              </Tooltip>
               <Tooltip title="スキルシート">
                 <IconButton
                   color="secondary"
