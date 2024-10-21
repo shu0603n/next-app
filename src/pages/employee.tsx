@@ -48,7 +48,7 @@ import AlertCustomerDelete from 'sections/apps/employee/AlertCustomerDelete';
 
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 // assets
-import { CloseOutlined, PlusOutlined, EyeTwoTone, DeleteTwoTone, FileTextOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteTwoTone, FileTextOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import { EmployeeType } from 'types/employee/employee';
 
