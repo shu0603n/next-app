@@ -68,6 +68,8 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: 'id', desc: false };
 
+  const router = useRouter();
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -107,6 +109,10 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
     }
     // eslint-disable-next-line
   }, [matchDownSM]);
+
+  const handleChangeDetail = (newValue: string) => {
+    router.push(`/employee/detail/${newValue}/basic`);
+  };
 
   return (
     <>
@@ -155,8 +161,8 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
                 <Fragment key={i}>
                   <TableRow
                     {...row.getRowProps()}
-                    onClick={() => {
-                      row.toggleRowSelected();
+                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                      handleChangeDetail(row.values.id);
                     }}
                     sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                   >
@@ -229,9 +235,6 @@ const CustomerEmployeePage = () => {
   };
   const router = useRouter();
 
-  const handleChangeDetail = (newValue: string) => {
-    router.push(`/employee/detail/${newValue}/basic`);
-  };
   const handleChangeDetailSkill = (newValue: string) => {
     router.push(`/employee/skill-sheet/${newValue}`);
   };
@@ -313,16 +316,6 @@ const CustomerEmployeePage = () => {
           );
           return (
             <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
-              <Tooltip title="詳細">
-                <IconButton
-                  color="secondary"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    handleChangeDetail(row.values.id);
-                  }}
-                >
-                  {collapseIcon}
-                </IconButton>
-              </Tooltip>
               <Tooltip title="スキルシート">
                 <IconButton
                   color="secondary"
