@@ -54,6 +54,11 @@ async function fetchTableData(id: string) {
   }
 }
 
+interface Props {
+  handleEdit: () => void;
+  renderRowSubComponent: FC<any>;
+}
+
 const TabProfile = () => {
   const router = useRouter();
   const id = router.query.id as string;
