@@ -22,7 +22,7 @@ import {
 // project import
 import MainCard from 'components/MainCard';
 import Avatar from 'components/@extended/Avatar';
-import EditCustomer from './TabPersonal';
+import TabPersonal from './TabPersonal';
 
 // assets
 import { AimOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
@@ -52,11 +52,6 @@ async function fetchTableData(id: string) {
     console.error('Error fetching data:', error);
     throw error;
   }
-}
-
-interface Props {
-  handleEdit: () => void;
-  renderRowSubComponent: FC<any>;
 }
 
 const TabProfile = () => {
@@ -316,9 +311,9 @@ const TabProfile = () => {
               </Grid>
               {/* 編集用ダイアログ */}
               <Dialog maxWidth="sm" onClose={() => setOpen(false)} open={open} fullWidth>
-                <EditCustomer
-                  data={editData} // 編集するデータを渡す
-                  onCancel={() => setOpen(false)} // ダイアログを閉じる
+                <TabPersonal
+                // data={editData} // 編集するデータを渡す
+                // onCancel={() => setOpen(false)} // ダイアログを閉じる
                 />
               </Dialog>
             </Grid>
