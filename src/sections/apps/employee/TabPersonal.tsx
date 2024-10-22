@@ -103,7 +103,12 @@ async function fetchJobCategory() {
   }
 }
 
-const TabPersonal = () => {
+interface TabPersonalProps {
+  data: EmployeeType | null;
+  onCancel: () => void;
+}
+
+const TabPersonal: React.FC<TabPersonalProps> = ({onCancel}) => {
   const theme = useTheme();
   const router = useRouter();
   const id = router.query.id as string;
@@ -512,7 +517,7 @@ const TabPersonal = () => {
 
           <Grid item xs={12}>
             <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
-              <Button variant="outlined" color="secondary">
+              <Button variant="outlined" color="secondary" onClick={onCancel}>
                 キャンセル
               </Button>
               <Button variant="contained" onClick={() => handleUpdateButtonClick(data.id)}>
