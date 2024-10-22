@@ -22,13 +22,13 @@ import {
 // project import
 import MainCard from 'components/MainCard';
 import Avatar from 'components/@extended/Avatar';
+import EditCustomer from './TabPersonal';
 
 // assets
 import { AimOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { Fragment, useEffect, useState } from 'react';
 import { PatternFormat } from 'react-number-format';
 import { EmployeeType } from 'types/employee/employee';
-import EditCustomer from './TabPersonal';
 
 // ==============================|| ACCOUNT PROFILE - BASIC ||============================== //
 
@@ -80,7 +80,7 @@ const TabProfile = () => {
 
   const handleEdit = () => {
     setOpen(true);
-    setEditData(data); // 現在のデータをセット
+    setEditData(data || null); // 現在のデータをセット
   };
 
   const skill = [
