@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import {
   useMediaQuery,
   Chip,
+  Button,
+  Dialog,
   Divider,
   Grid,
   List,
@@ -26,6 +28,7 @@ import { AimOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { Fragment, useEffect, useState } from 'react';
 import { PatternFormat } from 'react-number-format';
 import { EmployeeType } from 'types/employee/employee';
+import EditCustomer from './TabPersonal';
 
 // ==============================|| ACCOUNT PROFILE - BASIC ||============================== //
 
@@ -59,6 +62,10 @@ const TabProfile = () => {
 
   const [data, setData] = useState<EmployeeType>();
 
+  const [open, setOpen] = useState<boolean>(false);
+
+  const [editData, setEditData] = useState<EmployeeType | null>(null);
+
   useEffect(() => {
     // ページがロードされたときにデータを取得
     fetchTableData(id)
@@ -70,6 +77,11 @@ const TabProfile = () => {
         console.error('Error:', error);
       });
   }, []); // 空の依存リストを指定することで、一度だけ実行される
+
+  const handleEdit = () => {
+    setOpen(true);
+    setEditData(data); // 現在のデータをセット
+  };
 
   const skill = [
     {
@@ -290,6 +302,20 @@ const TabProfile = () => {
                   <Typography color="secondary">{data.remarks}</Typography>
                 </MainCard>
               </Grid>
+              <Grid item xs={12}>
+                <Stack direction="row" justifyContent="flex-end">
+                  <Button variant="contained" onClick={handleEdit}>
+                    編集
+                  </Button>
+                </Stack>
+              </Grid>
+              {/* 編集用ダイアログ */}
+              <Dialog maxWidth="sm" onClose={() => setOpen(false)} open={open} fullWidth>
+                <EditCustomer
+                  data={editData} // 編集するデータを渡す
+                  onCancel={() => setOpen(false)} // ダイアログを閉じる
+                />
+              </Dialog>
             </Grid>
           </Grid>
         </>
