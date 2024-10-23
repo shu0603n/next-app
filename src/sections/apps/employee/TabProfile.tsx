@@ -310,10 +310,10 @@ const TabProfile = () => {
                 </Stack>
               </Grid>
               {/* 編集用ダイアログ */}
-              <Dialog maxWidth="sm" onClose={() => setOpen(false)} open={open} fullWidth>
+              <Dialog maxWidth="lg" onClose={() => setOpen(false)} open={open} fullWidth>
                   <TabPersonal
                     data={editData} // 編集するデータを渡す
-                    onCancel={() => setOpen(false)} // ダイアログを閉じる
+                    closeHandle={() => setOpen(false)} // ダイアログを閉じる
                 />
               </Dialog>
             </Grid>

@@ -105,10 +105,10 @@ async function fetchJobCategory() {
 
 interface TabPersonalProps {
   data: EmployeeType | null;
-  onCancel: () => void;
+  closeHandle: () => void;
 }
 
-const TabPersonal: React.FC<TabPersonalProps> = ({onCancel}) => {
+const TabPersonal: React.FC<TabPersonalProps> = ({closeHandle}) => {
   const theme = useTheme();
   const router = useRouter();
   const id = router.query.id as string;
@@ -152,7 +152,7 @@ const TabPersonal: React.FC<TabPersonalProps> = ({onCancel}) => {
 
     fetchPositionData()
       .then((data) => {
-        setPositionData(data.data.rows);
+        setPositionData(data.data);
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -160,7 +160,7 @@ const TabPersonal: React.FC<TabPersonalProps> = ({onCancel}) => {
 
     fetchEmploymentData()
       .then((data) => {
-        setEmploymentData(data.data.rows);
+        setEmploymentData(data.data);
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -168,7 +168,7 @@ const TabPersonal: React.FC<TabPersonalProps> = ({onCancel}) => {
 
     fetchJobCategory()
       .then((data) => {
-        setJobCategoryData(data.data.rows);
+        setJobCategoryData(data.data);
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -265,6 +265,7 @@ const TabPersonal: React.FC<TabPersonalProps> = ({onCancel}) => {
             close: false
           })
         );
+        closeHandle();
       })
       .catch((error) => {
         console.error('Error updating data:', error);
@@ -517,7 +518,7 @@ const TabPersonal: React.FC<TabPersonalProps> = ({onCancel}) => {
 
           <Grid item xs={12}>
             <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
-              <Button variant="outlined" color="secondary" onClick={onCancel}>
+              <Button variant="outlined" color="secondary" onClick={closeHandle}>
                 キャンセル
               </Button>
               <Button variant="contained" onClick={() => handleUpdateButtonClick(data.id)}>
