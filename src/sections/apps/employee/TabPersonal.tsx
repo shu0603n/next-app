@@ -285,7 +285,7 @@ const TabPersonal: React.FC<TabPersonalProps> = ({onCancel}) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
       {data && (
-        <Grid container spacing={3}>
+        <Grid container spacing={3} sx={{ padding: 2 }}>
           <Grid item xs={12} sm={6}>
             <MainCard title="基本情報">
               <Grid container spacing={3}>
