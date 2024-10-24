@@ -11,7 +11,6 @@ import Layout from 'layout';
 import Page from 'components/Page';
 import MainCard from 'components/MainCard';
 import TabProfile from 'sections/apps/employee/TabProfile';
-import TabPersonal from 'sections/apps/employee/TabPersonal';
 import TabSkill from 'sections/apps/employee/TabSkill';
 import TabInvoice from 'sections/apps/employee/TabInvoice';
 import TabAccount from 'sections/apps/employee/TabAccount';
@@ -40,7 +39,6 @@ const EmployeeDetail = () => {
         <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
           <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto" aria-label="account profile tab">
             <Tab label="プロフィール" icon={<UserOutlined />} value="basic" iconPosition="start" />
-            <Tab label="詳細情報" icon={<FileTextOutlined />} value="personal" iconPosition="start" />
             <Tab label="スキル一覧" icon={<FileTextOutlined />} value="skill" iconPosition="start" />
             <Tab label="請求一覧" icon={<FileTextOutlined />} value="invoice" iconPosition="start" />
             <Tab label="アカウント情報" icon={<ContainerOutlined />} value="my-account" iconPosition="start" />
@@ -50,7 +48,6 @@ const EmployeeDetail = () => {
         </Box>
         <Box sx={{ mt: 2.5 }}>
           {tab === 'basic' && <TabProfile />}
-          {tab === 'personal' && <TabPersonal />}
           {tab === 'skill' && <TabSkill />}
           {tab === 'invoice' && <TabInvoice />}
           {tab === 'my-account' && <TabAccount />}

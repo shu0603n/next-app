@@ -103,7 +103,13 @@ async function fetchJobCategory() {
   }
 }
 
-const TabPersonal = () => {
+interface TabPersonalProps {
+  data: EmployeeType | null;
+  closeHandle: () => void;
+  updateIsComplete: (result: boolean) => void;
+}
+
+const TabPersonal: React.FC<TabPersonalProps> = ({closeHandle, updateIsComplete}) => {
   const theme = useTheme();
   const router = useRouter();
   const id = router.query.id as string;
@@ -147,7 +153,7 @@ const TabPersonal = () => {
 
     fetchPositionData()
       .then((data) => {
-        setPositionData(data.data.rows);
+        setPositionData(data.data);
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -155,7 +161,7 @@ const TabPersonal = () => {
 
     fetchEmploymentData()
       .then((data) => {
-        setEmploymentData(data.data.rows);
+        setEmploymentData(data.data);
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -163,7 +169,7 @@ const TabPersonal = () => {
 
     fetchJobCategory()
       .then((data) => {
-        setJobCategoryData(data.data.rows);
+        setJobCategoryData(data.data);
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -260,6 +266,8 @@ const TabPersonal = () => {
             close: false
           })
         );
+        closeHandle();
+        updateIsComplete(true);
       })
       .catch((error) => {
         console.error('Error updating data:', error);
@@ -274,13 +282,14 @@ const TabPersonal = () => {
             close: false
           })
         );
+        updateIsComplete(false);
       });
   };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
       {data && (
-        <Grid container spacing={3}>
+        <Grid container spacing={3} sx={{ padding: 2 }}>
           <Grid item xs={12} sm={6}>
             <MainCard title="基本情報">
               <Grid container spacing={3}>
@@ -512,7 +521,7 @@ const TabPersonal = () => {
 
           <Grid item xs={12}>
             <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
-              <Button variant="outlined" color="secondary">
+              <Button variant="outlined" color="secondary" onClick={closeHandle}>
                 キャンセル
               </Button>
               <Button variant="contained" onClick={() => handleUpdateButtonClick(data.id)}>

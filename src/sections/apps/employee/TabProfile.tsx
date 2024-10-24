@@ -4,6 +4,8 @@ import { useRouter } from 'next/router';
 import {
   useMediaQuery,
   Chip,
+  Button,
+  Dialog,
   Divider,
   Grid,
   List,
@@ -20,6 +22,7 @@ import {
 // project import
 import MainCard from 'components/MainCard';
 import Avatar from 'components/@extended/Avatar';
+import TabPersonal from './TabPersonal';
 
 // assets
 import { AimOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
@@ -59,8 +62,11 @@ const TabProfile = () => {
 
   const [data, setData] = useState<EmployeeType>();
 
-  useEffect(() => {
-    // ページがロードされたときにデータを取得
+  const [open, setOpen] = useState<boolean>(false);
+
+  const [editData, setEditData] = useState<EmployeeType | null>(null);
+
+  const getUpdateData = () => {
     fetchTableData(id)
       .then((data) => {
         setData(data.data.rows[0]);
@@ -69,7 +75,28 @@ const TabProfile = () => {
         // エラーハンドリング
         console.error('Error:', error);
       });
+  };
+
+  useEffect(() => {
+    // ページがロードされたときにデータを取得
+    getUpdateData();
   }, []); // 空の依存リストを指定することで、一度だけ実行される
+
+  const handleEdit = () => {
+    setOpen(true);
+    setEditData(data || null); // 現在のデータをセット
+  };
+
+  const handleSave = () => {
+    setOpen(false);
+    fetchTableData(id);
+  }
+
+  const updateIsComplete = async (result: boolean) => {
+    if(result) {
+      getUpdateData();
+    }
+  };
 
   const skill = [
     {
@@ -290,6 +317,21 @@ const TabProfile = () => {
                   <Typography color="secondary">{data.remarks}</Typography>
                 </MainCard>
               </Grid>
+              <Grid item xs={12}>
+                <Stack direction="row" justifyContent="flex-end">
+                  <Button variant="contained" onClick={handleEdit}>
+                    編集
+                  </Button>
+                </Stack>
+              </Grid>
+              {/* 編集用ダイアログ */}
+              <Dialog maxWidth="lg" onClose={() => setOpen(false)} open={open} fullWidth>
+                  <TabPersonal
+                    data={editData} // 編集するデータを渡す
+                    closeHandle={handleSave} // ダイアログを閉じる
+                    updateIsComplete={updateIsComplete}
+                />
+              </Dialog>
             </Grid>
           </Grid>
         </>
