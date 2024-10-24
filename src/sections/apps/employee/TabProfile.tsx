@@ -66,8 +66,7 @@ const TabProfile = () => {
 
   const [editData, setEditData] = useState<EmployeeType | null>(null);
 
-  useEffect(() => {
-    // ページがロードされたときにデータを取得
+  const getUpdateData = () => {
     fetchTableData(id)
       .then((data) => {
         setData(data.data.rows[0]);
@@ -76,11 +75,27 @@ const TabProfile = () => {
         // エラーハンドリング
         console.error('Error:', error);
       });
+  };
+
+  useEffect(() => {
+    // ページがロードされたときにデータを取得
+    getUpdateData();
   }, []); // 空の依存リストを指定することで、一度だけ実行される
 
   const handleEdit = () => {
     setOpen(true);
     setEditData(data || null); // 現在のデータをセット
+  };
+
+  const handleSave = () => {
+    setOpen(false);
+    fetchTableData(id);
+  }
+
+  const updateIsComplete = async (result: boolean) => {
+    if(result) {
+      getUpdateData();
+    }
   };
 
   const skill = [
@@ -313,7 +328,8 @@ const TabProfile = () => {
               <Dialog maxWidth="lg" onClose={() => setOpen(false)} open={open} fullWidth>
                   <TabPersonal
                     data={editData} // 編集するデータを渡す
-                    closeHandle={() => setOpen(false)} // ダイアログを閉じる
+                    closeHandle={handleSave} // ダイアログを閉じる
+                    updateIsComplete={updateIsComplete}
                 />
               </Dialog>
             </Grid>

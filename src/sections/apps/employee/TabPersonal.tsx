@@ -106,9 +106,10 @@ async function fetchJobCategory() {
 interface TabPersonalProps {
   data: EmployeeType | null;
   closeHandle: () => void;
+  updateIsComplete: (result: boolean) => void;
 }
 
-const TabPersonal: React.FC<TabPersonalProps> = ({closeHandle}) => {
+const TabPersonal: React.FC<TabPersonalProps> = ({closeHandle, updateIsComplete}) => {
   const theme = useTheme();
   const router = useRouter();
   const id = router.query.id as string;
@@ -266,6 +267,7 @@ const TabPersonal: React.FC<TabPersonalProps> = ({closeHandle}) => {
           })
         );
         closeHandle();
+        updateIsComplete(true);
       })
       .catch((error) => {
         console.error('Error updating data:', error);
@@ -280,6 +282,7 @@ const TabPersonal: React.FC<TabPersonalProps> = ({closeHandle}) => {
             close: false
           })
         );
+        updateIsComplete(false);
       });
   };
 
