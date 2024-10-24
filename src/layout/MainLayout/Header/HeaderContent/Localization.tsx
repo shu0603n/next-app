@@ -95,6 +95,30 @@ const Localization = () => {
                     }
                   }}
                 >
+                  <ListItemButton selected={i18n === 'jp'} onClick={() => handleListItemClick('jp')}>
+                    <ListItemText
+                      primary={
+                        <Grid container>
+                          <Typography color="textPrimary">日本語</Typography>
+                          <Typography variant="caption" color="textSecondary" sx={{ ml: '8px' }}>
+                            (Japanese)
+                          </Typography>
+                        </Grid>
+                      }
+                    />
+                  </ListItemButton>
+                  <ListItemButton selected={i18n === 'zh'} onClick={() => handleListItemClick('zh')}>
+                    <ListItemText
+                      primary={
+                        <Grid container>
+                          <Typography color="textPrimary">中国語</Typography>
+                          <Typography variant="caption" color="textSecondary" sx={{ ml: '8px' }}>
+                            (Chinese)
+                          </Typography>
+                        </Grid>
+                      }
+                    />
+                  </ListItemButton>
                   <ListItemButton selected={i18n === 'en'} onClick={() => handleListItemClick('en')}>
                     <ListItemText
                       primary={
@@ -126,18 +150,6 @@ const Localization = () => {
                           <Typography color="textPrimary">Română</Typography>
                           <Typography variant="caption" color="textSecondary" sx={{ ml: '8px' }}>
                             (Romanian)
-                          </Typography>
-                        </Grid>
-                      }
-                    />
-                  </ListItemButton>
-                  <ListItemButton selected={i18n === 'zh'} onClick={() => handleListItemClick('zh')}>
-                    <ListItemText
-                      primary={
-                        <Grid container>
-                          <Typography color="textPrimary">中国人</Typography>
-                          <Typography variant="caption" color="textSecondary" sx={{ ml: '8px' }}>
-                            (Chinese)
                           </Typography>
                         </Grid>
                       }

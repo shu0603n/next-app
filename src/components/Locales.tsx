@@ -18,8 +18,10 @@ const loadLocaleData = (locale: I18n) => {
     case 'zh':
       return import('utils/locales/zh.json');
     case 'en':
-    default:
       return import('utils/locales/en.json');
+    case 'jp':
+    default:
+      return import('utils/locales/jp.json');
   }
 };
 
