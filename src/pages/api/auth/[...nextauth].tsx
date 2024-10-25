@@ -1,37 +1,12 @@
 import NextAuth from 'next-auth';
-import Auth0Provider from 'next-auth/providers/auth0';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { PrismaClient } from '@prisma/client'; // Import PrismaClient
 
-export let users = [
-  {
-    id: 1,
-    name: 'INFO',
-    email: 'info@codedthemes.com',
-    password: '123456'
-  },
-  {
-    id: 2,
-    name: '村井俊介',
-    email: 'shu0603n@gmail.com',
-    password: '123456'
-  },
-  {
-    id: 3,
-    name: 'むらいさんドットコム',
-    email: 'info@murai-san.com',
-    password: '123456'
-  }
-];
+const prisma = new PrismaClient(); // Create a Prisma client instance
 
 export default NextAuth({
   secret: process.env.NEXTAUTH_SECRET_KEY,
   providers: [
-    Auth0Provider({
-      name: 'Auth0',
-      clientId: process.env.REACT_APP_AUTH0_CLIENT_ID!,
-      clientSecret: process.env.REACT_APP_AUTH0_CLIENT_SECRET!,
-      issuer: `https://${process.env.REACT_APP_AUTH0_DOMAIN}`
-    }),
     CredentialsProvider({
       id: 'login',
       name: 'Login',
@@ -45,35 +20,40 @@ export default NextAuth({
           return null; // credentialsがundefinedの場合
         }
 
-        const user = users.find((user) => user.email === credentials.email && user.password === credentials.password);
+        // employeeテーブルからユーザーを取得
+        const user = await prisma.employee.findFirst({
+          where: { email: credentials.email } // emailで検索
+        });
 
-        if (user) {
+        // ユーザーが存在し、パスワードが一致するか確認
+        if (user && user.password === credentials.password) {
+          // 本番環境ではパスワードをハッシュ化することを忘れずに
           return {
             id: user.id,
-            name: user.name,
-            email: user.email,
-          }; // User型として返す
+            name: user.sei + user.mei, // 名前の結合
+            email: user.email
+          };
         } else {
           return null; // 認証失敗時にはnullを返す
         }
       }
-    }),
+    })
   ],
   callbacks: {
     jwt: async ({ token, user, account }) => {
       if (user) {
         // @ts-ignore
-        token.accessToken = user.accessToken;
-        token.id = user.id;
-        token.provider = account?.provider;
+        token.accessToken = user.accessToken; // アクセストークン
+        token.id = user.id; // ユーザーID
+        token.provider = account?.provider; // プロバイダー情報
       }
       return token;
     },
     session: ({ session, token }) => {
       if (token) {
-        session.id = token.id;
-        session.provider = token.provider;
-        session.token = token;
+        session.id = token.id; // セッションにユーザーIDを追加
+        session.provider = token.provider; // プロバイダー情報を追加
+        session.token = token; // トークン情報を追加
       }
       return session;
     }
