@@ -98,6 +98,10 @@ const TabProfile = () => {
     }
   };
 
+  const handleChangeDetailSkill = (newValue: string) => {
+    router.push(`/employee/skill-sheet/${newValue}`);
+  };
+
   const skill = [
     {
       experienct_years: 15,
@@ -318,7 +322,9 @@ const TabProfile = () => {
                 </MainCard>
               </Grid>
               <Grid item xs={12}>
-                <Stack direction="row" justifyContent="flex-end">
+                <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
+                  <Button variant="outlined" onClick={handleChangeDetailSkill(id)
+                  }>業務履歴</Button>
                   <Button variant="contained" onClick={handleEdit}>
                     編集
                   </Button>

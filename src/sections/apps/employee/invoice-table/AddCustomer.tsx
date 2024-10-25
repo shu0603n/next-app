@@ -573,7 +573,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                     <Button color="error" onClick={onCancel}>
                       キャンセル
                     </Button>
-                    <Button type="submit" variant="contained" disabled={isSubmitting}>
+                    <Button type="submit" variant="contained" disabled={isSubmitting} onClick={AddCustomer}>
                       {customer ? '編集' : '追加'}
                     </Button>
                   </Stack>
