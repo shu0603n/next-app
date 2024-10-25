@@ -91,7 +91,7 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                   }}
                   component="ul"
                 >
-                  {customer.skills.map((skill: string, index: number) => (
+                  {customer.skills?.map((skill: string, index: number) => (
                     <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
                       <Chip color="secondary" variant="outlined" size="small" label={skill} />
                     </ListItem>
@@ -114,7 +114,7 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                   }}
                   component="ul"
                 >
-                  {customer.process.map((skill: string, index: number) => (
+                  {customer.process?.map((skill: string, index: number) => (
                     <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
                       <Chip color="secondary" variant="outlined" size="small" label={skill} />
                     </ListItem>
