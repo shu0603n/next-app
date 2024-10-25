@@ -1,4 +1,5 @@
 import { useState, SyntheticEvent } from 'react';
+import { useRouter } from 'next/router';
 
 // material-ui
 import {
@@ -35,6 +36,8 @@ import { CheckOutlined, EyeOutlined, EyeInvisibleOutlined, LineOutlined } from '
 // ==============================|| TAB - PASSWORD CHANGE ||============================== //
 
 const TabPassword = () => {
+  const router = useRouter();
+  const id = router.query.id as string;
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -51,6 +54,92 @@ const TabPassword = () => {
 
   const handleMouseDownPassword = (event: SyntheticEvent) => {
     event.preventDefault();
+  };
+
+  const handleUpdateButtonClick = async () => {
+    // 入力値を取得
+    const oldInputElement = document.getElementById('password-old') as HTMLInputElement | null;
+    const newInputElement = document.getElementById('password-new') as HTMLInputElement | null;
+
+    // スナックバーを表示
+    dispatch(
+      openSnackbar({
+        open: true,
+        message: '更新処理中…',
+        variant: 'alert',
+        alert: {
+          color: 'secondary'
+        },
+        close: false
+      })
+    );
+
+    // 更新リクエストのデータ
+    const updatedData = {
+      id: id,
+      old_password: oldInputElement,
+      new_password: newInputElement
+    };
+
+    // APIにデータを送信
+    try {
+      await fetch(`/api/db/employee/password/update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedData)
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('API request failed');
+          }
+          return response.json();
+        })
+        .then((responseData) => {
+          console.log(responseData);
+          // const row = responseData.data.rows[0];
+          // setData(row);
+          dispatch(
+            openSnackbar({
+              open: true,
+              message: '正常に更新されました。',
+              variant: 'alert',
+              alert: {
+                color: 'success'
+              },
+              close: false
+            })
+          );
+        })
+        .catch((error) => {
+          console.error('Error updating data:', error);
+          dispatch(
+            openSnackbar({
+              open: true,
+              message: 'データの更新に失敗しました。',
+              variant: 'alert',
+              alert: {
+                color: 'error'
+              },
+              close: false
+            })
+          );
+        });
+    } catch (error) {
+      console.error('Error updating data:', error);
+      dispatch(
+        openSnackbar({
+          open: true,
+          message: 'データの更新に失敗しました。',
+          variant: 'alert',
+          alert: {
+            color: 'error'
+          },
+          close: false
+        })
+      );
+    }
   };
 
   return (
@@ -138,9 +227,9 @@ const TabPassword = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <Stack spacing={1.25}>
-                    <InputLabel htmlFor="password-password">新しいパスワード</InputLabel>
+                    <InputLabel htmlFor="password-new">新しいパスワード</InputLabel>
                     <OutlinedInput
-                      id="password-password"
+                      id="password-new"
                       placeholder="新しいパスワードを入力"
                       type={showNewPassword ? 'text' : 'password'}
                       value={values.password}
@@ -164,7 +253,7 @@ const TabPassword = () => {
                       inputProps={{}}
                     />
                     {touched.password && errors.password && (
-                      <FormHelperText error id="password-password-helper">
+                      <FormHelperText error id="password-new-helper">
                         {errors.password}
                       </FormHelperText>
                     )}
@@ -247,7 +336,12 @@ const TabPassword = () => {
                   <Button variant="outlined" color="secondary">
                     キャンセル
                   </Button>
-                  <Button disabled={isSubmitting || Object.keys(errors).length !== 0} type="submit" variant="contained">
+                  <Button
+                    disabled={isSubmitting || Object.keys(errors).length !== 0}
+                    type="submit"
+                    variant="contained"
+                    onClick={() => handleUpdateButtonClick()}
+                  >
                     プロフィールを更新
                   </Button>
                 </Stack>
