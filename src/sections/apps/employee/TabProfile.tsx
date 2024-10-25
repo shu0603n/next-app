@@ -90,10 +90,10 @@ const TabProfile = () => {
   const handleSave = () => {
     setOpen(false);
     fetchTableData(id);
-  }
+  };
 
   const updateIsComplete = async (result: boolean) => {
-    if(result) {
+    if (result) {
       getUpdateData();
     }
   };
@@ -156,7 +156,7 @@ const TabProfile = () => {
                         </Stack>
                       </Grid>
                       <Stack spacing={2.5} alignItems="center">
-                        <Avatar alt="Avatar 1" size="xl" src="/assets/images/users/default.png" />
+                        <Avatar alt="Avatar 1" size="xl" src={`/assets/images/users/avatar-${data.avatar}.png`} />
                         <Stack spacing={0.5} alignItems="center">
                           <Typography variant="h5">{`${data.sei} ${data.mei}`}</Typography>
                           <Typography color="secondary">{data.position_name}</Typography>
@@ -318,7 +318,14 @@ const TabProfile = () => {
               </Grid>
               <Grid item xs={12}>
                 <MainCard title="備考">
-                  <Typography color="secondary">{data.remarks}</Typography>
+                  <Typography color="secondary" component="div">
+                    {data.remarks.split(/\r?\n/).map((line, index) => (
+                      <Fragment key={index}>
+                        {line}
+                        <br />
+                      </Fragment>
+                    ))}
+                  </Typography>
                 </MainCard>
               </Grid>
               <Grid item xs={12}>
@@ -332,10 +339,10 @@ const TabProfile = () => {
               </Grid>
               {/* 編集用ダイアログ */}
               <Dialog maxWidth="lg" onClose={() => setOpen(false)} open={open} fullWidth>
-                  <TabPersonal
-                    data={editData} // 編集するデータを渡す
-                    closeHandle={handleSave} // ダイアログを閉じる
-                    updateIsComplete={updateIsComplete}
+                <TabPersonal
+                  data={editData} // 編集するデータを渡す
+                  closeHandle={handleSave} // ダイアログを閉じる
+                  updateIsComplete={updateIsComplete}
                 />
               </Dialog>
             </Grid>

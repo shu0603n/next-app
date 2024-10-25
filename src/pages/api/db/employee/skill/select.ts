@@ -12,7 +12,6 @@ export default async function handler(request: NextApiRequest, response: NextApi
         employee_skills
     LEFT JOIN 
         client ON employee_skills.client_id = client.id
-
     WHERE 
         employee_skills.employee_id = ${id};
     `;

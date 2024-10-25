@@ -22,4 +22,5 @@ export type EmployeeType = {
   postal_code: string;
   project_id: number;
   remarks: string;
+  avatar: string;
 };

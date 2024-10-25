@@ -55,11 +55,13 @@ model employee {
   joining_date    DateTime?         @db.Date
   retirement_date DateTime?         @db.Date
   phone_number    String?           @db.VarChar(255)
-  email           String?           @db.VarChar(255)
+  email           String?           @unique(map: "unique_email") @db.VarChar(255)
   postal_code     String?           @db.VarChar(8)
   remarks         String?           @db.VarChar(255)
   position_id     Int?
   employment_id   Int?
+  password        String?           @db.VarChar(255)
+  avatar          String?
   attendance      attendance[]
   employment      employment?       @relation(fields: [employment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   job_category    job_category?     @relation(fields: [job_category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

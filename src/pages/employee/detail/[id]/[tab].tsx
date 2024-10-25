@@ -34,7 +34,7 @@ const EmployeeDetail = () => {
   };
 
   return (
-    <Page title="Account Profile">
+    <Page title="社員詳細">
       <MainCard border={false} boxShadow>
         <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
           <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto" aria-label="account profile tab">
