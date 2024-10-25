@@ -103,7 +103,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
 
   useEffect(() => {
     if (matchDownSM) {
-      setHiddenColumns(['avatar', 'name_k', 'status', 'gender', 'employment_name', 'job_category_name']);
+      setHiddenColumns(['avatar', 'name_k', 'gender', 'employment_name', 'job_category_name']);
     } else {
       setHiddenColumns(['avatar', 'name_k']);
     }
@@ -290,6 +290,11 @@ const CustomerEmployeePage = () => {
         disableSortBy: true
       },
       {
+        Header: '役職',
+        accessor: 'position_name',
+        disableSortBy: true
+      },
+      {
         Header: '勤怠',
         accessor: 'status',
         Cell: ({ value }: { value: string }) => {
@@ -297,10 +302,10 @@ const CustomerEmployeePage = () => {
             case '1':
               return <Chip color="error" label="Rejected" size="small" variant="light" />;
             case '2':
-              return <Chip color="success" label="Verified" size="small" variant="light" />;
+              return <Chip color="success" label="勤務中" size="small" variant="light" />;
             case '3':
             default:
-              return <Chip color="info" label="Pending" size="small" variant="light" />;
+              return <Chip color="info" label="勤務中" size="small" variant="light" />;
           }
         }
       },
