@@ -77,8 +77,8 @@ const TabPassword = () => {
     // 更新リクエストのデータ
     const updatedData = {
       id: id,
-      old_password: oldInputElement,
-      new_password: newInputElement
+      old_password: oldInputElement?.value ?? '',
+      new_password: newInputElement?.value ?? ''
     };
 
     // APIにデータを送信
