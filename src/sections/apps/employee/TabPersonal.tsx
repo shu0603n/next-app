@@ -139,9 +139,9 @@ const TabPersonal: React.FC<TabPersonalProps> = ({closeHandle, updateIsComplete}
       .then((data) => {
         const row = data.data.rows[0];
         setData(row);
-        setBirthday(new Date(row.birthday));
-        setJoiningDate(new Date(row.joining_date));
-        setRetirementDate(new Date(row.retirement_date));
+        setBirthday(row.birthday ? new Date(row.birthday) : null);
+        setJoiningDate(row.joining_date ? new Date(row.joining_date) : null);
+        setRetirementDate(row.retirement_date ? new Date(row.retirement_date) : null);
         setGender(row.gender);
         setEmployment(row.employment_id);
         setPosition(row.position_id);
