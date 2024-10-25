@@ -133,7 +133,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              Add Customer
+              新規登録
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
@@ -253,7 +253,7 @@ const CustomerEmployeePage = () => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
-              <Avatar alt="Avatar 1" size="sm" src={`/assets/images/users/avatar-${!values.avatar ? 1 : values.avatar}.png`} />
+              <Avatar alt="Avatar 1" size="sm" src={`/assets/images/users/avatar-${values.avatar}.png`} />
               <Stack spacing={0}>
                 <Typography variant="caption" color="textSecondary">
                   {values.name_k}

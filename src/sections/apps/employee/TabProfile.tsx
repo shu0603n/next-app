@@ -152,7 +152,7 @@ const TabProfile = () => {
                         </Stack>
                       </Grid>
                       <Stack spacing={2.5} alignItems="center">
-                        <Avatar alt="Avatar 1" size="xl" src="/assets/images/users/default.png" />
+                        <Avatar alt="Avatar 1" size="xl" src={`/assets/images/users/avatar-${data.avatar}.png`} />
                         <Stack spacing={0.5} alignItems="center">
                           <Typography variant="h5">{`${data.sei} ${data.mei}`}</Typography>
                           <Typography color="secondary">{data.position_name}</Typography>

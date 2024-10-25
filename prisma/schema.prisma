@@ -61,6 +61,7 @@ model employee {
   position_id     Int?
   employment_id   Int?
   password        String?           @db.VarChar(255)
+  avatar          String?
   attendance      attendance[]
   employment      employment?       @relation(fields: [employment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   job_category    job_category?     @relation(fields: [job_category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

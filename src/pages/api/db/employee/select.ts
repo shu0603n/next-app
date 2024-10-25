@@ -9,6 +9,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
         emp.sei || ' ' || emp.mei AS name,
         emp.sei_k || ' ' || emp.mei_k AS name_k,
         emp.gender,
+        emp.avatar,
         Job_category.name AS job_category_name,
         Employment.name AS employment_name,
         position.name AS position_name

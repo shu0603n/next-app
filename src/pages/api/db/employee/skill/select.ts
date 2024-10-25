@@ -7,14 +7,11 @@ export default async function handler(request: NextApiRequest, response: NextApi
     const data = await sql`
     SELECT 
     	employee_skills.*,
-        client.name AS client_name,
-		skills_used.id as skills_used_id
+        client.name AS client_name
     FROM 
         employee_skills
-    INNER JOIN 
+    LEFT JOIN 
         client ON employee_skills.client_id = client.id
-    INNER JOIN 
-        skills_used ON employee_skills.id = skills_used.id
     WHERE 
         employee_skills.employee_id = ${id};
     `;
