@@ -23,4 +23,5 @@ export type EmployeeType = {
   project_id: number;
   remarks: string;
   avatar: string;
+  status: number;
 };
