@@ -1,17 +1,24 @@
-// next
 import NextAuth from 'next-auth';
 import Auth0Provider from 'next-auth/providers/auth0';
-// import CredentialsProvider from 'next-auth/providers/credentials';
-// import GoogleProvider from 'next-auth/providers/google';
-
-// third-party
-// import axios from 'utils/axios';
+import CredentialsProvider from 'next-auth/providers/credentials';
 
 export let users = [
   {
     id: 1,
-    name: 'Jone Doe',
+    name: 'INFO',
     email: 'info@codedthemes.com',
+    password: '123456'
+  },
+  {
+    id: 2,
+    name: '村井俊介',
+    email: 'shu0603n@gmail.com',
+    password: '123456'
+  },
+  {
+    id: 3,
+    name: 'むらいさんドットコム',
+    email: 'info@murai-san.com',
     password: '123456'
   }
 ];
@@ -25,72 +32,32 @@ export default NextAuth({
       clientSecret: process.env.REACT_APP_AUTH0_CLIENT_SECRET!,
       issuer: `https://${process.env.REACT_APP_AUTH0_DOMAIN}`
     }),
-  //   GoogleProvider({
-  //     name: 'Google',
-  //     clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID!,
-  //     clientSecret: process.env.REACT_APP_GOOGLE_CLIENT_SECRET!,
-  //     authorization: {
-  //       params: {
-  //         prompt: 'consent',
-  //         access_type: 'offline',
-  //         response_type: 'code'
-  //       }
-  //     }
-  //   }),
-  //   CredentialsProvider({
-  //     id: 'login',
-  //     name: 'Login',
-  //     credentials: {
-  //       email: { label: 'Email', type: 'email', placeholder: 'Enter Email' },
-  //       password: { label: 'Password', type: 'password', placeholder: 'Enter Password' }
-  //     },
-  //     async authorize(credentials) {
-  //       try {
-  //         console.log("login-",JSON.stringify(credentials))
-  //         const user = await axios.post('/api/account/login', {
-  //           password: credentials?.password,
-  //           email: credentials?.email
-  //         });
-  //         console.log("login-",user)
+    CredentialsProvider({
+      id: 'login',
+      name: 'Login',
+      credentials: {
+        email: { label: 'Email', type: 'email', placeholder: 'Enter Email' },
+        password: { label: 'Password', type: 'password', placeholder: 'Enter Password' }
+      },
+      // @ts-ignore
+      async authorize(credentials) {
+        if (!credentials) {
+          return null; // credentialsがundefinedの場合
+        }
 
-  //         if (user) {
-  //           user.data.user['accessToken'] = user.data.serviceToken;
-  //           return user.data.user;
-  //         }
-  //       } catch (e: any) {
-  //         console.log("login-Error",e)
-  //         throw new Error(e?.message);
-  //       }
-  //     }
-  //   }),
-  //   CredentialsProvider({
-  //     id: 'register',
-  //     name: 'Register',
-  //     credentials: {
-  //       name: { label: 'Name', type: 'text', placeholder: 'Enter Name' },
-  //       email: { label: 'Email', type: 'email', placeholder: 'Enter Email' },
-  //       password: { label: 'Password', type: 'password', placeholder: 'Enter Password' }
-  //     },
-  //     async authorize(credentials) {
-  //       try {
-  //         console.log("register",credentials)
-  //         const user = await axios.post('/api/account/register', {
-  //           name: credentials?.name,
-  //           password: credentials?.password,
-  //           email: credentials?.email
-  //         });
-  //         console.log("register",user)
+        const user = users.find((user) => user.email === credentials.email && user.password === credentials.password);
 
-  //         if (user) {
-  //           users.push(user.data);
-  //           return user.data;
-  //         }
-  //       } catch (e: any) {
-  //                   const errorMessage = e?.response.data.message;
-  //         throw new Error(errorMessage);
-  //       }
-  //     }
-  //   })
+        if (user) {
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+          }; // User型として返す
+        } else {
+          return null; // 認証失敗時にはnullを返す
+        }
+      }
+    }),
   ],
   callbacks: {
     jwt: async ({ token, user, account }) => {
@@ -118,8 +85,8 @@ export default NextAuth({
   jwt: {
     secret: process.env.REACT_APP_JWT_SECRET
   },
-  // pages: {
-  //   signIn: '/login',
-  //   newUser: '/register'
-  // }
+  pages: {
+    signIn: '/login', // サインインページ
+    newUser: '/register' // 新規ユーザー登録ページ
+  }
 });
