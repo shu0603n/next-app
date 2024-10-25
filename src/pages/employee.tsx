@@ -103,7 +103,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
 
   useEffect(() => {
     if (matchDownSM) {
-      setHiddenColumns(['avatar', 'name_k', 'gender', 'employment_name', 'job_category_name']);
+      setHiddenColumns(['avatar', 'name_k', 'status', 'gender', 'employment_name', 'position_name', 'job_category_name']);
     } else {
       setHiddenColumns(['avatar', 'name_k']);
     }
