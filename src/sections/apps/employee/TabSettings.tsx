@@ -1,7 +1,18 @@
 import { useState } from 'react';
 
 // material-ui
-import { Button, Checkbox, Divider, Grid, List, ListItem, ListItemText, Stack, Switch, Typography } from '@mui/material';
+import {
+  Button,
+  // Checkbox,
+  Divider,
+  Grid,
+  List,
+  ListItem,
+  ListItemText,
+  Stack,
+  Switch,
+  Typography
+} from '@mui/material';
 
 // プロジェクトのインポート
 import MainCard from 'components/MainCard';
@@ -9,7 +20,7 @@ import MainCard from 'components/MainCard';
 // ==============================|| アカウントプロファイル - 設定 ||============================== //
 
 const TabSettings = () => {
-  const [checked, setChecked] = useState(['en', 'email-1', 'email-3', 'order-1', 'order-3']);
+  const [checked, setChecked] = useState(['en', 'pass', 'email-1', 'email-3', 'order-1', 'order-3']);
 
   const handleToggle = (value: string) => () => {
     const currentIndex = checked.indexOf(value);
@@ -34,7 +45,7 @@ const TabSettings = () => {
                 <Typography variant="subtitle1">管理者権限の設定</Typography>
                 <List sx={{ p: 0, '& .MuiListItem-root': { p: 0, py: 0.25 } }}>
                   <ListItem>
-                    <ListItemText id="switch-list-label-en" primary={<Typography color="secondary">管理者メニューを表示する</Typography>} />
+                    <ListItemText id="switch-list-label-en" primary={<Typography color="secondary">「設定」を表示する</Typography>} />
                     <Switch
                       edge="end"
                       onChange={handleToggle('en')}
@@ -45,11 +56,11 @@ const TabSettings = () => {
                     />
                   </ListItem>
                   <ListItem>
-                    <ListItemText id="switch-list-label-sctp" primary={<Typography color="secondary">顧客情報を表示する</Typography>} />
+                    <ListItemText id="passwordChange" primary={<Typography color="secondary">「パスワード変更」を表示する</Typography>} />
                     <Switch
                       edge="end"
-                      onChange={handleToggle('sctp')}
-                      checked={checked.indexOf('sctp') !== -1}
+                      onChange={handleToggle('pass')}
+                      checked={checked.indexOf('pass') !== -1}
                       inputProps={{
                         'aria-labelledby': 'switch-list-label-sctp'
                       }}
@@ -59,7 +70,7 @@ const TabSettings = () => {
               </Stack>
             </MainCard>
           </Grid>
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <MainCard title="システム通知からの更新">
               <Stack spacing={2.5}>
                 <Typography variant="subtitle1">何についてメールを送信しますか？</Typography>
@@ -87,7 +98,7 @@ const TabSettings = () => {
                 </List>
               </Stack>
             </MainCard>
-          </Grid>
+          </Grid> */}
         </Grid>
       </Grid>
       <Grid item xs={12} sm={6}>

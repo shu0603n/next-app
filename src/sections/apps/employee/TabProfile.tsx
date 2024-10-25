@@ -314,7 +314,14 @@ const TabProfile = () => {
               </Grid>
               <Grid item xs={12}>
                 <MainCard title="備考">
-                  <Typography color="secondary">{data.remarks}</Typography>
+                  <Typography color="secondary" component="div">
+                    {data.remarks.split(/\r?\n/).map((line, index) => (
+                      <Fragment key={index}>
+                        {line}
+                        <br />
+                      </Fragment>
+                    ))}
+                  </Typography>
                 </MainCard>
               </Grid>
               <Grid item xs={12}>
