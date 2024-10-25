@@ -299,7 +299,7 @@ const CustomerClientPage = () => {
   );
 
   return (
-    <Page title="Customer List">
+    <Page title="企業一覧">
       <MainCard content={false}>
         {tableData && (
           <Fragment>

@@ -564,7 +564,7 @@ const CustomerProjectPage = () => {
   }
 
   return (
-    <Page title="Customer List">
+    <Page title="案件一覧">
       <MainCard content={false}>
         {projectData && (
           <Fragment>

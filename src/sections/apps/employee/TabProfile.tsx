@@ -90,10 +90,10 @@ const TabProfile = () => {
   const handleSave = () => {
     setOpen(false);
     fetchTableData(id);
-  }
+  };
 
   const updateIsComplete = async (result: boolean) => {
-    if(result) {
+    if (result) {
       getUpdateData();
     }
   };
@@ -326,10 +326,10 @@ const TabProfile = () => {
               </Grid>
               {/* 編集用ダイアログ */}
               <Dialog maxWidth="lg" onClose={() => setOpen(false)} open={open} fullWidth>
-                  <TabPersonal
-                    data={editData} // 編集するデータを渡す
-                    closeHandle={handleSave} // ダイアログを閉じる
-                    updateIsComplete={updateIsComplete}
+                <TabPersonal
+                  data={editData} // 編集するデータを渡す
+                  closeHandle={handleSave} // ダイアログを閉じる
+                  updateIsComplete={updateIsComplete}
                 />
               </Dialog>
             </Grid>

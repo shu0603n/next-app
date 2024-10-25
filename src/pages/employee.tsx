@@ -348,7 +348,7 @@ const CustomerEmployeePage = () => {
   );
 
   return (
-    <Page title="Customer List">
+    <Page title="社員一覧">
       <MainCard content={false}>
         {tableData && (
           <ScrollX>
