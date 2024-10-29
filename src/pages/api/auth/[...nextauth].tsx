@@ -1,8 +1,8 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { PrismaClient } from '@prisma/client'; // Import PrismaClient
+import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient(); // Create a Prisma client instance
+const prisma = new PrismaClient();
 
 export default NextAuth({
   secret: process.env.NEXTAUTH_SECRET_KEY,
@@ -17,43 +17,53 @@ export default NextAuth({
       // @ts-ignore
       async authorize(credentials) {
         if (!credentials) {
-          return null; // credentialsがundefinedの場合
+          return null;
         }
 
-        // employeeテーブルからユーザーを取得
         const user = await prisma.employee.findFirst({
-          where: { email: credentials.email } // emailで検索
+          where: { email: credentials.email },
+          include: {
+            job_category: {
+              select: {
+                name: true
+              }
+            }
+          }
         });
+        console.log('findFirst', user);
 
-        // ユーザーが存在し、パスワードが一致するか確認
         if (user && user.password === credentials.password) {
-          // 本番環境ではパスワードをハッシュ化することを忘れずに
           return {
             id: user.id,
-            name: user.sei + user.mei, // 名前の結合
-            email: user.email
+            name: `${user.sei} ${user.mei}`,
+            email: user.email,
+            jobCategories: user.job_category?.name
           };
         } else {
-          return null; // 認証失敗時にはnullを返す
+          return null;
         }
       }
     })
   ],
   callbacks: {
     jwt: async ({ token, user, account }) => {
+      console.log('jwt', token, user, account);
       if (user) {
         // @ts-ignore
-        token.accessToken = user.accessToken; // アクセストークン
-        token.id = user.id; // ユーザーID
-        token.provider = account?.provider; // プロバイダー情報
+        token.accessToken = user.accessToken;
+        token.id = user.id;
+        token.provider = account?.provider;
+        token.jobCategories = user.jobCategories;
       }
       return token;
     },
     session: ({ session, token }) => {
+      console.log('session', session, token);
       if (token) {
-        session.id = token.id; // セッションにユーザーIDを追加
-        session.provider = token.provider; // プロバイダー情報を追加
-        session.token = token; // トークン情報を追加
+        session.id = token.id;
+        session.provider = token.provider;
+        session.token = token;
+        session.jobCategories = token.jobCategories as string;
       }
       return session;
     }
