@@ -10,13 +10,13 @@ export default async function handler(request: NextApiRequest, response: NextApi
         skill.name,
         technic.name AS technic_name 
     FROM 
-        skills_used AS skills_used
+        employee_project_skills AS employee_project_skills
     INNER JOIN 
-        skill ON skills_used.skill_id = skill.id
+        skill ON employee_project_skills.skill_id = skill.id
     INNER JOIN 
         technic ON skill.technic_id = technic.id
     WHERE 
-        skills_used.employee_project_id = ${id};
+        employee_project_skills.employee_project_id = ${id};
     `;
     return response.status(200).json({ data });
   } catch (error) {

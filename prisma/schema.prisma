@@ -72,18 +72,18 @@ model employee {
 }
 
 model employee_project {
-  id            Int            @id(map: "employee_skills_pkey") @default(autoincrement())
-  employee_id   Int
-  start_date    DateTime?      @db.Date
-  end_date      DateTime?      @db.Date
-  project_title String?        @db.VarChar(255)
-  description   String?        @db.VarChar(2000)
-  people_number Int?
-  client_id     Int?
-  client        client?        @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "employee_skills_client_id_fkey")
-  employee      employee       @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "employee_skills_employee_id_fkey")
-  process_used  process_used[]
-  skills_used   skills_used[]
+  id                         Int                          @id(map: "employee_skills_pkey") @default(autoincrement())
+  employee_id                Int
+  start_date                 DateTime?                    @db.Date
+  end_date                   DateTime?                    @db.Date
+  project_title              String?                      @db.VarChar(255)
+  description                String?                      @db.VarChar(2000)
+  people_number              Int?
+  client_id                  Int?
+  client                     client?                      @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "employee_skills_client_id_fkey")
+  employee                   employee                     @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "employee_skills_employee_id_fkey")
+  employee_project_processes employee_project_processes[]
+  employee_project_skills    employee_project_skills[]
 }
 
 model employment {
@@ -122,18 +122,18 @@ model position {
 }
 
 model process {
-  id              Int               @id @default(autoincrement())
-  name            String            @db.VarChar(30)
-  process_used    process_used[]
-  project_process project_process[]
+  id                         Int                          @id @default(autoincrement())
+  name                       String                       @db.VarChar(30)
+  employee_project_processes employee_project_processes[]
+  project_process            project_process[]
 }
 
-model process_used {
-  id               Int               @id @default(autoincrement())
+model employee_project_processes {
+  id               Int               @id(map: "process_used_pkey") @default(autoincrement())
   project_id       Int?
   process_id       Int?
-  employee_project employee_project? @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_used_employee_project_id_fkey")
-  process          process?          @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employee_project employee_project? @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "employee_project_processes_employee_project_id_fkey")
+  process          process?          @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_used_process_id_fkey")
 }
 
 model project {
@@ -205,21 +205,21 @@ model project_type {
 }
 
 model skill {
-  id             Int              @id @default(autoincrement())
-  name           String           @db.VarChar(30)
-  technic_id     Int?
-  candidate_flag Boolean?         @default(false)
-  project_skills project_skills[]
-  technic        technic?         @relation(fields: [technic_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  skills_used    skills_used[]
+  id                      Int                       @id @default(autoincrement())
+  name                    String                    @db.VarChar(30)
+  technic_id              Int?
+  candidate_flag          Boolean?                  @default(false)
+  employee_project_skills employee_project_skills[]
+  project_skills          project_skills[]
+  technic                 technic?                  @relation(fields: [technic_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model skills_used {
-  id                 Int               @id @default(autoincrement())
+model employee_project_skills {
+  id                 Int               @id(map: "skills_used_pkey") @default(autoincrement())
   employee_skills_id Int?
   skill_id           Int?
-  employee_project   employee_project? @relation(fields: [employee_skills_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  skill              skill?            @relation(fields: [skill_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employee_project   employee_project? @relation(fields: [employee_skills_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "skills_used_employee_skills_id_fkey")
+  skill              skill?            @relation(fields: [skill_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "skills_used_skill_id_fkey")
 }
 
 model technic {

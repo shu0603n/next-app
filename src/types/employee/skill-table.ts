@@ -1,7 +1,7 @@
 export type SkillTableType = {
   id: number;
   employee_id: number;
-  skills_used_id: number;
+  employee_project_skills_id: number;
   start_date: string;
   end_date: string;
   project_title: string;
