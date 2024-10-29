@@ -36,7 +36,6 @@ import {
   ShoppingCartOutlined
 } from '@ant-design/icons';
 
-
 // type
 import { NavItemType } from 'types/menu';
 

@@ -148,7 +148,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
 
       // 更新結果を必要に応じて処理
     } else {
-      console.log(working_hours_per_day)
+      console.log(working_hours_per_day);
       // id が存在しない場合は新規挿入を行う
       const res = await prisma.project.create({
         data: {
@@ -179,7 +179,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
           contract_period,
           working_days_count,
           working_days_list,
-          working_hours_per_day:working_hours_per_day,
+          working_hours_per_day: working_hours_per_day,
           work_notes,
           price: Number(price),
           price_type: Number(price_type),

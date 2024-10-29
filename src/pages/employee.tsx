@@ -48,7 +48,7 @@ import AlertCustomerDelete from 'sections/apps/employee/AlertCustomerDelete';
 
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 // assets
-import { PlusOutlined, DeleteTwoTone, FileTextOutlined } from '@ant-design/icons';
+import { PlusOutlined, DeleteTwoTone } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import { EmployeeType } from 'types/employee/employee';
 
@@ -233,11 +233,6 @@ const CustomerEmployeePage = () => {
   const handleClose = () => {
     setOpen(!open);
   };
-  const router = useRouter();
-
-  const handleChangeDetailSkill = (newValue: string) => {
-    router.push(`/employee/skill-sheet/${newValue}`);
-  };
 
   const columns = useMemo(
     () => [
@@ -312,22 +307,12 @@ const CustomerEmployeePage = () => {
         }
       },
       {
-        Header: '詳細',
+        Header: '削除',
         className: 'cell-center',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           return (
-            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
-              <Tooltip title="スキルシート">
-                <IconButton
-                  color="secondary"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    handleChangeDetailSkill(row.values.id);
-                  }}
-                >
-                  <FileTextOutlined twoToneColor={theme.palette.secondary.main} />
-                </IconButton>
-              </Tooltip>
+            <Stack>
               <Tooltip title="削除">
                 <IconButton
                   color="error"

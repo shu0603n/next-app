@@ -82,7 +82,7 @@ const AuthRegister = ({ providers, csrfToken }: any) => {
           password: Yup.string().max(255).required('Password is required')
         })}
         onSubmit={(values, { setErrors, setSubmitting }) => {
-           signIn('register', {
+          signIn('register', {
             redirect: false,
             name: values.name,
             email: values.email,

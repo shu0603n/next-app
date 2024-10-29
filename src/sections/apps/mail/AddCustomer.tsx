@@ -99,7 +99,7 @@ const AddCustomer = ({ old, customer, onCancel, onReload }: Props) => {
   }, []); // 空の依存リストを指定することで、一度だけ実行される
 
   const CustomerSchema = Yup.object().shape({
-    title: Yup.string().max(255).required('プロジェクト名は必須です'),
+    title: Yup.string().max(255).required('プロジェクト名は必須です')
     // description: Yup.string().max(1000).required('本文は必須です。'),
     // employee: Yup.string().trim().required('役割の選択は必須です')
   });
@@ -114,7 +114,7 @@ const AddCustomer = ({ old, customer, onCancel, onReload }: Props) => {
           headers: {
             'Content-Type': 'application/json' // 必要に応じてヘッダーを調整
           },
-          body: JSON.stringify(values), // valuesをJSON文字列に変換してbodyに設定
+          body: JSON.stringify(values) // valuesをJSON文字列に変換してbodyに設定
         };
 
         alertSnackBar('処理中…', 'secondary');
