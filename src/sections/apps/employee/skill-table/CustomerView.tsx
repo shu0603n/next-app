@@ -28,19 +28,25 @@ const CustomerView = ({ data }: Props) => {
                   <List sx={{ py: 0 }}>
                     <ListItem divider={!matchDownMD}>
                       <Grid container spacing={3}>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={12}>
+                          <Stack spacing={0.5}>
+                            <Typography color="secondary">ID</Typography>
+                            <Typography>{data.id}</Typography>
+                          </Stack>
+                        </Grid>
+                        <Grid item xs={12} md={12}>
                           <Stack spacing={0.5}>
                             <Typography color="secondary">プロジェクト名</Typography>
                             <Typography>{data.project_title}</Typography>
                           </Stack>
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={12}>
                           <Stack spacing={0.5}>
                             <Typography color="secondary">会社名</Typography>
                             <Typography>{data.client_name}</Typography>
                           </Stack>
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={12}>
                           <Stack spacing={0.5}>
                             <Typography color="secondary">業務内容</Typography>
                             <Typography>{data.description}</Typography>

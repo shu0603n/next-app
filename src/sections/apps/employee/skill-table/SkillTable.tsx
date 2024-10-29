@@ -16,8 +16,7 @@ import {
   Column,
   HeaderGroup,
   Row,
-  Cell,
-  HeaderProps
+  Cell
 } from 'react-table';
 
 // project import
@@ -25,14 +24,7 @@ import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import IconButton from 'components/@extended/IconButton';
 import { PopupTransition } from 'components/@extended/Transitions';
-import {
-  CSVExport,
-  HeaderSort,
-  IndeterminateCheckbox,
-  SortingSelect,
-  TablePagination,
-  TableRowSelection
-} from 'components/third-party/ReactTable';
+import { CSVExport, HeaderSort, SortingSelect, TablePagination, TableRowSelection } from 'components/third-party/ReactTable';
 
 import AddCustomer from 'sections/apps/employee/skill-table/AddCustomer';
 import CustomerView from 'sections/apps/employee/skill-table/CustomerView';
@@ -204,13 +196,8 @@ const SkillTable = ({ data }: SkillTableProps) => {
   const columns = useMemo(
     () => [
       {
-        title: 'Row Selection',
-        Header: ({ getToggleAllPageRowsSelectedProps }: HeaderProps<{}>) => (
-          <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
-        ),
-        accessor: 'selection',
-        Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />,
-        disableSortBy: true
+        Header: 'ID',
+        accessor: 'id'
       },
       {
         Header: '開始日',

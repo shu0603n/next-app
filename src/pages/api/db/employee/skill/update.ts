@@ -3,56 +3,53 @@ import { NextApiResponse, NextApiRequest } from 'next';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    const id = request.query.id as string;
     const toNull = (str: string) => {
       return str === null || str === '' ? null : str;
     };
-    const { start_date, end_date, project_title, description, people_number, client_id } = request.body;
 
-    if (!project_title || !start_date) {
+    const { id, start_date, end_date, project_title, description, people_number, client_id } = request.body;
+
+    // 必須パラメータのチェック
+    if (!id || !project_title || !start_date) {
       throw new Error('パラメーターが不足しています');
     }
 
+    // 更新クエリ
     const result = await sql`
-    INSERT INTO employee_skills (
-      employee_id, 
-      start_date, 
-      end_date, 
-      project_title, 
-      description, 
-      people_number, 
-      client_id
-    )
-    VALUES (
-      ${toNull(id)},
-      ${toNull(start_date)},
-      ${toNull(end_date)},
-      ${toNull(project_title)},
-      ${toNull(description)},
-      ${toNull(people_number)},
-      ${toNull(client_id)}
-    );
-  `;
+    UPDATE employee_skills
+    SET 
+      start_date = ${toNull(start_date)},
+      end_date = ${toNull(end_date)},
+      project_title = ${toNull(project_title)},
+      description = ${toNull(description)},
+      people_number = ${toNull(people_number)},
+      client_id = ${toNull(client_id)}
+    WHERE 
+      id = ${toNull(id)};
+    `;
 
+    // 更新された行数の確認
     if (result.rowCount === 0) {
-      throw new Error('データを挿入できませんでした');
+      throw new Error('データを更新できませんでした');
     }
 
     if (result.rowCount !== 1) {
       throw new Error('複数のレコードが更新されてしまった可能性があります');
     }
 
+    // 更新後のデータを取得
     const data = await sql`
     SELECT 
-    	employee_skills.*,
-        client.name AS client_name
+      employee_skills.*,
+      client.name AS client_name
     FROM 
-        employee_skills
+      employee_skills
     LEFT JOIN 
-        client ON employee_skills.client_id = client.id
+      client ON employee_skills.client_id = client.id
     WHERE 
-        employee_skills.employee_id = ${id};
+      employee_skills.employee_id = ${id};
     `;
+
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);
