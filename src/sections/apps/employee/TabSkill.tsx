@@ -36,7 +36,7 @@ async function fetchTableData(id: string) {
     data.data.rows = await Promise.all(
       data.data.rows.map(async (row: SkillTableType) => {
         try {
-          const skills = await fetchSkillList(row.skills_used_id);
+          const skills = await fetchSkillList(row.id);
           return { ...row, skill: skills.data.rows ?? [] };
         } catch (error) {
           console.error('Error fetching skills:', error);

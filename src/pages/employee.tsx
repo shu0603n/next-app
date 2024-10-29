@@ -292,15 +292,17 @@ const CustomerEmployeePage = () => {
       {
         Header: '勤怠',
         accessor: 'status',
-        Cell: ({ value }: { value: string }) => {
+        Cell: ({ value }: { value: Number }) => {
           switch (value) {
-            case '1':
-              return <Chip color="error" label="Rejected" size="small" variant="light" />;
-            case '2':
-              return <Chip color="success" label="勤務中" size="small" variant="light" />;
-            case '3':
-            default:
+            case 1:
               return <Chip color="info" label="勤務中" size="small" variant="light" />;
+            case 2:
+              return <Chip color="secondary" label="退勤" size="small" variant="light" />;
+            case 3:
+              return <Chip color="warning" label="欠勤" size="small" variant="light" />;
+            case 4:
+            default:
+              return <Chip color="error" label="退職者" size="small" variant="light" />;
           }
         }
       },

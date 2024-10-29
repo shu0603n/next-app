@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 // material-ui
@@ -27,6 +28,7 @@ import {
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { alertSnackBar } from 'function/alert/alertSnackBar';
 
 // third-party
 import _ from 'lodash';
@@ -36,9 +38,6 @@ import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
 // project imports
 import AlertCustomerDelete from './AlertCustomerDelete';
 import IconButton from 'components/@extended/IconButton';
-
-import { dispatch } from 'store';
-import { openSnackbar } from 'store/reducers/snackbar';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
@@ -50,7 +49,9 @@ import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 import { CloseOutlined } from '@ant-design/icons';
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
+  console.log('customer', customer)
   const newCustomer = {
+    id: '',
     project_title: '',
     description: '',
     people_number: '',
@@ -63,6 +64,7 @@ const getInitialValues = (customer: FormikValues | null) => {
   };
 
   if (customer) {
+    newCustomer.id = customer.id;
     newCustomer.project_title = customer.project_title;
     newCustomer.description = customer.description;
     newCustomer.people_number = customer.people_number;
@@ -136,6 +138,8 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
   const [startDate, setStartDate] = useState<Date | null>();
   const [endDate, setEndDate] = useState<Date | null>();
   const isCreating = !customer;
+  const router = useRouter();
+  const id = router.query.id as string;
 
   const CustomerSchema = Yup.object().shape({
     project_title: Yup.string().max(255).required('プロジェクト名は必須です')
@@ -181,39 +185,63 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     initialValues: getInitialValues(customer!),
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
-      console.log('フォームが送信されました！');
-      console.log(values);
       try {
-        alert(values);
-
         if (customer) {
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: '顧客情報を正常に更新しました。',
-              variant: 'alert',
-              alert: {
-                color: 'success'
-              },
-              close: false
+          alertSnackBar('処理中…', 'secondary');
+          fetch(`/api/db/employee/skill/update?id=${id}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(values)
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error('更新に失敗しました。');
+              }
+              return response.json();
             })
-          );
+            .then((data) => {
+              console.log(data);
+              // onReload(data.data);
+              alertSnackBar('正常に更新されました。', 'success');
+            })
+            .catch((error) => {
+              console.error('エラー:', error);
+              alertSnackBar('データの更新に失敗しました。', 'error');
+            })
+            .finally(() => {
+              onCancel();
+            });
         } else {
-          dispatch(
-            openSnackbar({
-              open: true,
-              message: '顧客を正常に追加しました。',
-              variant: 'alert',
-              alert: {
-                color: 'success'
-              },
-              close: false
+          alertSnackBar('処理中…', 'secondary');
+          fetch(`/api/db/employee/skill/insert?id=${id}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(values)
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error('更新に失敗しました。');
+              }
+              return response.json();
             })
-          );
+            .then((data) => {
+              console.log(data);
+              // onReload(data.data);
+              alertSnackBar('正常に追加されました。', 'success');
+            })
+            .catch((error) => {
+              console.error('エラー:', error);
+              alertSnackBar('データの追加に失敗しました。', 'error');
+            })
+            .finally(() => {
+              setSubmitting(false);
+              onCancel();
+            });
         }
-
-        setSubmitting(false);
-        onCancel();
       } catch (error) {
         console.error(error);
       }
@@ -258,6 +286,12 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="customer-id">id</InputLabel>
+                        <TextField fullWidth id="customer-id" {...getFieldProps('id')} />
+                      </Stack>
+                    </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-name">開始日</InputLabel>
@@ -272,6 +306,19 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
+                        <InputLabel htmlFor="customer-project_title">プロジェクト名</InputLabel>
+                        <TextField
+                          fullWidth
+                          id="customer-project_title"
+                          placeholder="企業名を入力"
+                          {...getFieldProps('project_title')}
+                          error={Boolean(touched.project_title && errors.project_title)}
+                          helperText={touched.project_title && errors.project_title}
+                        />
+                      </Stack>
+                    </Grid>
+                    {/* <Grid item xs={12}>
+                      <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-client">企業名</InputLabel>
                         <TextField
                           fullWidth
@@ -282,7 +329,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           helperText={touched.client && errors.client}
                         />
                       </Stack>
-                    </Grid>
+                    </Grid> */}
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-description">業務内容</InputLabel>
