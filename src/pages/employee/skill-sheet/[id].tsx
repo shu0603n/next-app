@@ -71,6 +71,20 @@ const SkillSheet = () => {
     }
   }
 
+  async function fetchBasicData(id: string) {
+    try {
+      const response = await fetch(`/api/db/employee/basic/select?id=${id}`);
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+      const data = await response.json();
+      return data; // APIから返されたデータを返します
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw error;
+    }
+  }
+
   const [sortBy] = useState('Default');
   const [globalFilter] = useState('');
   const [userCard, setUserCard] = useState<Array<ProjectCard>>([]);
