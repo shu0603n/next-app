@@ -16,7 +16,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
 
     // 更新クエリ
     const result = await sql`
-    UPDATE employee_skills
+    UPDATE employee_project
     SET 
       start_date = ${toNull(start_date)},
       end_date = ${toNull(end_date)},
@@ -40,14 +40,14 @@ export default async function handler(request: NextApiRequest, response: NextApi
     // 更新後のデータを取得
     const data = await sql`
     SELECT 
-      employee_skills.*,
+      employee_project.*,
       client.name AS client_name
     FROM 
-      employee_skills
+      employee_project
     LEFT JOIN 
-      client ON employee_skills.client_id = client.id
+      client ON employee_project.client_id = client.id
     WHERE 
-      employee_skills.employee_id = ${id};
+      employee_project.employee_id = ${id};
     `;
 
     return response.status(200).json({ data });

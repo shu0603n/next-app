@@ -12,7 +12,7 @@ export type EmployeeType = {
   joining_date: string;
   retirement_date: string;
   client_id: number;
-  employee_skills_id: number;
+  employee_project_id: number;
   employment_id: number;
   employment_name: string;
   job_category_id: number;

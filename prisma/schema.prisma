@@ -21,17 +21,17 @@ model attendance {
 }
 
 model client {
-  id              Int               @id @default(autoincrement())
-  name            String            @db.VarChar(255)
-  name_k          String?           @db.VarChar(255)
-  address         String?           @db.VarChar(255)
-  phone           String?           @db.VarChar(255)
-  email           String?           @db.VarChar(255)
-  postal_code     String?           @db.VarChar(255)
-  remarks         String?           @db.VarChar(255)
-  employee_skills employee_skills[]
-  invoice         invoice[]
-  project         project[]
+  id               Int                @id @default(autoincrement())
+  name             String             @db.VarChar(255)
+  name_k           String?            @db.VarChar(255)
+  address          String?            @db.VarChar(255)
+  phone            String?            @db.VarChar(255)
+  email            String?            @db.VarChar(255)
+  postal_code      String?            @db.VarChar(255)
+  remarks          String?            @db.VarChar(255)
+  employee_project employee_project[]
+  invoice          invoice[]
+  project          project[]
 }
 
 model contract {
@@ -41,38 +41,38 @@ model contract {
 }
 
 model employee {
-  id              Int               @id @default(autoincrement())
-  sei             String            @db.VarChar(255)
-  mei             String            @db.VarChar(255)
-  sei_k           String?           @db.VarChar(255)
-  mei_k           String?           @db.VarChar(255)
-  gender          String?           @db.VarChar(255)
-  birthday        DateTime?         @db.Date
-  job_category_id Int?
-  client_id       Int?
-  project_id      Int?
-  address         String?           @db.VarChar(255)
-  joining_date    DateTime?         @db.Date
-  retirement_date DateTime?         @db.Date
-  phone_number    String?           @db.VarChar(255)
-  email           String?           @unique(map: "unique_email") @db.VarChar(255)
-  postal_code     String?           @db.VarChar(8)
-  remarks         String?           @db.VarChar(255)
-  position_id     Int?
-  employment_id   Int?
-  password        String?           @db.VarChar(255)
-  avatar          String?
-  attendance      attendance[]
-  employment      employment?       @relation(fields: [employment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  job_category    job_category?     @relation(fields: [job_category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  position        position?         @relation(fields: [position_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  employee_skills employee_skills[]
-  invoice         invoice[]
-  project         project[]
+  id               Int                @id @default(autoincrement())
+  sei              String             @db.VarChar(255)
+  mei              String             @db.VarChar(255)
+  sei_k            String?            @db.VarChar(255)
+  mei_k            String?            @db.VarChar(255)
+  gender           String?            @db.VarChar(255)
+  birthday         DateTime?          @db.Date
+  job_category_id  Int?
+  client_id        Int?
+  project_id       Int?
+  address          String?            @db.VarChar(255)
+  joining_date     DateTime?          @db.Date
+  retirement_date  DateTime?          @db.Date
+  phone_number     String?            @db.VarChar(255)
+  email            String?            @unique(map: "unique_email") @db.VarChar(255)
+  postal_code      String?            @db.VarChar(8)
+  remarks          String?
+  position_id      Int?
+  employment_id    Int?
+  password         String?            @db.VarChar(255)
+  avatar           String?
+  attendance       attendance[]
+  employment       employment?        @relation(fields: [employment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  job_category     job_category?      @relation(fields: [job_category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  position         position?          @relation(fields: [position_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employee_project employee_project[]
+  invoice          invoice[]
+  project          project[]
 }
 
-model employee_skills {
-  id            Int            @id @default(autoincrement())
+model employee_project {
+  id            Int            @id(map: "employee_skills_pkey") @default(autoincrement())
   employee_id   Int
   start_date    DateTime?      @db.Date
   end_date      DateTime?      @db.Date
@@ -80,8 +80,8 @@ model employee_skills {
   description   String?        @db.VarChar(2000)
   people_number Int?
   client_id     Int?
-  client        client?        @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  employee      employee       @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  client        client?        @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "employee_skills_client_id_fkey")
+  employee      employee       @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "employee_skills_employee_id_fkey")
   process_used  process_used[]
   skills_used   skills_used[]
 }
@@ -129,11 +129,11 @@ model process {
 }
 
 model process_used {
-  id              Int              @id @default(autoincrement())
-  project_id      Int?
-  process_id      Int?
-  employee_skills employee_skills? @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_used_employee_skills_id_fkey")
-  process         process?         @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id               Int               @id @default(autoincrement())
+  project_id       Int?
+  process_id       Int?
+  employee_project employee_project? @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_used_employee_project_id_fkey")
+  process          process?          @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model project {
@@ -215,11 +215,11 @@ model skill {
 }
 
 model skills_used {
-  id                 Int              @id @default(autoincrement())
+  id                 Int               @id @default(autoincrement())
   employee_skills_id Int?
   skill_id           Int?
-  employee_skills    employee_skills? @relation(fields: [employee_skills_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  skill              skill?           @relation(fields: [skill_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employee_project   employee_project? @relation(fields: [employee_skills_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  skill              skill?            @relation(fields: [skill_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model technic {
