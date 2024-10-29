@@ -33,6 +33,7 @@ const SkillSheet = () => {
   const router = useRouter();
   const { id } = router.query;
   const [projects, setProjects] = useState<Array<ProjectCard>>([]);
+  const [basics, setBasics] = useState<Array<BasicCard>>([]);
 
   const { list } = useSelector((state) => state.invoice);
 
@@ -45,16 +46,24 @@ const SkillSheet = () => {
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
 
   type ProjectCard = {
-    id: string;
+    id: number;
     start_date: string;
     end_date: string;
     people: number;
     client: string;
-    title: string;
+    project_title: string;
     description: string;
-    // skills: string[];
+    skills: string[];
     process: string[];
     time: string;
+  };
+
+  type BasicCard = {
+    id: number;
+    sei: string;
+    mei: string;
+    birthday: number;
+    address: string;
   };
 
   async function fetchTableData(id: string) {
@@ -101,6 +110,14 @@ const SkillSheet = () => {
         .catch((error) => {
           console.error('Error:', error);
         });
+
+      fetchBasicData(id)
+        .then((data) => {
+          setBasics(data.data.rows);
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
     } else {
       console.error('Invalid ID:', id);
     }
@@ -118,8 +135,23 @@ const SkillSheet = () => {
     setUserCard(newData);
   }, [globalFilter, projects]);
 
+  function calculateAge(birthday: number) {
+    const birthDate = new Date(birthday);
+    const today = new Date();
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    return age;
+  }
+
   return (
     <Page title="SkillSheet">
+      {JSON.stringify(basics)}
       <MainCard content={false}>
         <Stack spacing={2.5}>
           <Box sx={{ p: 2.5, pb: 0 }}>
@@ -168,9 +200,9 @@ const SkillSheet = () => {
                   <Stack spacing={1}>
                     <Typography variant="h5">エンジニア情報</Typography>
                     <FormControl sx={{ width: '100%' }}>
-                      <Typography color="secondary">氏名 : {list?.cashierInfo.name}</Typography>
-                      <Typography color="secondary">年齢 : {list?.cashierInfo.address}歳</Typography>
-                      <Typography color="secondary">住所 : {list?.cashierInfo.phone}</Typography>
+                      <Typography color="secondary">氏名 : {`${basics[0].sei} ${basics[0].mei}`}</Typography>
+                      <Typography color="secondary">年齢 : {calculateAge(basics[0].birthday)}歳</Typography>
+                      <Typography color="secondary">住所 : {basics[0].address}</Typography>
                       <Typography color="secondary">{list?.cashierInfo.email}</Typography>
                     </FormControl>
                   </Stack>
