@@ -129,11 +129,11 @@ model process {
 }
 
 model employee_project_processes {
-  id               Int               @id(map: "process_used_pkey") @default(autoincrement())
-  project_id       Int?
-  process_id       Int?
-  employee_project employee_project? @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "employee_project_processes_employee_project_id_fkey")
-  process          process?          @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_used_process_id_fkey")
+  id                  Int               @id(map: "process_used_pkey") @default(autoincrement())
+  employee_project_id Int?
+  process_id          Int?
+  employee_project    employee_project? @relation(fields: [employee_project_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_used_employee_skills_id_fkey")
+  process             process?          @relation(fields: [process_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "process_used_process_id_fkey")
 }
 
 model project {
@@ -215,11 +215,11 @@ model skill {
 }
 
 model employee_project_skills {
-  id                 Int               @id(map: "skills_used_pkey") @default(autoincrement())
-  employee_skills_id Int?
-  skill_id           Int?
-  employee_project   employee_project? @relation(fields: [employee_skills_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "skills_used_employee_skills_id_fkey")
-  skill              skill?            @relation(fields: [skill_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "skills_used_skill_id_fkey")
+  id                  Int               @id(map: "skills_used_pkey") @default(autoincrement())
+  employee_project_id Int?
+  skill_id            Int?
+  employee_project    employee_project? @relation(fields: [employee_project_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "skills_used_employee_skills_id_fkey")
+  skill               skill?            @relation(fields: [skill_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "skills_used_skill_id_fkey")
 }
 
 model technic {

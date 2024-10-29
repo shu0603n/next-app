@@ -13,9 +13,9 @@ export default async function handler(request: NextApiRequest, response: NextApi
       INNER JOIN
         process
       ON
-          employee_project_processes.process_id = process.id
+          employee_project_processes.employee_project_id = process.id
       WHERE
-          employee_project_processes.project_id = ${Number(id)}
+          employee_project_processes.employee_project_id = ${Number(id)}
     `;
     return response.status(200).json({ data });
   } catch (error) {
