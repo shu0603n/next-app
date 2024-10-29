@@ -151,7 +151,6 @@ const SkillSheet = () => {
 
   return (
     <Page title="SkillSheet">
-      {JSON.stringify(basics)}
       <MainCard content={false}>
         <Stack spacing={2.5}>
           <Box sx={{ p: 2.5, pb: 0 }}>
@@ -200,10 +199,15 @@ const SkillSheet = () => {
                   <Stack spacing={1}>
                     <Typography variant="h5">エンジニア情報</Typography>
                     <FormControl sx={{ width: '100%' }}>
-                      <Typography color="secondary">氏名 : {`${basics[0].sei} ${basics[0].mei}`}</Typography>
-                      <Typography color="secondary">年齢 : {calculateAge(basics[0].birthday)}歳</Typography>
-                      <Typography color="secondary">住所 : {basics[0].address}</Typography>
-                      <Typography color="secondary">{list?.cashierInfo.email}</Typography>
+                      {basics.length > 0 ? (
+                        <>
+                          <Typography color="secondary">氏名 : {`${basics[0].sei} ${basics[0].mei}`}</Typography>
+                          <Typography color="secondary">年齢 : {calculateAge(basics[0].birthday)}歳</Typography>
+                          <Typography color="secondary">住所 : {basics[0].address}</Typography>
+                        </>
+                      ) : (
+                        <Typography color="secondary">読み込み中...</Typography>
+                      )}
                     </FormControl>
                   </Stack>
                 </MainCard>

@@ -52,14 +52,12 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                   <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: '100%' }}>
                     <Typography variant="h4" component="span">
                       <Typography variant="h3" component="span" color="primary">
-                        {customer.project_title}
+                        {customer.project_title || ''}
                       </Typography>
                     </Typography>
-                    {customer.start_date && (
-                      <Typography variant="h4" color="text.secondary">
-                        ({formatDate(customer.start_date)}~{formatDate(customer.end_date)})
-                      </Typography>
-                    )}
+                    <Typography variant="h4" color="text.secondary">
+                      {customer.start_date ? formatDate(customer.start_date) : ''} ~ {customer.end_date ? formatDate(customer.end_date) : '現在就業中'}
+                    </Typography>
                   </Stack>
                 }
                 secondary={
@@ -79,12 +77,14 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                 業務内容
               </Typography>
               <Typography>
-                {customer.description.split('\r\n').map((val, index) => (
-                  <Fragment key={index}>
-                    {val}
-                    <br />
-                  </Fragment>
-                ))}
+                {customer?.description
+                  ? customer.description.split('\r\n').map((val, index) => (
+                      <Fragment key={index}>
+                        {val}
+                        <br />
+                      </Fragment>
+                    ))
+                  : ``}
               </Typography>
             </Grid>
           </Grid>
