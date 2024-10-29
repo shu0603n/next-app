@@ -56,7 +56,8 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                       </Typography>
                     </Typography>
                     <Typography variant="h4" color="text.secondary">
-                      {customer.start_date ? formatDate(customer.start_date) : ''} ~ {customer.end_date ? formatDate(customer.end_date) : '現在就業中'}
+                      {customer.start_date ? formatDate(customer.start_date) : ''} ~{' '}
+                      {customer.end_date ? formatDate(customer.end_date) : '現在就業中'}
                     </Typography>
                   </Stack>
                 }
