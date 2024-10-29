@@ -144,7 +144,7 @@ const ProfileTabs = ({ focusInput }: Props) => {
             {user && (
               <Stack spacing={0.5} alignItems="center">
                 <Typography variant="h5">{user.name}</Typography>
-                <Typography color="secondary">{user.role}</Typography>
+                <Typography color="secondary">{user.jobCategories}</Typography>
               </Stack>
             )}
             <Stack direction="row" spacing={3} sx={{ '& svg': { fontSize: '1.15rem', cursor: 'pointer' } }}>

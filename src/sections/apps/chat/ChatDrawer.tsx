@@ -200,7 +200,7 @@ function ChatDrawer({ handleDrawerOpen, openChatDrawer, setUser }: ChatDrawerPro
                           {user.name}
                         </Typography>
                         <Typography align="left" variant="caption" color="textSecondary">
-                          {user.role}
+                          {user.jobCategories}
                         </Typography>
                       </Stack>
                     )}
