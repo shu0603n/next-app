@@ -9,5 +9,20 @@ declare module 'next-auth' {
     id: any;
     provider: any;
     token: any;
+    jobCategories?: string;
+    user: {
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+      jobCategories?: string | null;
+    };
+  }
+
+  interface User {
+    id: string;
+    name: string;
+    email: string;
+    jobCategories?: string | null;
   }
 }

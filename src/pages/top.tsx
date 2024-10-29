@@ -45,6 +45,7 @@ import { renderFilterTypes } from 'utils/react-table';
 
 // assets
 import { EditTwoTone } from '@ant-design/icons';
+import useUser from 'hooks/useUser';
 
 function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
@@ -208,10 +209,10 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
   );
 }
 // ===========================|| WIDGET - STATISTICS ||=========================== //
-async function fetchTableData() {
+async function fetchTableData(id: number) {
   try {
     const selectData = {
-      employee_id: 1,
+      employee_id: id,
       date: new Date()
     };
 
@@ -239,10 +240,11 @@ const Top = () => {
   const theme = useTheme();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const [tableData, setTableData] = useState<Array<AttendanceType>>(); // データを保持する状態変数
+  const user = useUser();
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
-    fetchTableData()
+    fetchTableData(Number(user?.id))
       .then((data) => {
         setTableData(data.data.rows); // データを状態に設定
         const now = new Date();
@@ -321,7 +323,7 @@ const Top = () => {
     const timeString = `${hours}:${minutes}`;
 
     const updatedData = {
-      employee_id: 1,
+      employee_id: Number(user?.id),
       date: now,
       start_time: timeString,
       location: ''
@@ -395,7 +397,7 @@ const Top = () => {
     const timeString = `${hours}:${minutes}`;
 
     const updatedData = {
-      employee_id: 1,
+      employee_id: Number(user?.id),
       date: now,
       end_time: timeString,
       location: ''
