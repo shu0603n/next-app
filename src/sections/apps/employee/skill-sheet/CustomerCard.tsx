@@ -19,11 +19,22 @@ type ProjectCard = {
   end_date: string;
   people: number;
   client: string;
-  title: string;
+  project_title: string;
   description: string;
   skills: string[];
   process: string[];
   time: string;
+};
+
+const formatDate = (isoDate: string) => {
+  const date = new Date(isoDate);
+  return date
+    .toLocaleDateString('ja-JP', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    })
+    .replace(/\//g, '/');
 };
 
 const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
@@ -40,14 +51,18 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
             <List sx={{ width: 1, p: 0 }}>
               <ListItemText
                 primary={
-                  <>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: '100%' }}>
                     <Typography variant="h4" component="span">
                       <Typography variant="h3" component="span" color="primary">
-                        {customer.title}
+                        {customer.project_title}
                       </Typography>
-                      {customer.start_date && `(${customer.start_date}~${customer.end_date})`}
                     </Typography>
-                  </>
+                    {customer.start_date && (
+                      <Typography variant="h4" color="text.secondary">
+                        ({formatDate(customer.start_date)}~{formatDate(customer.end_date)})
+                      </Typography>
+                    )}
+                  </Stack>
                 }
                 secondary={
                   <Typography variant="caption" color="secondary">

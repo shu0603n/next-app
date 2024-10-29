@@ -109,7 +109,7 @@ interface TabPersonalProps {
   updateIsComplete: (result: boolean) => void;
 }
 
-const TabPersonal: React.FC<TabPersonalProps> = ({closeHandle, updateIsComplete}) => {
+const TabPersonal: React.FC<TabPersonalProps> = ({ closeHandle, updateIsComplete }) => {
   const theme = useTheme();
   const router = useRouter();
   const id = router.query.id as string;

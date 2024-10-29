@@ -71,7 +71,14 @@ const SkillSheet = () => {
     }
   }
 
-  const getUpdateData = () => {
+  const [sortBy] = useState('Default');
+  const [globalFilter] = useState('');
+  const [userCard, setUserCard] = useState<Array<ProjectCard>>([]);
+  const PER_PAGE = 20;
+
+  const _DATA = usePagination(userCard, PER_PAGE);
+
+  useEffect(() => {
     if (typeof id === 'string') {
       fetchTableData(id)
         .then((data) => {
@@ -83,18 +90,10 @@ const SkillSheet = () => {
     } else {
       console.error('Invalid ID:', id);
     }
-  };
-
-  const [sortBy] = useState('Default');
-  const [globalFilter] = useState('');
-  const [userCard, setUserCard] = useState<Array<ProjectCard>>([]);
-  const PER_PAGE = 20;
-
-  const _DATA = usePagination(userCard, PER_PAGE);
+  }, [id]);
 
   // search
   useEffect(() => {
-    getUpdateData();
     const newData = projects.filter((value: any) => {
       if (globalFilter) {
         return value.title.toLowerCase().includes(globalFilter.toLowerCase());
@@ -107,7 +106,6 @@ const SkillSheet = () => {
 
   return (
     <Page title="SkillSheet">
-      {JSON.stringify(projects)}
       <MainCard content={false}>
         <Stack spacing={2.5}>
           <Box sx={{ p: 2.5, pb: 0 }}>

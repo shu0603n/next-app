@@ -330,8 +330,9 @@ const TabProfile = () => {
               </Grid>
               <Grid item xs={12}>
                 <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
-                  <Button variant="outlined" onClick={() => handleChangeDetailSkill(id)
-                  }>業務履歴</Button>
+                  <Button variant="outlined" onClick={() => handleChangeDetailSkill(id)}>
+                    業務履歴
+                  </Button>
                   <Button variant="contained" onClick={handleEdit}>
                     編集
                   </Button>
