@@ -34,6 +34,7 @@ const SkillSheet = () => {
   const { id } = router.query;
   const [projects, setProjects] = useState<Array<ProjectCard>>([]);
   const [basics, setBasics] = useState<Array<BasicCard>>([]);
+  const [skills, setSkills] = useState<Array<SkillCard>>([]);
 
   const { list } = useSelector((state) => state.invoice);
 
@@ -66,9 +67,13 @@ const SkillSheet = () => {
     address: string;
   };
 
+  type SkillCard = {
+    name: string;
+  };
+
   async function fetchTableData(id: string) {
     try {
-      const response = await fetch(`/api/db/employee/skill/select?id=${id}`);
+      const response = await fetch(`/api/db/employee/project/select?id=${id}`);
       if (!response.ok) {
         throw new Error('API request failed');
       }
@@ -94,6 +99,20 @@ const SkillSheet = () => {
     }
   }
 
+  async function fetchSkillData(id: string) {
+    try {
+      const response = await fetch(`/api/db/employee/skill-sheet/select?id=${id}`);
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+      const data = await response.json();
+      return data; // APIから返されたデータを返します
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw error;
+    }
+  }
+
   const [sortBy] = useState('Default');
   const [globalFilter] = useState('');
   const [userCard, setUserCard] = useState<Array<ProjectCard>>([]);
@@ -103,20 +122,14 @@ const SkillSheet = () => {
 
   useEffect(() => {
     if (typeof id === 'string') {
-      fetchTableData(id)
-        .then((data) => {
-          setProjects(data.data.rows);
+      Promise.all([fetchTableData(id), fetchBasicData(id), fetchSkillData(id)])
+        .then(([tableData, basicData, skillData]) => {
+          setProjects(tableData.data.rows);
+          setBasics(basicData.data.rows);
+          setSkills(skillData.data.rows);
         })
         .catch((error) => {
-          console.error('Error:', error);
-        });
-
-      fetchBasicData(id)
-        .then((data) => {
-          setBasics(data.data.rows);
-        })
-        .catch((error) => {
-          console.error('Error:', error);
+          console.error('Error fetching data:', error);
         });
     } else {
       console.error('Invalid ID:', id);

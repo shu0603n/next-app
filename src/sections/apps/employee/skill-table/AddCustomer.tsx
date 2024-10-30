@@ -49,7 +49,7 @@ import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 import { CloseOutlined } from '@ant-design/icons';
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
-  console.log('customer', customer)
+  console.log('customer', customer);
   const newCustomer = {
     id: '',
     project_title: '',
@@ -188,7 +188,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
       try {
         if (customer) {
           alertSnackBar('処理中…', 'secondary');
-          fetch(`/api/db/employee/skill/update?id=${id}`, {
+          fetch(`/api/db/employee/project/update?id=${id}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -215,7 +215,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             });
         } else {
           alertSnackBar('処理中…', 'secondary');
-          fetch(`/api/db/employee/skill/insert?id=${id}`, {
+          fetch(`/api/db/employee/project/insert?id=${id}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'

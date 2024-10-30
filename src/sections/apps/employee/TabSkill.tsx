@@ -12,7 +12,7 @@ import { SkillTableType } from 'types/employee/skill-table';
 async function fetchSkillList(id: number) {
   try {
     console.log(id);
-    const response = await fetch(`/api/db/employee/skill/skills/select?id=${id}`);
+    const response = await fetch(`/api/db/employee/project/skills/select?id=${id}`);
     if (!response.ok) {
       throw new Error('API request failed');
     }
@@ -26,7 +26,7 @@ async function fetchSkillList(id: number) {
 
 async function fetchTableData(id: string) {
   try {
-    const response = await fetch(`/api/db/employee/skill/select?id=${id}`);
+    const response = await fetch(`/api/db/employee/project/select?id=${id}`);
     if (!response.ok) {
       throw new Error('API request failed');
     }
