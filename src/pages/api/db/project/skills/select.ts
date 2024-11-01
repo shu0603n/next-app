@@ -21,7 +21,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
       ON
           skill.Technic_id = technic.id
       WHERE
-          skills_used.employee_skills_id = ${Number(id)}
+          skills_used.employee_project_id = ${Number(id)}
     `;
     return response.status(200).json({ data });
   } catch (error) {

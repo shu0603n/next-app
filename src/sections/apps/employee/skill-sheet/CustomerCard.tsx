@@ -94,47 +94,51 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
               <Typography variant="h5" component="span">
                 使用スキル
               </Typography>
-              <Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    listStyle: 'none',
-                    p: 0.5,
-                    m: 0
-                  }}
-                  component="ul"
-                >
-                  {customer.skills?.map((skill: string, index: number) => (
-                    <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                      <Chip color="secondary" variant="outlined" size="small" label={skill} />
-                    </ListItem>
-                  ))}
+              {customer.skills?.some((skill) => skill) && (
+                <Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      listStyle: 'none',
+                      p: 0.5,
+                      m: 0
+                    }}
+                    component="ul"
+                  >
+                    {customer.skills.map((skill: string, index: number) => (
+                      <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
+                        <Chip color="secondary" variant="outlined" size="small" label={skill} />
+                      </ListItem>
+                    ))}
+                  </Box>
                 </Box>
-              </Box>
+              )}
             </Grid>
             <Grid item xs={12}>
               <Typography variant="h5" component="span">
                 担当工程
               </Typography>
-              <Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    listStyle: 'none',
-                    p: 0.5,
-                    m: 0
-                  }}
-                  component="ul"
-                >
-                  {customer.process?.map((skill: string, index: number) => (
-                    <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                      <Chip color="secondary" variant="outlined" size="small" label={skill} />
-                    </ListItem>
-                  ))}
+              {customer.process?.some((process) => process) && (
+                <Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      listStyle: 'none',
+                      p: 0.5,
+                      m: 0
+                    }}
+                    component="ul"
+                  >
+                    {customer.process.map((skill: string, index: number) => (
+                      <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
+                        <Chip color="secondary" variant="outlined" size="small" label={skill} />
+                      </ListItem>
+                    ))}
+                  </Box>
                 </Box>
-              </Box>
+              )}
             </Grid>
           </Grid>
         </Grid>
