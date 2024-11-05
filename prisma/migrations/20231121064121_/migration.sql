@@ -121,12 +121,12 @@ CREATE TABLE "process" (
 );
 
 -- CreateTable
-CREATE TABLE "process_used" (
+CREATE TABLE "employee_project_processes" (
     "id" SERIAL NOT NULL,
     "project_id" INTEGER,
     "process_id" INTEGER,
 
-    CONSTRAINT "process_used_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "employee_project_processes_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -186,12 +186,12 @@ CREATE TABLE "skill" (
 );
 
 -- CreateTable
-CREATE TABLE "skills_used" (
+CREATE TABLE "employee_project_skills" (
     "id" SERIAL NOT NULL,
     "employee_skills_id" INTEGER,
     "skill_id" INTEGER,
 
-    CONSTRAINT "skills_used_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "employee_project_skills_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -291,10 +291,10 @@ ALTER TABLE "invoice" ADD CONSTRAINT "invoice_employee_id_fkey" FOREIGN KEY ("em
 ALTER TABLE "invoice" ADD CONSTRAINT "invoice_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "process_used" ADD CONSTRAINT "process_used_employee_skills_id_fkey" FOREIGN KEY ("project_id") REFERENCES "employee_skills"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "employee_project_processes" ADD CONSTRAINT "employee_project_processes_employee_skills_id_fkey" FOREIGN KEY ("project_id") REFERENCES "employee_skills"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "process_used" ADD CONSTRAINT "process_used_process_id_fkey" FOREIGN KEY ("process_id") REFERENCES "process"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "employee_project_processes" ADD CONSTRAINT "employee_project_processes_process_id_fkey" FOREIGN KEY ("process_id") REFERENCES "process"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "project" ADD CONSTRAINT "example_table_client_id_fkey" FOREIGN KEY ("client_id") REFERENCES "client"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -318,10 +318,10 @@ ALTER TABLE "project_skills" ADD CONSTRAINT "project_skills_skill_id_fkey" FOREI
 ALTER TABLE "skill" ADD CONSTRAINT "skill_technic_id_fkey" FOREIGN KEY ("technic_id") REFERENCES "technic"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "skills_used" ADD CONSTRAINT "skills_used_employee_skills_id_fkey" FOREIGN KEY ("employee_skills_id") REFERENCES "employee_skills"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "employee_project_skills" ADD CONSTRAINT "employee_project_skills_employee_skills_id_fkey" FOREIGN KEY ("employee_skills_id") REFERENCES "employee_skills"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "skills_used" ADD CONSTRAINT "skills_used_skill_id_fkey" FOREIGN KEY ("skill_id") REFERENCES "skill"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "employee_project_skills" ADD CONSTRAINT "employee_project_skills_skill_id_fkey" FOREIGN KEY ("skill_id") REFERENCES "skill"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
