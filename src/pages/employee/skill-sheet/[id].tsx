@@ -34,8 +34,6 @@ const SkillSheet = () => {
   const { id } = router.query;
   const [projects, setProjects] = useState<Array<ProjectCard>>([]);
   const [basics, setBasics] = useState<Array<BasicCard>>([]);
-  const [skills, setSkills] = useState<Array<SkillCard>>([]);
-
   const { list } = useSelector((state) => state.invoice);
 
   const today = new Date().toLocaleDateString('ja-JP', {
@@ -67,10 +65,6 @@ const SkillSheet = () => {
     address: string;
   };
 
-  type SkillCard = {
-    name: string;
-  };
-
   async function fetchTableData(id: string) {
     try {
       const response = await fetch(`/api/db/employee/project/select?id=${id}`);
@@ -99,20 +93,6 @@ const SkillSheet = () => {
     }
   }
 
-  async function fetchSkillData(id: string) {
-    try {
-      const response = await fetch(`/api/db/employee/skill-sheet/select?id=${id}`);
-      if (!response.ok) {
-        throw new Error('API request failed');
-      }
-      const data = await response.json();
-      return data; // APIから返されたデータを返します
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      throw error;
-    }
-  }
-
   const [sortBy] = useState('Default');
   const [globalFilter] = useState('');
   const [userCard, setUserCard] = useState<Array<ProjectCard>>([]);
@@ -122,11 +102,10 @@ const SkillSheet = () => {
 
   useEffect(() => {
     if (typeof id === 'string') {
-      Promise.all([fetchTableData(id), fetchBasicData(id), fetchSkillData(id)])
-        .then(([tableData, basicData, skillData]) => {
+      Promise.all([fetchTableData(id), fetchBasicData(id)])
+        .then(([tableData, basicData]) => {
           setProjects(tableData.data.rows);
           setBasics(basicData.data.rows);
-          setSkills(skillData.data.rows);
         })
         .catch((error) => {
           console.error('Error fetching data:', error);

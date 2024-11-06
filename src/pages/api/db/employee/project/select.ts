@@ -9,8 +9,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
     SELECT 
         employee_project.*,
         client.name AS client_name,
-        array_agg(s.name) AS skills,
-        array_agg(p.name) AS process
+        array_agg(DISTINCT s.name) AS skills,
+        array_agg(DISTINCT p.name) AS process
     FROM 
         employee_project
     LEFT JOIN 

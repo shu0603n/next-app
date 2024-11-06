@@ -7,17 +7,19 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
+import { SkillTableType } from 'types/employee/skill-table';
 
 // types
 interface Props {
   title: string;
   open: boolean;
   handleClose: (status: boolean) => void;
+  onReload: (data: SkillTableType[]) => void;
 }
 
 // ==============================|| 顧客 - 削除 ||============================== //
 
-export default function AlertCustomerDelete({ title, open, handleClose }: Props) {
+export default function AlertCustomerDelete({ title, open, handleClose, onReload }: Props) {
   const handleDelete = async (title: string) => {
     try {
       const response = await fetch(`/api/db/employee/project/delete?id=${title}`, {
@@ -30,6 +32,8 @@ export default function AlertCustomerDelete({ title, open, handleClose }: Props)
 
       const data = await response.json();
       console.log('削除成功:', data);
+      onReload(data);
+      handleClose(false);
     } catch (error) {
       console.error('エラー:', error);
     }

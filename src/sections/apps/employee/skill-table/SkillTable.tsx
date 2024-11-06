@@ -183,6 +183,17 @@ const SkillTable = ({ data }: SkillTableProps) => {
   const [customer, setCustomer] = useState<any>(null);
   const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
+  const [updatedData, setUpdatedData] = useState<SkillTableType[]>(data);
+
+  useEffect(() => {
+    setUpdatedData(data);
+  }, [data]);
+
+  const handleReloadData = (newData: SkillTableType[]) => {
+    if (Array.isArray(newData)) {
+      setUpdatedData(newData);
+    }
+  };
 
   const handleAdd = () => {
     setAdd(!add);
@@ -191,6 +202,9 @@ const SkillTable = ({ data }: SkillTableProps) => {
 
   const handleClose = () => {
     setOpen(!open);
+    if (customerDeleteId) {
+      setUpdatedData((prevData) => prevData.filter((item) => item.id !== customerDeleteId));
+    }
   };
 
   const columns = useMemo(
@@ -270,8 +284,8 @@ const SkillTable = ({ data }: SkillTableProps) => {
                   color="error"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    handleClose();
                     setCustomerDeleteId(row.values.id);
+                    setOpen(true);
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -292,13 +306,13 @@ const SkillTable = ({ data }: SkillTableProps) => {
       <ScrollX>
         <ReactTable
           columns={columns}
-          data={data}
+          data={updatedData}
           handleAdd={handleAdd}
           renderRowSubComponent={renderRowSubComponent}
           getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
         />
       </ScrollX>
-      <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} />
+      <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} onReload={handleReloadData} />
       {/* add customer dialog */}
       <Dialog
         maxWidth="sm"
