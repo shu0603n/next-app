@@ -37,6 +37,7 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // タイプ
 import { UserCardProps } from 'types/user-profile';
+import { SkillTableType } from 'types/employee/skill-table';
 
 // アセット
 import { DeleteOutlined, DownloadOutlined, EditOutlined } from '@ant-design/icons';
@@ -325,10 +326,23 @@ export default function CustomerPreview({ customer, open, onClose }: { customer:
         open={add}
         sx={{ '& .MuiDialog-paper': { p: 0 } }}
       >
-        <AddCustomer customer={customer} onCancel={handleAdd} />
+        <AddCustomer
+          customer={customer}
+          onCancel={handleAdd}
+          reloadDataAfterAdd={(data: SkillTableType[]) => {
+            console.log(data);
+          }}
+        />
       </Dialog>
 
-      <AlertCustomerDelete title={customer.fatherName} open={openAlert} handleClose={handleClose} />
+      <AlertCustomerDelete
+        title={customer.fatherName}
+        open={openAlert}
+        handleClose={handleClose}
+        reloadDataAfterDelete={(data: SkillTableType[]) => {
+          console.log(data);
+        }}
+      />
     </>
   );
 }
