@@ -198,6 +198,7 @@ const SkillTable = ({ data }: SkillTableProps) => {
   const handleAdd = () => {
     setAdd(!add);
     if (customer && !add) setCustomer(null);
+    if (customer) setUpdatedData((prevData) => prevData.filter((item) => item.id !== customer));
   };
 
   const handleClose = () => {
@@ -206,6 +207,23 @@ const SkillTable = ({ data }: SkillTableProps) => {
       setUpdatedData((prevData) => prevData.filter((item) => item.id !== customerDeleteId));
     }
   };
+
+  const formatDate = (isoDate: string) => {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString('ja-JP', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  };
+
+  useEffect(() => {
+    const formattedData = data.map((item) => ({
+      ...item,
+      start_date: formatDate(item.start_date)
+    }));
+    setUpdatedData(formattedData);
+  }, [data]);
 
   const columns = useMemo(
     () => [
@@ -312,7 +330,7 @@ const SkillTable = ({ data }: SkillTableProps) => {
           getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
         />
       </ScrollX>
-      <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} onReload={handleReloadData} />
+      <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} reloadDataAfterDelete={handleReloadData} />
       {/* add customer dialog */}
       <Dialog
         maxWidth="sm"
@@ -324,7 +342,7 @@ const SkillTable = ({ data }: SkillTableProps) => {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        <AddCustomer customer={customer} onCancel={handleAdd} />
+        <AddCustomer customer={customer} onCancel={handleAdd} reloadDataAfterAdd={handleReloadData} />
       </Dialog>
     </MainCard>
   );

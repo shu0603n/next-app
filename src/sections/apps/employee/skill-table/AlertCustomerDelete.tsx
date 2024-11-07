@@ -14,12 +14,12 @@ interface Props {
   title: string;
   open: boolean;
   handleClose: (status: boolean) => void;
-  onReload: (data: SkillTableType[]) => void;
+  reloadDataAfterDelete: (data: SkillTableType[]) => void;
 }
 
 // ==============================|| 顧客 - 削除 ||============================== //
 
-export default function AlertCustomerDelete({ title, open, handleClose, onReload }: Props) {
+export default function AlertCustomerDelete({ title, open, handleClose, reloadDataAfterDelete }: Props) {
   const handleDelete = async (title: string) => {
     try {
       const response = await fetch(`/api/db/employee/project/delete?id=${title}`, {
@@ -32,7 +32,7 @@ export default function AlertCustomerDelete({ title, open, handleClose, onReload
 
       const data = await response.json();
       console.log('削除成功:', data);
-      onReload(data);
+      reloadDataAfterDelete(data);
       handleClose(false);
     } catch (error) {
       console.error('エラー:', error);

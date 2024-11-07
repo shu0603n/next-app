@@ -47,6 +47,8 @@ import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
 import { CloseOutlined } from '@ant-design/icons';
+import { SkillTableType } from 'types/employee/skill-table';
+
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
   console.log('customer', customer);
@@ -131,10 +133,11 @@ const filterSkills = createFilterOptions<string>();
 
 export interface Props {
   customer?: any;
-  onCancel: () => void;
+  onCancel: (status: boolean) => void;
+  reloadDataAfterAdd: (data: SkillTableType[]) => void;
 }
 
-const AddCustomer = ({ customer, onCancel }: Props) => {
+const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
   const [startDate, setStartDate] = useState<Date | null>();
   const [endDate, setEndDate] = useState<Date | null>();
   const isCreating = !customer;
@@ -178,7 +181,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
 
   const handleAlertClose = () => {
     setOpenAlert(!openAlert);
-    onCancel();
+    onCancel(false);
   };
 
   const formik = useFormik({
@@ -203,7 +206,6 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             })
             .then((data) => {
               console.log(data);
-              // onReload(data.data);
               alertSnackBar('正常に更新されました。', 'success');
             })
             .catch((error) => {
@@ -211,7 +213,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
               alertSnackBar('データの更新に失敗しました。', 'error');
             })
             .finally(() => {
-              onCancel();
+              onCancel(false);
             });
         } else {
           alertSnackBar('処理中…', 'secondary');
@@ -230,8 +232,8 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             })
             .then((data) => {
               console.log(data);
-              // onReload(data.data);
               alertSnackBar('正常に追加されました。', 'success');
+              reloadDataAfterAdd(data);
             })
             .catch((error) => {
               console.error('エラー:', error);
@@ -239,7 +241,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             })
             .finally(() => {
               setSubmitting(false);
-              onCancel();
+              onCancel(false);
             });
         }
       } catch (error) {
@@ -617,7 +619,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                 </Grid>
                 <Grid item>
                   <Stack direction="row" spacing={2} alignItems="center">
-                    <Button color="error" onClick={onCancel}>
+                    <Button color="error" onClick={() => onCancel(false)}>
                       キャンセル
                     </Button>
                     <Button type="submit" variant="contained" disabled={isSubmitting}>
@@ -630,7 +632,16 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
           </Form>
         </LocalizationProvider>
       </FormikProvider>
-      {!isCreating && <AlertCustomerDelete title={customer.fatherName} open={openAlert} handleClose={handleAlertClose} />}
+      {!isCreating && (
+        <AlertCustomerDelete
+          title={customer.fatherName}
+          open={openAlert}
+          handleClose={handleAlertClose}
+          reloadDataAfterDelete={(data: SkillTableType[]) => {
+            console.log(data);
+          }}
+        />
+      )}
     </>
   );
 };
