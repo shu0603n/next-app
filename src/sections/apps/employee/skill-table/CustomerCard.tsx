@@ -40,6 +40,7 @@ import { EnvironmentOutlined, LinkOutlined, MailOutlined, MoreOutlined, PhoneOut
 // types
 import { UserCardProps } from 'types/user-profile';
 import ListSmallCard from 'sections/apps/customer/exportpdf/ListSmallCard';
+import { SkillTableType } from 'types/employee/skill-table';
 
 // ==============================|| 顧客 - カード ||============================== //
 
@@ -233,7 +234,14 @@ const CustomerCard = ({ customer }: { customer: UserCardProps }) => {
         <AddCustomer customer={customer} onCancel={handleAdd} />
       </Dialog>
       <CustomerPreview customer={customer} open={open} onClose={handleClose} />
-      <AlertCustomerDelete title={customer.fatherName} open={openAlert} handleClose={handleAlertClose} />
+      <AlertCustomerDelete
+        title={customer.fatherName}
+        open={openAlert}
+        handleClose={handleAlertClose}
+        reloadDataAfterDelete={(data: SkillTableType[]) => {
+          console.log(data);
+        }}
+      />
     </>
   );
 };
