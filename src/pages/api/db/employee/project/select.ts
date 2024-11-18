@@ -29,6 +29,9 @@ export default async function handler(request: NextApiRequest, response: NextApi
         employee_project.id, client.name;
     `;
 
+    // データをコンソールに出力して確認
+    console.log('取得したデータ:', data);
+
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);

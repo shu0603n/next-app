@@ -88,9 +88,9 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 
   useEffect(() => {
     if (matchDownSM) {
-      setHiddenColumns(['start_date', 'client_name', 'people_number']);
+      setHiddenColumns(['start_date', 'client_name', 'people_number', `end_date`, `description`, 'contact', `skills`, `process`]);
     } else {
-      setHiddenColumns(['people_number']);
+      setHiddenColumns(['people_number', `end_date`, `description`, 'contact', `skills`, `process`]);
     }
     // eslint-disable-next-line
   }, [matchDownSM]);
@@ -198,7 +198,6 @@ const SkillTable = ({ data }: SkillTableProps) => {
   const handleAdd = () => {
     setAdd(!add);
     if (customer && !add) setCustomer(null);
-    if (customer) setUpdatedData((prevData) => prevData.filter((item) => item.id !== customer));
   };
 
   const handleClose = () => {
@@ -236,8 +235,16 @@ const SkillTable = ({ data }: SkillTableProps) => {
         accessor: 'start_date'
       },
       {
+        Header: '終了日',
+        accessor: 'end_date'
+      },
+      {
         Header: 'プロジェクト名',
         accessor: 'project_title'
+      },
+      {
+        Header: '業務内容',
+        accessor: 'description'
       },
       {
         Header: '企業名',
@@ -247,20 +254,19 @@ const SkillTable = ({ data }: SkillTableProps) => {
         Header: '人数',
         accessor: 'people_number'
       },
-
-      // {
-      //   Header: '役割',
-      //   accessor: 'contact'
-      // },
-      // {
-      //   Header: 'スキル',
-      //   accessor: 'skills',
-      //   className: 'cell-right'
-      // },
-      // {
-      //   Header: '担当工程',
-      //   accessor: 'process_list'
-      // },
+      {
+        Header: '役割',
+        accessor: 'contact'
+      },
+      {
+        Header: 'スキル',
+        accessor: 'skills',
+        className: 'cell-right'
+      },
+      {
+        Header: '担当工程',
+        accessor: 'process'
+      },
 
       {
         Header: 'アクション',

@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // material-ui
 import {
@@ -53,25 +53,24 @@ import { SkillTableType } from 'types/employee/skill-table';
 const getInitialValues = (customer: FormikValues | null) => {
   console.log('customer', customer);
   const newCustomer = {
-    id: '',
+    id: null as number | null,
+    start_date: null as Date | null,
+    end_date: null as Date | null,
     project_title: '',
     description: '',
     people_number: '',
-    start_date: new Date(),
-    end_date: new Date(),
     skills: [],
     process: [],
-    client: '',
     role: ''
   };
 
   if (customer) {
     newCustomer.id = customer.id;
+    newCustomer.start_date = customer.start_date;
+    newCustomer.end_date = customer.end_date;
     newCustomer.project_title = customer.project_title;
     newCustomer.description = customer.description;
     newCustomer.people_number = customer.people_number;
-    // newCustomer.start_date = startDate;
-    // newCustomer.end_date = endDate;
     return _.merge({}, newCustomer, customer);
   }
 
@@ -130,7 +129,6 @@ const filterprocess = createFilterOptions<string>();
 const filterSkills = createFilterOptions<string>();
 
 // ==============================|| 顧客の追加/編集 ||============================== //
-
 export interface Props {
   customer?: any;
   onCancel: (status: boolean) => void;
@@ -138,8 +136,6 @@ export interface Props {
 }
 
 const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
-  const [startDate, setStartDate] = useState<Date | null>();
-  const [endDate, setEndDate] = useState<Date | null>();
   const isCreating = !customer;
   const router = useRouter();
   const id = router.query.id as string;
@@ -250,6 +246,12 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
     }
   });
 
+  useEffect(() => {
+    if (customer) {
+      formik.setValues(getInitialValues(customer)); // customerが更新されるたびにフォームの値を更新
+    }
+  }, [customer]);
+
   const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
   let TagsError: boolean | string | undefined = false;
   if (formik.touched.skills && typeof formik.errors.skills) {
@@ -280,6 +282,7 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
   return (
     <>
       <FormikProvider value={formik}>
+        {JSON.stringify(getFieldProps(customer))}
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <DialogTitle>{customer ? 'スキル情報の編集' : '新しいスキルの追加'}</DialogTitle>
@@ -290,20 +293,28 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-id">id</InputLabel>
-                        <TextField fullWidth id="customer-id" {...getFieldProps('id')} />
+                        <InputLabel htmlFor="id">id</InputLabel>
+                        <TextField fullWidth id="id" {...getFieldProps('id')} />
                       </Stack>
                     </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-name">開始日</InputLabel>
-                        <DatePicker value={startDate} onChange={(newValue) => setStartDate(newValue)} format="yyyy/MM/dd" />
+                        <DatePicker
+                          format="yyyy/MM/dd"
+                          value={getFieldProps('start_date').value ? new Date(getFieldProps('start_date').value) : null}
+                          onChange={(newValue) => setFieldValue('start_date', newValue)}
+                        />
                       </Stack>
                     </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-name">終了日</InputLabel>
-                        <DatePicker value={endDate} onChange={(newValue) => setEndDate(newValue)} format="yyyy/MM/dd" />
+                        <DatePicker
+                          format="yyyy/MM/dd"
+                          value={getFieldProps('end_date').value ? new Date(getFieldProps('end_date').value) : null}
+                          onChange={(newValue) => setFieldValue('end_date', newValue)}
+                        />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
@@ -435,8 +446,8 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              name="skills"
                               placeholder="使用したスキルを入力してください"
+                              {...getFieldProps('skills')}
                               error={formik.touched.skills && Boolean(formik.errors.skills)}
                               helperText={TagsError}
                             />
@@ -534,8 +545,8 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              name="process"
                               placeholder="担当した工程を入力してください"
+                              {...getFieldProps('process')}
                               error={formik.touched.process && Boolean(formik.errors.process)}
                               helperText={TagsError}
                             />
