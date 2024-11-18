@@ -9,21 +9,6 @@ import { SkillTableType } from 'types/employee/skill-table';
 
 // ==============================|| アカウントプロファイル - 役割 ||============================== //
 
-async function fetchSkillList(id: number) {
-  try {
-    console.log(id);
-    const response = await fetch(`/api/db/employee/project/skills/select?id=${id}`);
-    if (!response.ok) {
-      throw new Error('API request failed');
-    }
-    const data = await response.json();
-    return data; // APIから返されたデータを返します
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-}
-
 async function fetchTableData(id: string) {
   try {
     const response = await fetch(`/api/db/employee/project/select?id=${id}`);
@@ -31,19 +16,6 @@ async function fetchTableData(id: string) {
       throw new Error('API request failed');
     }
     const data = await response.json();
-
-    // マップ処理を非同期関数として実行し、Promise.allで待機します
-    data.data.rows = await Promise.all(
-      data.data.rows.map(async (row: SkillTableType) => {
-        try {
-          const skills = await fetchSkillList(row.id);
-          return { ...row, skill: skills.data.rows ?? [] };
-        } catch (error) {
-          console.error('Error fetching skills:', error);
-          return { ...row, skill: undefined };
-        }
-      })
-    );
 
     return data; // APIから返されたデータを返します
   } catch (error) {

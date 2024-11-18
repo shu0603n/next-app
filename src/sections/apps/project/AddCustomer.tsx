@@ -320,7 +320,6 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
   return (
     <>
       <FormikProvider value={formik}>
-        {JSON.stringify(customer)}
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <DialogTitle>{customer ? '編集' : '新規追加'}</DialogTitle>

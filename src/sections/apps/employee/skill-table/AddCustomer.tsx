@@ -51,7 +51,6 @@ import { SkillTableType } from 'types/employee/skill-table';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
-  console.log('customer', customer);
   const newCustomer = {
     id: null as number | null,
     start_date: null as Date | null,
@@ -201,7 +200,6 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
               return response.json();
             })
             .then((data) => {
-              console.log(data);
               alertSnackBar('正常に更新されました。', 'success');
             })
             .catch((error) => {
@@ -227,7 +225,6 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
               return response.json();
             })
             .then((data) => {
-              console.log(data);
               alertSnackBar('正常に追加されました。', 'success');
               reloadDataAfterAdd(data);
             })
@@ -282,7 +279,6 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
   return (
     <>
       <FormikProvider value={formik}>
-        {JSON.stringify(getFieldProps(customer))}
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <DialogTitle>{customer ? 'スキル情報の編集' : '新しいスキルの追加'}</DialogTitle>
@@ -648,9 +644,7 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
           title={customer.fatherName}
           open={openAlert}
           handleClose={handleAlertClose}
-          reloadDataAfterDelete={(data: SkillTableType[]) => {
-            console.log(data);
-          }}
+          reloadDataAfterDelete={(data: SkillTableType[]) => {}}
         />
       )}
     </>
