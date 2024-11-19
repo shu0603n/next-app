@@ -201,6 +201,7 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
             })
             .then((data) => {
               alertSnackBar('正常に更新されました。', 'success');
+              reloadDataAfterAdd(data.data.rows);
             })
             .catch((error) => {
               console.error('エラー:', error);
@@ -226,7 +227,7 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
             })
             .then((data) => {
               alertSnackBar('正常に追加されました。', 'success');
-              reloadDataAfterAdd(data);
+              reloadDataAfterAdd(data.data.rows);
             })
             .catch((error) => {
               console.error('エラー:', error);
