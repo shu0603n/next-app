@@ -76,7 +76,7 @@ const getInitialValues = (customer: FormikValues | null) => {
   return newCustomer;
 };
 
-const role = ['PG', 'L', 'PL', 'PM'];
+const role = ['PG', 'PM', 'PL', 'BA', `SE`, `QA`, `UX`, 'UI', 'SA', 'DEV', 'TM', `HR`, `DOC`, `DBA`, `DE`, `ML`, `DEVOPS`, `SCRUM`];
 
 const skills = [
   'Java',
@@ -280,6 +280,7 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
   return (
     <>
       <FormikProvider value={formik}>
+        {JSON.stringify(customer)}
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <DialogTitle>{customer ? 'スキル情報の編集' : '新しいスキルの追加'}</DialogTitle>
@@ -288,12 +289,6 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="id">id</InputLabel>
-                        <TextField fullWidth id="id" {...getFieldProps('id')} />
-                      </Stack>
-                    </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-name">開始日</InputLabel>

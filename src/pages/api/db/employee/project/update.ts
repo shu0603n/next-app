@@ -8,7 +8,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
       return str === null || str === '' ? null : str;
     };
 
-    const { id, start_date, end_date, project_title, description, people_number, client_id } = request.body;
+    const { id, start_date, end_date, project_title, description, people_number, client_id, skills, process } = request.body;
 
     // 必須パラメータのチェック
     if (!id || !project_title || !start_date) {
@@ -34,8 +34,62 @@ export default async function handler(request: NextApiRequest, response: NextApi
       throw new Error('データを更新できませんでした');
     }
 
-    if (result.rowCount !== 1) {
-      throw new Error('複数のレコードが更新されてしまった可能性があります');
+    // employee_project_idを取得するためにSELECTを実行
+    const employeeProjectIdResult = await sql`
+    SELECT id FROM employee_project WHERE id = ${id};
+    `;
+
+    if (employeeProjectIdResult.rowCount === 0) {
+      throw new Error('指定されたプロジェクトIDが存在しません');
+    }
+
+    const employeeProjectId = employeeProjectIdResult.rows[0].id;
+
+    // 既存のスキルデータを削除
+    await sql`
+    DELETE FROM employee_project_skills
+    WHERE employee_project_id = ${employeeProjectId};
+    `;
+
+    await sql`
+    DELETE FROM employee_project_processes
+    WHERE employee_project_id = ${employeeProjectId};
+    `;
+
+    // employee_project_skillsテーブルにスキルを追加
+    if (skills && skills.length > 0) {
+      for (const skillName of skills) {
+        const skillResult = await sql`
+        SELECT id FROM skill WHERE name = ${skillName};
+      `;
+
+        if (skillResult.rowCount > 0) {
+          const skillId = skillResult.rows[0].id;
+
+          await sql`
+          INSERT INTO employee_project_skills (employee_project_id, skill_id)
+          VALUES (${employeeProjectId}, ${skillId})
+          `;
+        }
+      }
+    }
+
+    // employee_project_processesテーブルにスキルを追加
+    if (process && process.length > 0) {
+      for (const processName of process) {
+        const processResult = await sql`
+        SELECT id FROM process WHERE name = ${processName};
+      `;
+
+        if (processResult.rowCount > 0) {
+          const processId = processResult.rows[0].id;
+
+          await sql`
+          INSERT INTO employee_project_processes (employee_project_id, process_id)
+          VALUES (${employeeProjectId}, ${processId})
+          `;
+        }
+      }
     }
 
     // 更新後のデータを取得
