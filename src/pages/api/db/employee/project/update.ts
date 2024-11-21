@@ -8,11 +8,27 @@ export default async function handler(request: NextApiRequest, response: NextApi
       return str === null || str === '' ? null : str;
     };
 
-    const { id, start_date, end_date, project_title, description, people_number, client_id, skills, process } = request.body;
+    const { id, start_date, end_date, project_title, description, people_number, client_id, skills, process, project_position_name } =
+      request.body;
+
+    console.log('Received skills:', skills);
 
     // 必須パラメータのチェック
     if (!id || !project_title || !start_date) {
       throw new Error('パラメーターが不足しています');
+    }
+
+    let project_position_id = null;
+    if (project_position_name) {
+      const positionResult = await sql`
+        SELECT id FROM project_position WHERE name = ${project_position_name};
+      `;
+
+      if (positionResult.rowCount > 0) {
+        project_position_id = positionResult.rows[0].id; // 該当するIDを取得
+      } else {
+        throw new Error('指定された役割名が見つかりません');
+      }
     }
 
     // 更新クエリ
@@ -24,7 +40,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
       project_title = ${toNull(project_title)},
       description = ${toNull(description)},
       people_number = ${toNull(people_number)},
-      client_id = ${toNull(client_id)}
+      client_id = ${toNull(client_id)},
+      project_position_id = ${toNull(project_position_id)}
     WHERE 
       id = ${toNull(id)};
     `;
@@ -97,6 +114,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
     SELECT 
         employee_project.*,
         client.name AS client_name,
+	    pp.name AS project_position_name,
         array_agg(DISTINCT s.name) AS skills,
         array_agg(DISTINCT p.name) AS process
     FROM 
@@ -111,10 +129,12 @@ export default async function handler(request: NextApiRequest, response: NextApi
         employee_project_processes epp ON employee_project.id = epp.employee_project_id
     LEFT JOIN
         process p ON epp.process_id = p.id
+    LEFT JOIN
+	    project_position pp ON employee_project.project_position_id = pp.id
     WHERE 
         employee_project.employee_id = ${employeeId} 
     GROUP BY 
-        employee_project.id, client.name;
+        employee_project.id, client.name, pp.name;
     `;
 
     return response.status(200).json({ data });

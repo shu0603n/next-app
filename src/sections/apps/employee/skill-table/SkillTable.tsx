@@ -88,9 +88,19 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 
   useEffect(() => {
     if (matchDownSM) {
-      setHiddenColumns(['start_date', 'client_name', 'people_number', `end_date`, `description`, 'position', `skills`, `process`]);
+      setHiddenColumns([
+        'start_date',
+        'client_name',
+        'people_number',
+        `end_date`,
+        `description`,
+        `project_position_id`,
+        'project_position_name',
+        `skills`,
+        `process`
+      ]);
     } else {
-      setHiddenColumns(['people_number', `end_date`, `description`, 'position', `skills`, `process`]);
+      setHiddenColumns(['people_number', `end_date`, `description`, `project_position_id`, 'project_position_name', `skills`, `process`]);
     }
     // eslint-disable-next-line
   }, [matchDownSM]);
@@ -255,8 +265,12 @@ const SkillTable = ({ data }: SkillTableProps) => {
         accessor: 'people_number'
       },
       {
+        Header: '役割ID',
+        accessor: `project_position_id`
+      },
+      {
         Header: '役割',
-        accessor: 'position'
+        accessor: 'project_position_name'
       },
       {
         Header: 'スキル',

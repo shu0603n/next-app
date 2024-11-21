@@ -60,7 +60,7 @@ const getInitialValues = (customer: FormikValues | null) => {
     people_number: '',
     skills: [],
     process: [],
-    role: ''
+    project_position_name: ''
   };
 
   if (customer) {
@@ -70,6 +70,7 @@ const getInitialValues = (customer: FormikValues | null) => {
     newCustomer.project_title = customer.project_title;
     newCustomer.description = customer.description;
     newCustomer.people_number = customer.people_number;
+    newCustomer.project_position_name = customer.project_position_name;
     return _.merge({}, newCustomer, customer);
   }
 
@@ -280,7 +281,6 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
   return (
     <>
       <FormikProvider value={formik}>
-        {JSON.stringify(customer)}
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <DialogTitle>{customer ? 'スキル情報の編集' : '新しいスキルの追加'}</DialogTitle>
@@ -370,8 +370,10 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
                           <Select
                             id="column-hiding"
                             displayEmpty
-                            {...getFieldProps('role')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('role', event.target.value as string)}
+                            {...getFieldProps('project_position_name')}
+                            onChange={(event: SelectChangeEvent<string>) =>
+                              setFieldValue('project_position_name', event.target.value as string)
+                            }
                             input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
                             renderValue={(selected) => {
                               if (!selected) {
@@ -388,9 +390,9 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
                             ))}
                           </Select>
                         </FormControl>
-                        {touched.role && errors.role && (
+                        {touched.project_position_name && errors.project_position_name && (
                           <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.role}
+                            {errors.project_position_name}
                           </FormHelperText>
                         )}
                       </Stack>
