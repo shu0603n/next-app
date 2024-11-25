@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { Grid } from '@mui/material';
 import SkillTable from './skill-table/SkillTable';
 import { useState, useEffect } from 'react';
-import { SkillTableType } from 'types/employee/skill-table';
+import { SkillTableType, skillType, processType } from 'types/employee/skill-table';
 
 // アセット
 
@@ -25,7 +25,9 @@ async function fetchTableData(id: string) {
 }
 
 const TabRole = () => {
-  const [data, setData] = useState<SkillTableType[]>([]); // デフォルト値を空の配列に設定
+  const [data, setData] = useState<SkillTableType[]>([]);
+  const [candidate_skills, setCandidate_skills] = useState<skillType[]>([]);
+  const [candidate_processes, setCandidate_processes] = useState<processType[]>([]);
   const router = useRouter();
   const id = router.query.id as string;
 
@@ -34,6 +36,9 @@ const TabRole = () => {
     fetchTableData(id)
       .then((fetchedData) => {
         setData(fetchedData.data.rows);
+        setCandidate_skills(fetchedData.skill);
+        setCandidate_processes(fetchedData.process);
+        console.log(fetchedData);
       })
       .catch((error) => {
         // エラーハンドリング
@@ -45,7 +50,7 @@ const TabRole = () => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
-        <SkillTable data={data} />
+        <SkillTable data={data} candidate_skills={candidate_skills} candidate_processes={candidate_processes} />
       </Grid>
     </Grid>
   );

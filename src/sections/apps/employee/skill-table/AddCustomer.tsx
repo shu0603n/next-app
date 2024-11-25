@@ -47,7 +47,7 @@ import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
 import { CloseOutlined } from '@ant-design/icons';
-import { SkillTableType } from 'types/employee/skill-table';
+import { SkillTableType, skillType, processType } from 'types/employee/skill-table';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
@@ -79,52 +79,6 @@ const getInitialValues = (customer: FormikValues | null) => {
 
 const role = ['PG', 'PM', 'PL', 'BA', `SE`, `QA`, `UX`, 'UI', 'SA', 'DEV', 'TM', `HR`, `DOC`, `DBA`, `DE`, `ML`, `DEVOPS`, `SCRUM`];
 
-const skills = [
-  'Java',
-  'HTML',
-  'CSS',
-  'Bootstrap',
-  'JavaScript',
-  'TypeScript',
-  'NodeJS',
-  'React',
-  'Angular',
-  'CI',
-  'C言語',
-  'C++',
-  'Java',
-  'C#',
-  'JavaScript',
-  'PHP',
-  'Ruby',
-  'TypeScript',
-  'Python',
-  'R言語',
-  'Go言語',
-  'Swift',
-  'Kotlin',
-  'Objective-C',
-  'Visual Basic',
-  'VBScript',
-  'BASIC',
-  'Google Apps Script',
-  'Haskell',
-  'Scala',
-  'Groovy',
-  'Delphi',
-  'Dart',
-  'D言語',
-  'Perl',
-  'COBOL',
-  'SQL',
-  'FORTRAN',
-  'MATLAB',
-  'Scratch'
-];
-const candidate_skills = ['Java', 'JavaScript', 'Python', 'PHP', 'TypeScript', 'C', 'C#', 'C++'];
-
-const process = ['要件定義', '基本設計', '詳細設計', '製造', '単体テスト', '結合テスト', '運用テスト', '保守'];
-
 const filterprocess = createFilterOptions<string>();
 const filterSkills = createFilterOptions<string>();
 
@@ -133,12 +87,21 @@ export interface Props {
   customer?: any;
   onCancel: (status: boolean) => void;
   reloadDataAfterAdd: (data: SkillTableType[]) => void;
+  candidate_skills: skillType[];
+  candidate_processes: processType[];
 }
 
-const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
+const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd, candidate_skills, candidate_processes }: Props) => {
   const isCreating = !customer;
   const router = useRouter();
   const id = router.query.id as string;
+
+  // candidate_flagがtrueのものだけ抽出
+  const filteredSkills = candidate_skills.filter((skill) => skill.candidate_flag);
+  const skills = candidate_skills.map((skill) => String(skill.name));
+  const CandidateSkillList = filteredSkills.map((skill) => skill.name);
+
+  const process = candidate_processes.map((process) => String(process.name));
 
   const CustomerSchema = Yup.object().shape({
     project_title: Yup.string().max(255).required('プロジェクト名は必須です')
@@ -479,20 +442,15 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
                           sx={{ mt: 1.5, flexWrap: { xs: 'wrap', sm: 'inherit' }, gap: { xs: 1, sm: 0 } }}
                         >
                           <Typography variant="caption">候補:</Typography>
-                          {candidate_skills
-                            .filter(
-                              (skill: string) => formik.values.skills && !formik.values.skills.map((item) => item).includes(skill as never)
-                            )
-                            .slice(0, 5)
-                            .map((option, index) => (
-                              <Chip
-                                key={index}
-                                variant="outlined"
-                                onClick={() => setFieldValue('skills', [...formik.values.skills, option])}
-                                label={<Typography variant="caption">{option}</Typography>}
-                                size="small"
-                              />
-                            ))}
+                          {CandidateSkillList.map((option, index) => (
+                            <Chip
+                              key={index}
+                              variant="outlined"
+                              onClick={() => setFieldValue('skills', [...formik.values.skills, option])}
+                              label={<Typography variant="caption">{option}</Typography>}
+                              size="small"
+                            />
+                          ))}
                         </Stack>
                       </Stack>
                     </Grid>

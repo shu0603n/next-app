@@ -35,7 +35,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { SkillTableType } from 'types/employee/skill-table';
+import { SkillTableType, skillType, processType } from 'types/employee/skill-table';
 
 // ==============================|| REACT TABLE - EDITABLE ROW ||============================== //
 
@@ -182,11 +182,16 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   );
 }
 
-interface SkillTableProps {
-  data: SkillTableType[];
-}
 // ==============================|| CUSTOMER - LIST ||============================== //
-const SkillTable = ({ data }: SkillTableProps) => {
+const SkillTable = ({
+  data,
+  candidate_skills,
+  candidate_processes
+}: {
+  data: SkillTableType[];
+  candidate_skills: skillType[];
+  candidate_processes: processType[];
+}) => {
   const theme = useTheme();
 
   const [open, setOpen] = useState<boolean>(false);
@@ -362,7 +367,13 @@ const SkillTable = ({ data }: SkillTableProps) => {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        <AddCustomer customer={customer} onCancel={handleAdd} reloadDataAfterAdd={handleReloadData} />
+        <AddCustomer
+          customer={customer}
+          onCancel={handleAdd}
+          reloadDataAfterAdd={handleReloadData}
+          candidate_skills={candidate_skills}
+          candidate_processes={candidate_processes}
+        />
       </Dialog>
     </MainCard>
   );
