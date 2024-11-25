@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { Grid } from '@mui/material';
 import SkillTable from './skill-table/SkillTable';
 import { useState, useEffect } from 'react';
-import { SkillTableType, skillType, processType } from 'types/employee/skill-table';
+import { SkillTableType, skill, processType } from 'types/employee/skill-table';
 
 // アセット
 
@@ -26,7 +26,7 @@ async function fetchTableData(id: string) {
 
 const TabRole = () => {
   const [data, setData] = useState<SkillTableType[]>([]);
-  const [candidate_skills, setCandidate_skills] = useState<skillType[]>([]);
+  const [candidate_skills, setCandidate_skills] = useState<skill[]>([]);
   const [candidate_processes, setCandidate_processes] = useState<processType[]>([]);
   const router = useRouter();
   const id = router.query.id as string;

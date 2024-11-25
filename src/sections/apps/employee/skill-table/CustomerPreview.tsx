@@ -38,7 +38,7 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // タイプ
 import { UserCardProps } from 'types/user-profile';
-import { SkillTableType, skillType, processType } from 'types/employee/skill-table';
+import { SkillTableType, skill, processType } from 'types/employee/skill-table';
 
 // アセット
 import { DeleteOutlined, DownloadOutlined, EditOutlined } from '@ant-design/icons';
@@ -90,7 +90,7 @@ export default function CustomerPreview({ customer, open, onClose }: { customer:
   const matchDownMD = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
   const [openAlert, setOpenAlert] = useState(false);
   const [tableData, setTableData] = useState<dbResponse>(defaultRes); // データを保持する状態変数
-  const [candidate_skills, setCandidate_skills] = useState<skillType[]>([]);
+  const [candidate_skills, setCandidate_skills] = useState<skill[]>([]);
   const [candidate_processes, setCandidate_processes] = useState<processType[]>([]);
   const router = useRouter();
   const id = router.query.id as string;
