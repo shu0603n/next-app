@@ -7,11 +7,24 @@ export default async function handler(request: NextApiRequest, response: NextApi
     const toNull = (str: string) => {
       return str === null || str === '' ? null : str;
     };
-    const { start_date, end_date, project_title, description, people_number, client_id, skills, process, project_position_name } =
+    const { start_date, end_date, project_title, client_name, description, people_number, skills, process, project_position_name } =
       request.body;
 
     if (!project_title || !start_date) {
       throw new Error('パラメーターが不足しています');
+    }
+
+    let client_id = null;
+    if (client_name) {
+      const clientResult = await sql`
+        SELECT id FROM client WHERE name = ${client_name};
+      `;
+
+      if (clientResult.rowCount > 0) {
+        client_id = clientResult.rows[0].id; // 該当するIDを取得
+      } else {
+        throw new Error('指定された役割名が見つかりません');
+      }
     }
 
     let project_position_id = null;

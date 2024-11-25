@@ -47,7 +47,7 @@ import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
 import { CloseOutlined } from '@ant-design/icons';
-import { SkillTableType, skill, processType, projectPositionType } from 'types/employee/skill-table';
+import { SkillTableType, skill, processType, projectPositionType, clientType } from 'types/employee/skill-table';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
@@ -56,6 +56,7 @@ const getInitialValues = (customer: FormikValues | null) => {
     start_date: null as Date | null,
     end_date: null as Date | null,
     project_title: '',
+    client_name: ``,
     description: '',
     people_number: '',
     skills: [],
@@ -68,6 +69,7 @@ const getInitialValues = (customer: FormikValues | null) => {
     newCustomer.start_date = customer.start_date;
     newCustomer.end_date = customer.end_date;
     newCustomer.project_title = customer.project_title;
+    newCustomer.client_name = customer.client_name;
     newCustomer.description = customer.description;
     newCustomer.people_number = customer.people_number;
     newCustomer.project_position_name = customer.project_position_name;
@@ -88,9 +90,18 @@ export interface Props {
   candidate_skills: skill[];
   candidate_processes: processType[];
   candidate_roles: projectPositionType[];
+  candidate_client: clientType[];
 }
 
-const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd, candidate_skills, candidate_processes, candidate_roles }: Props) => {
+const AddCustomer = ({
+  customer,
+  onCancel,
+  reloadDataAfterAdd,
+  candidate_skills,
+  candidate_processes,
+  candidate_roles,
+  candidate_client
+}: Props) => {
   const isCreating = !customer;
   const router = useRouter();
   const id = router.query.id as string;
@@ -101,8 +112,8 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd, candidate_skills,
   const CandidateSkillList = filteredSkills.map((skill) => skill.name);
 
   const process = candidate_processes.map((process) => String(process.name));
-
   const role = candidate_roles.map((role) => String(role.name));
+  const client = candidate_client.map((client) => String(client.name));
 
   const CustomerSchema = Yup.object().shape({
     project_title: Yup.string().max(255).required('プロジェクト名は必須です')
@@ -286,19 +297,40 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd, candidate_skills,
                         />
                       </Stack>
                     </Grid>
-                    {/* <Grid item xs={12}>
+
+                    <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-client">企業名</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="customer-client"
-                          placeholder="企業名を入力"
-                          {...getFieldProps('client')}
-                          error={Boolean(touched.client && errors.client)}
-                          helperText={touched.client && errors.client}
-                        />
+                        <FormControl fullWidth>
+                          <Select
+                            id="column-hiding"
+                            displayEmpty
+                            {...getFieldProps('client_name')}
+                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('client_name', event.target.value as string)}
+                            input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
+                            renderValue={(selected) => {
+                              if (!selected) {
+                                return <Typography variant="subtitle1">企業を選択</Typography>;
+                              }
+
+                              return <Typography variant="subtitle2">{selected}</Typography>;
+                            }}
+                          >
+                            {client.map((column: any) => (
+                              <MenuItem key={column} value={column}>
+                                <ListItemText primary={column} />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {touched.client_name && errors.client_name && (
+                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
+                            {errors.client_name}
+                          </FormHelperText>
+                        )}
                       </Stack>
-                    </Grid> */}
+                    </Grid>
+
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-description">業務内容</InputLabel>

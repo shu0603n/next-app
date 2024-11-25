@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { Grid } from '@mui/material';
 import SkillTable from './skill-table/SkillTable';
 import { useState, useEffect } from 'react';
-import { SkillTableType, skill, processType, projectPositionType } from 'types/employee/skill-table';
+import { SkillTableType, skill, processType, projectPositionType, clientType } from 'types/employee/skill-table';
 
 // アセット
 
@@ -29,6 +29,7 @@ const TabRole = () => {
   const [candidate_skills, setCandidate_skills] = useState<skill[]>([]);
   const [candidate_processes, setCandidate_processes] = useState<processType[]>([]);
   const [candidate_roles, setCandidate_roles] = useState<projectPositionType[]>([]);
+  const [candidate_client, setCandidate_client] = useState<clientType[]>([]);
   const router = useRouter();
   const id = router.query.id as string;
 
@@ -40,6 +41,7 @@ const TabRole = () => {
         setCandidate_skills(fetchedData.skill);
         setCandidate_processes(fetchedData.process);
         setCandidate_roles(fetchedData.role);
+        setCandidate_client(fetchedData.client);
       })
       .catch((error) => {
         // エラーハンドリング
@@ -56,6 +58,7 @@ const TabRole = () => {
           candidate_skills={candidate_skills}
           candidate_processes={candidate_processes}
           candidate_roles={candidate_roles}
+          candidate_client={candidate_client}
         />
       </Grid>
     </Grid>

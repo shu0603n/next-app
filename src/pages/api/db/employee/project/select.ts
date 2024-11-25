@@ -29,6 +29,19 @@ export default async function handler(request: NextApiRequest, response: NextApi
       }
     });
 
+    const clientPromisep = prisma.client.findMany({
+      select: {
+        id: true,
+        name: true,
+        name_k: false,
+        address: false,
+        phone: false,
+        email: false,
+        postal_code: false,
+        remarks: false
+      }
+    });
+
     const data = await sql`
     SELECT 
         employee_project.*,
@@ -60,11 +73,9 @@ export default async function handler(request: NextApiRequest, response: NextApi
     const [skill] = await Promise.all([skillPromise]);
     const [process] = await Promise.all([processPromise]);
     const [role] = await Promise.all([project_positionPromise]);
+    const [client] = await Promise.all([clientPromisep]);
 
-    // データをコンソールに出力して確認
-    console.log('取得したデータ:', data, skill, process, role);
-
-    return response.status(200).json({ data, skill, process, role });
+    return response.status(200).json({ data, skill, process, role, client });
   } catch (error) {
     console.error('エラーが発生しました:', error);
     return response.status(500).json({ error: 'データを取得できませんでした。' });

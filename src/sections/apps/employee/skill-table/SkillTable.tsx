@@ -35,7 +35,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { SkillTableType, skill, processType, projectPositionType } from 'types/employee/skill-table';
+import { SkillTableType, skill, processType, projectPositionType, clientType } from 'types/employee/skill-table';
 
 // ==============================|| REACT TABLE - EDITABLE ROW ||============================== //
 
@@ -89,6 +89,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   useEffect(() => {
     if (matchDownSM) {
       setHiddenColumns([
+        `id`,
         'start_date',
         'client_name',
         'people_number',
@@ -100,7 +101,16 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
         `process`
       ]);
     } else {
-      setHiddenColumns(['people_number', `end_date`, `description`, `project_position_id`, 'project_position_name', `skills`, `process`]);
+      setHiddenColumns([
+        `id`,
+        'people_number',
+        `end_date`,
+        `description`,
+        `project_position_id`,
+        'project_position_name',
+        `skills`,
+        `process`
+      ]);
     }
     // eslint-disable-next-line
   }, [matchDownSM]);
@@ -187,12 +197,14 @@ const SkillTable = ({
   data,
   candidate_skills,
   candidate_processes,
-  candidate_roles
+  candidate_roles,
+  candidate_client
 }: {
   data: SkillTableType[];
   candidate_skills: skill[];
   candidate_processes: processType[];
   candidate_roles: projectPositionType[];
+  candidate_client: clientType[];
 }) => {
   const theme = useTheme();
 
@@ -376,6 +388,7 @@ const SkillTable = ({
           candidate_skills={candidate_skills}
           candidate_processes={candidate_processes}
           candidate_roles={candidate_roles}
+          candidate_client={candidate_client}
         />
       </Dialog>
     </MainCard>

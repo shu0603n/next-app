@@ -29,3 +29,14 @@ export type projectPositionType = {
   name: string;
   description: string;
 };
+
+export type clientType = {
+  id: number;
+  name: string;
+  name_k: string;
+  address: string;
+  phone: string;
+  email: string;
+  postal_code: string;
+  remarks: string;
+};
