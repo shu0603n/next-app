@@ -38,7 +38,6 @@ const TabRole = () => {
         setData(fetchedData.data.rows);
         setCandidate_skills(fetchedData.skill);
         setCandidate_processes(fetchedData.process);
-        console.log(fetchedData);
       })
       .catch((error) => {
         // エラーハンドリング
