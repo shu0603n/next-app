@@ -35,7 +35,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { SkillTableType, skill, processType } from 'types/employee/skill-table';
+import { SkillTableType, skillType, processType } from 'types/employee/skill-table';
 
 // ==============================|| REACT TABLE - EDITABLE ROW ||============================== //
 
@@ -189,7 +189,7 @@ const SkillTable = ({
   candidate_processes
 }: {
   data: SkillTableType[];
-  candidate_skills: skill[];
+  candidate_skills: skillType[];
   candidate_processes: processType[];
 }) => {
   const theme = useTheme();

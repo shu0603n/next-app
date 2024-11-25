@@ -47,7 +47,7 @@ import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
 import { CloseOutlined } from '@ant-design/icons';
-import { SkillTableType, skill, processType } from 'types/employee/skill-table';
+import { SkillTableType, skillType, processType } from 'types/employee/skill-table';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
@@ -87,7 +87,7 @@ export interface Props {
   customer?: any;
   onCancel: (status: boolean) => void;
   reloadDataAfterAdd: (data: SkillTableType[]) => void;
-  candidate_skills: skill[];
+  candidate_skills: skillType[];
   candidate_processes: processType[];
 }
 
