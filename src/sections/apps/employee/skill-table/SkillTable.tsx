@@ -35,7 +35,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { SkillTableType, skill, processType } from 'types/employee/skill-table';
+import { SkillTableType, skill, processType, projectPositionType } from 'types/employee/skill-table';
 
 // ==============================|| REACT TABLE - EDITABLE ROW ||============================== //
 
@@ -186,11 +186,13 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 const SkillTable = ({
   data,
   candidate_skills,
-  candidate_processes
+  candidate_processes,
+  candidate_roles
 }: {
   data: SkillTableType[];
   candidate_skills: skill[];
   candidate_processes: processType[];
+  candidate_roles: projectPositionType[];
 }) => {
   const theme = useTheme();
 
@@ -373,6 +375,7 @@ const SkillTable = ({
           reloadDataAfterAdd={handleReloadData}
           candidate_skills={candidate_skills}
           candidate_processes={candidate_processes}
+          candidate_roles={candidate_roles}
         />
       </Dialog>
     </MainCard>

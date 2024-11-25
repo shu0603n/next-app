@@ -47,7 +47,7 @@ import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
 import { CloseOutlined } from '@ant-design/icons';
-import { SkillTableType, skill, processType } from 'types/employee/skill-table';
+import { SkillTableType, skill, processType, projectPositionType } from 'types/employee/skill-table';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
@@ -77,8 +77,6 @@ const getInitialValues = (customer: FormikValues | null) => {
   return newCustomer;
 };
 
-const role = ['PG', 'PM', 'PL', 'BA', `SE`, `QA`, `UX`, 'UI', 'SA', 'DEV', 'TM', `HR`, `DOC`, `DBA`, `DE`, `ML`, `DEVOPS`, `SCRUM`];
-
 const filterprocess = createFilterOptions<string>();
 const filterSkills = createFilterOptions<string>();
 
@@ -89,9 +87,10 @@ export interface Props {
   reloadDataAfterAdd: (data: SkillTableType[]) => void;
   candidate_skills: skill[];
   candidate_processes: processType[];
+  candidate_roles: projectPositionType[];
 }
 
-const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd, candidate_skills, candidate_processes }: Props) => {
+const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd, candidate_skills, candidate_processes, candidate_roles }: Props) => {
   const isCreating = !customer;
   const router = useRouter();
   const id = router.query.id as string;
@@ -102,6 +101,8 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd, candidate_skills,
   const CandidateSkillList = filteredSkills.map((skill) => skill.name);
 
   const process = candidate_processes.map((process) => String(process.name));
+
+  const role = candidate_roles.map((role) => String(role.name));
 
   const CustomerSchema = Yup.object().shape({
     project_title: Yup.string().max(255).required('プロジェクト名は必須です')

@@ -38,7 +38,7 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // タイプ
 import { UserCardProps } from 'types/user-profile';
-import { SkillTableType, skill, processType } from 'types/employee/skill-table';
+import { SkillTableType, skill, processType, projectPositionType } from 'types/employee/skill-table';
 
 // アセット
 import { DeleteOutlined, DownloadOutlined, EditOutlined } from '@ant-design/icons';
@@ -92,6 +92,7 @@ export default function CustomerPreview({ customer, open, onClose }: { customer:
   const [tableData, setTableData] = useState<dbResponse>(defaultRes); // データを保持する状態変数
   const [candidate_skills, setCandidate_skills] = useState<skill[]>([]);
   const [candidate_processes, setCandidate_processes] = useState<processType[]>([]);
+  const [candidate_roles, setCandidate_roles] = useState<projectPositionType[]>([]);
   const router = useRouter();
   const id = router.query.id as string;
 
@@ -107,6 +108,7 @@ export default function CustomerPreview({ customer, open, onClose }: { customer:
         setTableData(tableDataResponse);
         setCandidate_skills(skillDataResponse.skill);
         setCandidate_processes(skillDataResponse.process);
+        setCandidate_roles(skillDataResponse.role);
       } catch (error) {
         // エラーハンドリング
         console.error('Error:', error);
@@ -365,6 +367,7 @@ export default function CustomerPreview({ customer, open, onClose }: { customer:
           }}
           candidate_skills={candidate_skills}
           candidate_processes={candidate_processes}
+          candidate_roles={candidate_roles}
         />
       </Dialog>
 

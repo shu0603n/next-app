@@ -23,3 +23,9 @@ export type processType = {
   id: number;
   name: number;
 };
+
+export type projectPositionType = {
+  id: number;
+  name: string;
+  description: string;
+};
