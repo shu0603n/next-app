@@ -149,6 +149,7 @@ const AddCustomer = ({
   });
 
   const [openAlert, setOpenAlert] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleAlertClose = () => {
     setOpenAlert(!openAlert);
@@ -178,6 +179,7 @@ const AddCustomer = ({
             .then((data) => {
               alertSnackBar('正常に更新されました。', 'success');
               reloadDataAfterAdd(data.data.rows);
+              setIsEditing(false);
             })
             .catch((error) => {
               console.error('エラー:', error);
@@ -204,6 +206,7 @@ const AddCustomer = ({
             .then((data) => {
               alertSnackBar('正常に追加されました。', 'success');
               reloadDataAfterAdd(data.data.rows);
+              setIsEditing(false);
             })
             .catch((error) => {
               console.error('エラー:', error);
@@ -226,7 +229,7 @@ const AddCustomer = ({
     }
   }, [customer]);
 
-  const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
+  const { errors, touched, handleSubmit, getFieldProps, setFieldValue } = formik;
   let TagsError: boolean | string | undefined = false;
   if (formik.touched.skills && typeof formik.errors.skills) {
     if (formik.touched.skills && typeof formik.errors.skills === 'string') {
@@ -618,7 +621,7 @@ const AddCustomer = ({
                     <Button color="error" onClick={() => onCancel(false)}>
                       キャンセル
                     </Button>
-                    <Button type="submit" variant="contained" disabled={isSubmitting}>
+                    <Button type="submit" variant="contained" disabled={isEditing}>
                       {customer ? '編集' : '追加'}
                     </Button>
                   </Stack>
