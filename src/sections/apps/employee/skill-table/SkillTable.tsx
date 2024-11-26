@@ -218,12 +218,6 @@ const SkillTable = ({
     setUpdatedData(data);
   }, [data]);
 
-  const handleReloadData = (newData: SkillTableType[]) => {
-    if (Array.isArray(newData)) {
-      setUpdatedData(newData);
-    }
-  };
-
   const handleAdd = () => {
     setAdd(!add);
     if (customer && !add) setCustomer(null);
@@ -246,12 +240,26 @@ const SkillTable = ({
   };
 
   useEffect(() => {
-    const formattedData = data.map((item) => ({
-      ...item,
-      start_date: formatDate(item.start_date)
-    }));
-    setUpdatedData(formattedData);
+    if (data) {
+      const formattedData = data.map((item) => ({
+        ...item,
+        start_date: formatDate(item.start_date),
+        end_date: item.end_date ? formatDate(item.end_date) : ''
+      }));
+      setUpdatedData(formattedData);
+    }
   }, [data]);
+
+  const handleReloadData = (newData: SkillTableType[]) => {
+    if (Array.isArray(newData)) {
+      const formattedData = newData.map((item) => ({
+        ...item,
+        start_date: formatDate(item.start_date),
+        end_date: item.end_date ? formatDate(item.end_date) : ''
+      }));
+      setUpdatedData(formattedData);
+    }
+  };
 
   const columns = useMemo(
     () => [
