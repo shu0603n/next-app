@@ -224,10 +224,14 @@ const AddCustomer = ({
   });
 
   useEffect(() => {
-    if (customer) {
-      formik.setValues(getInitialValues(customer)); // customerが更新されるたびにフォームの値を更新
+    if (isCreating) {
+      // 新規作成時はフォームをリセットして初期値を設定
+      formik.resetForm({ values: getInitialValues(null) });
+    } else if (customer) {
+      // 編集時はcustomerが変更された場合のみフォームの値を更新
+      formik.setValues(getInitialValues(customer));
     }
-  }, [customer]);
+  }, [customer, isCreating]);
 
   const { errors, touched, handleSubmit, getFieldProps, setFieldValue } = formik;
   let TagsError: boolean | string | undefined = false;
