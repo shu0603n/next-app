@@ -7,17 +7,38 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
+import { SkillTableType } from 'types/employee/skill-table';
 
 // types
 interface Props {
   title: string;
   open: boolean;
   handleClose: (status: boolean) => void;
+  reloadDataAfterDelete: (data: SkillTableType[]) => void;
 }
 
 // ==============================|| 顧客 - 削除 ||============================== //
 
-export default function AlertCustomerDelete({ title, open, handleClose }: Props) {
+export default function AlertCustomerDelete({ title, open, handleClose, reloadDataAfterDelete }: Props) {
+  const handleDelete = async (title: string) => {
+    try {
+      const response = await fetch(`/api/db/employee/project/delete?id=${title}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        throw new Error('削除に失敗しました');
+      }
+
+      const data = await response.json();
+      console.log('削除成功:', data);
+      reloadDataAfterDelete(data);
+      handleClose(false);
+    } catch (error) {
+      console.error('エラー:', error);
+    }
+  };
+
   return (
     <Dialog
       open={open}
@@ -51,7 +72,7 @@ export default function AlertCustomerDelete({ title, open, handleClose }: Props)
             <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
               キャンセル
             </Button>
-            <Button fullWidth color="error" variant="contained" onClick={() => handleClose(true)} autoFocus>
+            <Button fullWidth color="error" variant="contained" onClick={() => handleDelete(title)} autoFocus>
               削除
             </Button>
           </Stack>

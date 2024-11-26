@@ -35,7 +35,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { SkillTableType } from 'types/employee/skill-table';
+import { SkillTableType, skill, processType, projectPositionType, clientType } from 'types/employee/skill-table';
 
 // ==============================|| REACT TABLE - EDITABLE ROW ||============================== //
 
@@ -88,9 +88,29 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 
   useEffect(() => {
     if (matchDownSM) {
-      setHiddenColumns(['start_date', 'client_name', 'people_number']);
+      setHiddenColumns([
+        `id`,
+        'start_date',
+        'client_name',
+        'people_number',
+        `end_date`,
+        `description`,
+        `project_position_id`,
+        'project_position_name',
+        `skills`,
+        `process`
+      ]);
     } else {
-      setHiddenColumns(['people_number']);
+      setHiddenColumns([
+        `id`,
+        'people_number',
+        `end_date`,
+        `description`,
+        `project_position_id`,
+        'project_position_name',
+        `skills`,
+        `process`
+      ]);
     }
     // eslint-disable-next-line
   }, [matchDownSM]);
@@ -172,17 +192,31 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   );
 }
 
-interface SkillTableProps {
-  data: SkillTableType[];
-}
 // ==============================|| CUSTOMER - LIST ||============================== //
-const SkillTable = ({ data }: SkillTableProps) => {
+const SkillTable = ({
+  data,
+  candidate_skills,
+  candidate_processes,
+  candidate_roles,
+  candidate_client
+}: {
+  data: SkillTableType[];
+  candidate_skills: skill[];
+  candidate_processes: processType[];
+  candidate_roles: projectPositionType[];
+  candidate_client: clientType[];
+}) => {
   const theme = useTheme();
 
   const [open, setOpen] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
   const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
+  const [updatedData, setUpdatedData] = useState<SkillTableType[]>(data);
+
+  useEffect(() => {
+    setUpdatedData(data);
+  }, [data]);
 
   const handleAdd = () => {
     setAdd(!add);
@@ -191,6 +225,40 @@ const SkillTable = ({ data }: SkillTableProps) => {
 
   const handleClose = () => {
     setOpen(!open);
+    if (customerDeleteId) {
+      setUpdatedData((prevData) => prevData.filter((item) => item.id !== customerDeleteId));
+    }
+  };
+
+  const formatDate = (isoDate: string) => {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString('ja-JP', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  };
+
+  useEffect(() => {
+    if (data) {
+      const formattedData = data.map((item) => ({
+        ...item,
+        start_date: formatDate(item.start_date),
+        end_date: item.end_date ? formatDate(item.end_date) : ''
+      }));
+      setUpdatedData(formattedData);
+    }
+  }, [data]);
+
+  const handleReloadData = (newData: SkillTableType[]) => {
+    if (Array.isArray(newData)) {
+      const formattedData = newData.map((item) => ({
+        ...item,
+        start_date: formatDate(item.start_date),
+        end_date: item.end_date ? formatDate(item.end_date) : ''
+      }));
+      setUpdatedData(formattedData);
+    }
   };
 
   const columns = useMemo(
@@ -204,8 +272,16 @@ const SkillTable = ({ data }: SkillTableProps) => {
         accessor: 'start_date'
       },
       {
+        Header: '終了日',
+        accessor: 'end_date'
+      },
+      {
         Header: 'プロジェクト名',
         accessor: 'project_title'
+      },
+      {
+        Header: '業務内容',
+        accessor: 'description'
       },
       {
         Header: '企業名',
@@ -215,20 +291,23 @@ const SkillTable = ({ data }: SkillTableProps) => {
         Header: '人数',
         accessor: 'people_number'
       },
-
-      // {
-      //   Header: '役割',
-      //   accessor: 'contact'
-      // },
-      // {
-      //   Header: 'スキル',
-      //   accessor: 'skills',
-      //   className: 'cell-right'
-      // },
-      // {
-      //   Header: '担当工程',
-      //   accessor: 'process_list'
-      // },
+      {
+        Header: '役割ID',
+        accessor: `project_position_id`
+      },
+      {
+        Header: '役割',
+        accessor: 'project_position_name'
+      },
+      {
+        Header: 'スキル',
+        accessor: 'skills',
+        className: 'cell-right'
+      },
+      {
+        Header: '担当工程',
+        accessor: 'process'
+      },
 
       {
         Header: 'アクション',
@@ -270,8 +349,8 @@ const SkillTable = ({ data }: SkillTableProps) => {
                   color="error"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
-                    handleClose();
                     setCustomerDeleteId(row.values.id);
+                    setOpen(true);
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -292,13 +371,13 @@ const SkillTable = ({ data }: SkillTableProps) => {
       <ScrollX>
         <ReactTable
           columns={columns}
-          data={data}
+          data={updatedData}
           handleAdd={handleAdd}
           renderRowSubComponent={renderRowSubComponent}
           getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
         />
       </ScrollX>
-      <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} />
+      <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} reloadDataAfterDelete={handleReloadData} />
       {/* add customer dialog */}
       <Dialog
         maxWidth="sm"
@@ -310,7 +389,15 @@ const SkillTable = ({ data }: SkillTableProps) => {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        <AddCustomer customer={customer} onCancel={handleAdd} />
+        <AddCustomer
+          customer={customer}
+          onCancel={handleAdd}
+          reloadDataAfterAdd={handleReloadData}
+          candidate_skills={candidate_skills}
+          candidate_processes={candidate_processes}
+          candidate_roles={candidate_roles}
+          candidate_client={candidate_client}
+        />
       </Dialog>
     </MainCard>
   );

@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // material-ui
 import {
@@ -47,99 +47,73 @@ import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
 import { CloseOutlined } from '@ant-design/icons';
+import { SkillTableType, skill, processType, projectPositionType, clientType } from 'types/employee/skill-table';
+
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
-  console.log('customer', customer)
   const newCustomer = {
-    id: '',
+    id: null as number | null,
+    start_date: null as Date | null,
+    end_date: null as Date | null,
     project_title: '',
+    client_name: ``,
     description: '',
     people_number: '',
-    start_date: new Date(),
-    end_date: new Date(),
     skills: [],
     process: [],
-    client: '',
-    role: ''
+    project_position_name: ''
   };
 
   if (customer) {
     newCustomer.id = customer.id;
+    newCustomer.start_date = customer.start_date;
+    newCustomer.end_date = customer.end_date;
     newCustomer.project_title = customer.project_title;
+    newCustomer.client_name = customer.client_name;
     newCustomer.description = customer.description;
     newCustomer.people_number = customer.people_number;
-    // newCustomer.start_date = startDate;
-    // newCustomer.end_date = endDate;
+    newCustomer.project_position_name = customer.project_position_name;
     return _.merge({}, newCustomer, customer);
   }
 
   return newCustomer;
 };
 
-const role = ['PG', 'L', 'PL', 'PM'];
-
-const skills = [
-  'Java',
-  'HTML',
-  'CSS',
-  'Bootstrap',
-  'JavaScript',
-  'TypeScript',
-  'NodeJS',
-  'React',
-  'Angular',
-  'CI',
-  'C言語',
-  'C++',
-  'Java',
-  'C#',
-  'JavaScript',
-  'PHP',
-  'Ruby',
-  'TypeScript',
-  'Python',
-  'R言語',
-  'Go言語',
-  'Swift',
-  'Kotlin',
-  'Objective-C',
-  'Visual Basic',
-  'VBScript',
-  'BASIC',
-  'Google Apps Script',
-  'Haskell',
-  'Scala',
-  'Groovy',
-  'Delphi',
-  'Dart',
-  'D言語',
-  'Perl',
-  'COBOL',
-  'SQL',
-  'FORTRAN',
-  'MATLAB',
-  'Scratch'
-];
-const candidate_skills = ['Java', 'JavaScript', 'Python', 'PHP', 'TypeScript', 'C', 'C#', 'C++'];
-
-const process = ['要件定義', '基本設計', '詳細設計', '製造', '単体テスト', '結合テスト', '運用テスト', '保守'];
-
 const filterprocess = createFilterOptions<string>();
 const filterSkills = createFilterOptions<string>();
 
 // ==============================|| 顧客の追加/編集 ||============================== //
-
 export interface Props {
   customer?: any;
-  onCancel: () => void;
+  onCancel: (status: boolean) => void;
+  reloadDataAfterAdd: (data: SkillTableType[]) => void;
+  candidate_skills: skill[];
+  candidate_processes: processType[];
+  candidate_roles: projectPositionType[];
+  candidate_client: clientType[];
 }
 
-const AddCustomer = ({ customer, onCancel }: Props) => {
-  const [startDate, setStartDate] = useState<Date | null>();
-  const [endDate, setEndDate] = useState<Date | null>();
+const AddCustomer = ({
+  customer,
+  onCancel,
+  reloadDataAfterAdd,
+  candidate_skills,
+  candidate_processes,
+  candidate_roles,
+  candidate_client
+}: Props) => {
   const isCreating = !customer;
   const router = useRouter();
   const id = router.query.id as string;
+
+  // candidate_flagがtrueのものだけ抽出
+  const filteredSkills = candidate_skills.filter((skill) => skill.candidate_flag);
+  const skills = candidate_skills.map((skill) => String(skill.name));
+  const CandidateSkillList = filteredSkills.map((skill) => skill.name);
+
+  const process = candidate_processes.map((process) => String(process.name));
+  const role = candidate_roles.map((role) => String(role.name));
+  const client = candidate_client.map((client) => String(client.name));
 
   const CustomerSchema = Yup.object().shape({
     project_title: Yup.string().max(255).required('プロジェクト名は必須です')
@@ -175,10 +149,11 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
   });
 
   const [openAlert, setOpenAlert] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleAlertClose = () => {
     setOpenAlert(!openAlert);
-    onCancel();
+    onCancel(false);
   };
 
   const formik = useFormik({
@@ -188,7 +163,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
       try {
         if (customer) {
           alertSnackBar('処理中…', 'secondary');
-          fetch(`/api/db/employee/skill/update?id=${id}`, {
+          fetch(`/api/db/employee/project/update?id=${id}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -202,20 +177,20 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
               return response.json();
             })
             .then((data) => {
-              console.log(data);
-              // onReload(data.data);
               alertSnackBar('正常に更新されました。', 'success');
+              reloadDataAfterAdd(data.data.rows);
+              setIsEditing(false);
             })
             .catch((error) => {
               console.error('エラー:', error);
               alertSnackBar('データの更新に失敗しました。', 'error');
             })
             .finally(() => {
-              onCancel();
+              onCancel(false);
             });
         } else {
           alertSnackBar('処理中…', 'secondary');
-          fetch(`/api/db/employee/skill/insert?id=${id}`, {
+          fetch(`/api/db/employee/project/insert?id=${id}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -229,9 +204,9 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
               return response.json();
             })
             .then((data) => {
-              console.log(data);
-              // onReload(data.data);
               alertSnackBar('正常に追加されました。', 'success');
+              reloadDataAfterAdd(data.data.rows);
+              setIsEditing(false);
             })
             .catch((error) => {
               console.error('エラー:', error);
@@ -239,7 +214,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
             })
             .finally(() => {
               setSubmitting(false);
-              onCancel();
+              onCancel(false);
             });
         }
       } catch (error) {
@@ -248,7 +223,17 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
     }
   });
 
-  const { errors, touched, handleSubmit, isSubmitting, getFieldProps, setFieldValue } = formik;
+  useEffect(() => {
+    if (isCreating) {
+      // 新規作成時はフォームをリセットして初期値を設定
+      formik.resetForm({ values: getInitialValues(null) });
+    } else if (customer) {
+      // 編集時はcustomerが変更された場合のみフォームの値を更新
+      formik.setValues(getInitialValues(customer));
+    }
+  }, [customer, isCreating]);
+
+  const { errors, touched, handleSubmit, getFieldProps, setFieldValue } = formik;
   let TagsError: boolean | string | undefined = false;
   if (formik.touched.skills && typeof formik.errors.skills) {
     if (formik.touched.skills && typeof formik.errors.skills === 'string') {
@@ -286,22 +271,24 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-id">id</InputLabel>
-                        <TextField fullWidth id="customer-id" {...getFieldProps('id')} />
-                      </Stack>
-                    </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-name">開始日</InputLabel>
-                        <DatePicker value={startDate} onChange={(newValue) => setStartDate(newValue)} format="yyyy/MM/dd" />
+                        <DatePicker
+                          format="yyyy/MM/dd"
+                          value={getFieldProps('start_date').value ? new Date(getFieldProps('start_date').value) : null}
+                          onChange={(newValue) => setFieldValue('start_date', newValue)}
+                        />
                       </Stack>
                     </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-name">終了日</InputLabel>
-                        <DatePicker value={endDate} onChange={(newValue) => setEndDate(newValue)} format="yyyy/MM/dd" />
+                        <DatePicker
+                          format="yyyy/MM/dd"
+                          value={getFieldProps('end_date').value ? new Date(getFieldProps('end_date').value) : null}
+                          onChange={(newValue) => setFieldValue('end_date', newValue)}
+                        />
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
@@ -317,19 +304,40 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                         />
                       </Stack>
                     </Grid>
-                    {/* <Grid item xs={12}>
+
+                    <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-client">企業名</InputLabel>
-                        <TextField
-                          fullWidth
-                          id="customer-client"
-                          placeholder="企業名を入力"
-                          {...getFieldProps('client')}
-                          error={Boolean(touched.client && errors.client)}
-                          helperText={touched.client && errors.client}
-                        />
+                        <FormControl fullWidth>
+                          <Select
+                            id="column-hiding"
+                            displayEmpty
+                            {...getFieldProps('client_name')}
+                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('client_name', event.target.value as string)}
+                            input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
+                            renderValue={(selected) => {
+                              if (!selected) {
+                                return <Typography variant="subtitle1">企業を選択</Typography>;
+                              }
+
+                              return <Typography variant="subtitle2">{selected}</Typography>;
+                            }}
+                          >
+                            {client.map((column: any) => (
+                              <MenuItem key={column} value={column}>
+                                <ListItemText primary={column} />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {touched.client_name && errors.client_name && (
+                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
+                            {errors.client_name}
+                          </FormHelperText>
+                        )}
                       </Stack>
-                    </Grid> */}
+                    </Grid>
+
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-description">業務内容</InputLabel>
@@ -365,8 +373,10 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           <Select
                             id="column-hiding"
                             displayEmpty
-                            {...getFieldProps('role')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('role', event.target.value as string)}
+                            {...getFieldProps('project_position_name')}
+                            onChange={(event: SelectChangeEvent<string>) =>
+                              setFieldValue('project_position_name', event.target.value as string)
+                            }
                             input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
                             renderValue={(selected) => {
                               if (!selected) {
@@ -383,9 +393,9 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                             ))}
                           </Select>
                         </FormControl>
-                        {touched.role && errors.role && (
+                        {touched.project_position_name && errors.project_position_name && (
                           <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.role}
+                            {errors.project_position_name}
                           </FormHelperText>
                         )}
                       </Stack>
@@ -433,8 +443,8 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              name="skills"
                               placeholder="使用したスキルを入力してください"
+                              {...getFieldProps('skills')}
                               error={formik.touched.skills && Boolean(formik.errors.skills)}
                               helperText={TagsError}
                             />
@@ -472,20 +482,15 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           sx={{ mt: 1.5, flexWrap: { xs: 'wrap', sm: 'inherit' }, gap: { xs: 1, sm: 0 } }}
                         >
                           <Typography variant="caption">候補:</Typography>
-                          {candidate_skills
-                            .filter(
-                              (skill: string) => formik.values.skills && !formik.values.skills.map((item) => item).includes(skill as never)
-                            )
-                            .slice(0, 5)
-                            .map((option, index) => (
-                              <Chip
-                                key={index}
-                                variant="outlined"
-                                onClick={() => setFieldValue('skills', [...formik.values.skills, option])}
-                                label={<Typography variant="caption">{option}</Typography>}
-                                size="small"
-                              />
-                            ))}
+                          {CandidateSkillList.map((option, index) => (
+                            <Chip
+                              key={index}
+                              variant="outlined"
+                              onClick={() => setFieldValue('skills', [...formik.values.skills, option])}
+                              label={<Typography variant="caption">{option}</Typography>}
+                              size="small"
+                            />
+                          ))}
                         </Stack>
                       </Stack>
                     </Grid>
@@ -532,8 +537,8 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              name="process"
                               placeholder="担当した工程を入力してください"
+                              {...getFieldProps('process')}
                               error={formik.touched.process && Boolean(formik.errors.process)}
                               helperText={TagsError}
                             />
@@ -617,10 +622,10 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
                 </Grid>
                 <Grid item>
                   <Stack direction="row" spacing={2} alignItems="center">
-                    <Button color="error" onClick={onCancel}>
+                    <Button color="error" onClick={() => onCancel(false)}>
                       キャンセル
                     </Button>
-                    <Button type="submit" variant="contained" disabled={isSubmitting}>
+                    <Button type="submit" variant="contained" disabled={isEditing}>
                       {customer ? '編集' : '追加'}
                     </Button>
                   </Stack>
@@ -630,7 +635,14 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
           </Form>
         </LocalizationProvider>
       </FormikProvider>
-      {!isCreating && <AlertCustomerDelete title={customer.fatherName} open={openAlert} handleClose={handleAlertClose} />}
+      {!isCreating && (
+        <AlertCustomerDelete
+          title={customer.fatherName}
+          open={openAlert}
+          handleClose={handleAlertClose}
+          reloadDataAfterDelete={(data: SkillTableType[]) => {}}
+        />
+      )}
     </>
   );
 };

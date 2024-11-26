@@ -34,7 +34,6 @@ const SkillSheet = () => {
   const { id } = router.query;
   const [projects, setProjects] = useState<Array<ProjectCard>>([]);
   const [basics, setBasics] = useState<Array<BasicCard>>([]);
-
   const { list } = useSelector((state) => state.invoice);
 
   const today = new Date().toLocaleDateString('ja-JP', {
@@ -68,7 +67,7 @@ const SkillSheet = () => {
 
   async function fetchTableData(id: string) {
     try {
-      const response = await fetch(`/api/db/employee/skill/select?id=${id}`);
+      const response = await fetch(`/api/db/employee/project/select?id=${id}`);
       if (!response.ok) {
         throw new Error('API request failed');
       }
@@ -103,20 +102,13 @@ const SkillSheet = () => {
 
   useEffect(() => {
     if (typeof id === 'string') {
-      fetchTableData(id)
-        .then((data) => {
-          setProjects(data.data.rows);
+      Promise.all([fetchTableData(id), fetchBasicData(id)])
+        .then(([tableData, basicData]) => {
+          setProjects(tableData.data.rows);
+          setBasics(basicData.data.rows);
         })
         .catch((error) => {
-          console.error('Error:', error);
-        });
-
-      fetchBasicData(id)
-        .then((data) => {
-          setBasics(data.data.rows);
-        })
-        .catch((error) => {
-          console.error('Error:', error);
+          console.error('Error fetching data:', error);
         });
     } else {
       console.error('Invalid ID:', id);

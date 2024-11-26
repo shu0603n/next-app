@@ -3,47 +3,19 @@ import { useRouter } from 'next/router';
 import { Grid } from '@mui/material';
 import SkillTable from './skill-table/SkillTable';
 import { useState, useEffect } from 'react';
-import { SkillTableType } from 'types/employee/skill-table';
+import { SkillTableType, skill, processType, projectPositionType, clientType } from 'types/employee/skill-table';
 
 // アセット
 
 // ==============================|| アカウントプロファイル - 役割 ||============================== //
 
-async function fetchSkillList(id: number) {
-  try {
-    console.log(id);
-    const response = await fetch(`/api/db/employee/skill/skills/select?id=${id}`);
-    if (!response.ok) {
-      throw new Error('API request failed');
-    }
-    const data = await response.json();
-    return data; // APIから返されたデータを返します
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    throw error;
-  }
-}
-
 async function fetchTableData(id: string) {
   try {
-    const response = await fetch(`/api/db/employee/skill/select?id=${id}`);
+    const response = await fetch(`/api/db/employee/project/select?id=${id}`);
     if (!response.ok) {
       throw new Error('API request failed');
     }
     const data = await response.json();
-
-    // マップ処理を非同期関数として実行し、Promise.allで待機します
-    data.data.rows = await Promise.all(
-      data.data.rows.map(async (row: SkillTableType) => {
-        try {
-          const skills = await fetchSkillList(row.id);
-          return { ...row, skill: skills.data.rows ?? [] };
-        } catch (error) {
-          console.error('Error fetching skills:', error);
-          return { ...row, skill: undefined };
-        }
-      })
-    );
 
     return data; // APIから返されたデータを返します
   } catch (error) {
@@ -53,7 +25,11 @@ async function fetchTableData(id: string) {
 }
 
 const TabRole = () => {
-  const [data, setData] = useState<SkillTableType[]>([]); // デフォルト値を空の配列に設定
+  const [data, setData] = useState<SkillTableType[]>([]);
+  const [candidate_skills, setCandidate_skills] = useState<skill[]>([]);
+  const [candidate_processes, setCandidate_processes] = useState<processType[]>([]);
+  const [candidate_roles, setCandidate_roles] = useState<projectPositionType[]>([]);
+  const [candidate_client, setCandidate_client] = useState<clientType[]>([]);
   const router = useRouter();
   const id = router.query.id as string;
 
@@ -62,6 +38,10 @@ const TabRole = () => {
     fetchTableData(id)
       .then((fetchedData) => {
         setData(fetchedData.data.rows);
+        setCandidate_skills(fetchedData.skill);
+        setCandidate_processes(fetchedData.process);
+        setCandidate_roles(fetchedData.role);
+        setCandidate_client(fetchedData.client);
       })
       .catch((error) => {
         // エラーハンドリング
@@ -73,7 +53,13 @@ const TabRole = () => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
-        <SkillTable data={data} />
+        <SkillTable
+          data={data}
+          candidate_skills={candidate_skills}
+          candidate_processes={candidate_processes}
+          candidate_roles={candidate_roles}
+          candidate_client={candidate_client}
+        />
       </Grid>
     </Grid>
   );

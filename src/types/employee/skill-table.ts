@@ -15,5 +15,28 @@ export type SkillTableType = {
 export type skill = {
   id: number;
   name: number;
-  technic_name: string;
+  technic_name?: string;
+  candidate_flag: boolean;
+};
+
+export type processType = {
+  id: number;
+  name: number;
+};
+
+export type projectPositionType = {
+  id: number;
+  name: string;
+  description: string;
+};
+
+export type clientType = {
+  id: number;
+  name: string;
+  name_k: string;
+  address: string;
+  phone: string;
+  email: string;
+  postal_code: string;
+  remarks: string;
 };

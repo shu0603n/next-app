@@ -80,8 +80,10 @@ model employee_project {
   description                String?                      @db.VarChar(2000)
   people_number              Int?
   client_id                  Int?
+  project_position_id        Int?
   client                     client?                      @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "employee_skills_client_id_fkey")
   employee                   employee                     @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "employee_skills_employee_id_fkey")
+  project_position           project_position?            @relation(fields: [project_position_id], references: [id], onUpdate: NoAction, map: "fk_project_position")
   employee_project_processes employee_project_processes[]
   employee_project_skills    employee_project_skills[]
 }
@@ -300,4 +302,11 @@ model verificationtokens {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model project_position {
+  id               Int                @id @default(autoincrement())
+  name             String             @db.VarChar(30)
+  description      String?            @db.VarChar(255)
+  employee_project employee_project[]
 }

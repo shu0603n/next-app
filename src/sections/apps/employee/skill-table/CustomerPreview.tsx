@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 // material-ui
 import { Theme } from '@mui/material/styles';
@@ -37,6 +38,7 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // タイプ
 import { UserCardProps } from 'types/user-profile';
+import { SkillTableType, skill, processType, projectPositionType, clientType } from 'types/employee/skill-table';
 
 // アセット
 import { DeleteOutlined, DownloadOutlined, EditOutlined } from '@ant-design/icons';
@@ -57,6 +59,7 @@ async function fetchTableData() {
     throw error;
   }
 }
+
 const defaultRes: dbResponse = {
   data: {
     command: '',
@@ -68,24 +71,57 @@ const defaultRes: dbResponse = {
   }
 };
 
+async function fetchSkillTableData(id: string) {
+  try {
+    const response = await fetch(`/api/db/employee/project/select?id=${id}`);
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
+
 export default function CustomerPreview({ customer, open, onClose }: { customer: UserCardProps; open: boolean; onClose: () => void }) {
   const matchDownMD = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
   const [openAlert, setOpenAlert] = useState(false);
   const [tableData, setTableData] = useState<dbResponse>(defaultRes); // データを保持する状態変数
+  const [candidate_skills, setCandidate_skills] = useState<skill[]>([]);
+  const [candidate_processes, setCandidate_processes] = useState<processType[]>([]);
+  const [candidate_roles, setCandidate_roles] = useState<projectPositionType[]>([]);
+  const [candidate_client, setCandidate_client] = useState<clientType[]>([]);
+  const router = useRouter();
+  const id = router.query.id as string;
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
-    fetchTableData()
-      .then((data) => {
-        setTableData(data); // データを状態に設定
-      })
-      .catch((error) => {
+    const fetchData = async () => {
+      try {
+        // 両方のデータを非同期で取得
+        const tableDataResponse = await fetchTableData();
+        const skillDataResponse = await fetchSkillTableData(id);
+
+        // データを状態に設定
+        setTableData(tableDataResponse);
+        setCandidate_skills(skillDataResponse.skill);
+        setCandidate_processes(skillDataResponse.process);
+        setCandidate_roles(skillDataResponse.role);
+        setCandidate_client(skillDataResponse.client_name);
+      } catch (error) {
         // エラーハンドリング
         console.error('Error:', error);
-      });
-  }, []); // 空の依存リストを指定することで、一度だけ実行される
+      }
+    };
 
-  console.log(tableData);
+    console.log(tableData);
+
+    // データ取得を実行
+    fetchData();
+  }, [id]); // `id` が変わったときに再実行される
 
   const [add, setAdd] = useState<boolean>(false);
   const handleAdd = () => {
@@ -325,10 +361,27 @@ export default function CustomerPreview({ customer, open, onClose }: { customer:
         open={add}
         sx={{ '& .MuiDialog-paper': { p: 0 } }}
       >
-        <AddCustomer customer={customer} onCancel={handleAdd} />
+        <AddCustomer
+          customer={customer}
+          onCancel={handleAdd}
+          reloadDataAfterAdd={(data: SkillTableType[]) => {
+            console.log(data);
+          }}
+          candidate_skills={candidate_skills}
+          candidate_processes={candidate_processes}
+          candidate_roles={candidate_roles}
+          candidate_client={candidate_client}
+        />
       </Dialog>
 
-      <AlertCustomerDelete title={customer.fatherName} open={openAlert} handleClose={handleClose} />
+      <AlertCustomerDelete
+        title={customer.fatherName}
+        open={openAlert}
+        handleClose={handleClose}
+        reloadDataAfterDelete={(data: SkillTableType[]) => {
+          console.log(data);
+        }}
+      />
     </>
   );
 }
