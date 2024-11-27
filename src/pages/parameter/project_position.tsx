@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement } from 'react';
 import { alpha, useTheme } from '@mui/material/styles';
-import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
+import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, useMediaQuery } from '@mui/material';
 import {
   useFilters,
   useExpanded,
