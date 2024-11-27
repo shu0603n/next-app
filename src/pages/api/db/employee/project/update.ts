@@ -147,7 +147,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
     WHERE 
         employee_project.employee_id = ${employeeId} 
     GROUP BY 
-        employee_project.id, client.name, pp.name;
+        employee_project.id, client.name, pp.name
+    ORDER BY employee_project.start_date DESC;
     `;
 
     return response.status(200).json({ data });
