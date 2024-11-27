@@ -104,7 +104,15 @@ const SkillSheet = () => {
     if (typeof id === 'string') {
       Promise.all([fetchTableData(id), fetchBasicData(id)])
         .then(([tableData, basicData]) => {
-          setProjects(tableData.data.rows);
+          // 取得したプロジェクトデータを並び替え
+          const sortedProjects = [...tableData.data.rows].sort((a, b) => {
+            const dateA = new Date(a.start_date);
+            const dateB = new Date(b.start_date);
+            return dateB.getTime() - dateA.getTime(); // 新しい順
+          });
+
+          // 並び替えたデータをsetProjectsで設定
+          setProjects(sortedProjects);
           setBasics(basicData.data.rows);
         })
         .catch((error) => {

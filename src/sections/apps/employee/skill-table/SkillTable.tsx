@@ -52,7 +52,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: 'project_title', desc: false };
+  const initialSortBy = useMemo(() => [{ id: 'start_date', desc: true }], []);
 
   const {
     getTableProps,
@@ -66,7 +66,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     page,
     gotoPage,
     setPageSize,
-    state: { globalFilter, selectedRowIds, pageIndex, pageSize, expanded },
+    state: { globalFilter, selectedRowIds, pageIndex, pageSize, expanded, sortBy },
     preGlobalFilteredRows,
     setGlobalFilter,
     setSortBy,
@@ -76,7 +76,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['cliant'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['cliant'], sortBy: initialSortBy }
     },
     useGlobalFilter,
     useFilters,
@@ -133,7 +133,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
             size="small"
           />
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
-            <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
+            <SortingSelect sortBy={sortBy[0]?.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
               新規追加
             </Button>
