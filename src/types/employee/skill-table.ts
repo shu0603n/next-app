@@ -10,8 +10,11 @@ export type SkillTableType = {
   client_id: number;
   process_list_id: number;
   client_name: string;
-  skill?: skill[];
+  skills?: skill[];
+  process?: processType[];
+  project_position_name?: string;
 };
+
 export type skill = {
   id: number;
   name: number;
