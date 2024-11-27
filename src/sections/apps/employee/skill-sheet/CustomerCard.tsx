@@ -79,7 +79,7 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
               </Typography>
               <Typography>
                 {customer?.description
-                  ? customer.description.split('\r\n').map((val, index) => (
+                  ? customer.description.split('\n').map((val, index) => (
                       <Fragment key={index}>
                         {val}
                         <br />
@@ -90,11 +90,11 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
             </Grid>
           </Grid>
           <Grid item xs={12} md={5}>
-            <Grid item xs={12}>
-              <Typography variant="h5" component="span">
-                使用スキル
-              </Typography>
-              {customer.skills?.some((skill) => skill) && (
+            {customer.skills?.some((skill) => skill) && (
+              <Grid item xs={12}>
+                <Typography variant="h5" component="span">
+                  使用スキル
+                </Typography>
                 <Box>
                   <Box
                     sx={{
@@ -113,13 +113,13 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                     ))}
                   </Box>
                 </Box>
-              )}
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="h5" component="span">
-                担当工程
-              </Typography>
-              {customer.process?.some((process) => process) && (
+              </Grid>
+            )}
+            {customer.process?.some((process) => process) && (
+              <Grid item xs={12}>
+                <Typography variant="h5" component="span">
+                  担当工程
+                </Typography>
                 <Box>
                   <Box
                     sx={{
@@ -138,8 +138,8 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                     ))}
                   </Box>
                 </Box>
-              )}
-            </Grid>
+              </Grid>
+            )}
           </Grid>
         </Grid>
         <Stack

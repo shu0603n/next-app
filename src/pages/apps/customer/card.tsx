@@ -174,7 +174,7 @@ const CustomerCardPage = () => {
               </Slide>
             ))
         ) : (
-          <EmptyUserCard title={'You have not created any customer yet.'} />
+          <EmptyUserCard title={'読み込み中...'} />
         )}
       </Grid>
       <Stack spacing={2} sx={{ p: 2.5 }} alignItems="flex-end">
