@@ -83,51 +83,47 @@ const CustomerView = ({ data }: Props) => {
                           </Stack>
                         </Grid>
                       </Grid>
-                      <Grid item xs={12} md={12}>
+                      <Grid item xs={12} md={8} sx={{ ml: 6 }}>
                         <Stack spacing={2.5}>
                           <Typography color="secondary">使用スキル</Typography>
-                          {data.skills && data.skills.length > 0 ? (
-                            <Box>
-                              <Box
-                                sx={{
-                                  display: 'flex',
-                                  flexWrap: 'wrap',
-                                  listStyle: 'none',
-                                  p: 0.5,
-                                  m: 0
-                                }}
-                                component="ul"
-                              >
-                                {data.skills.map((skills: any, index: number) => (
-                                  <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                                    <Chip variant="outlined" size="small" label={skills} />
-                                  </ListItem>
-                                ))}
-                              </Box>
+                          {data.skills && data.skills.filter((skill) => skill !== null && skill !== undefined).length > 0 ? (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                listStyle: 'none',
+                                p: 0.5,
+                                m: 0
+                              }}
+                              component="ul"
+                            >
+                              {data.skills.map((skills: any, index: number) => (
+                                <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
+                                  <Chip variant="outlined" size="small" label={skills} />
+                                </ListItem>
+                              ))}
                             </Box>
                           ) : (
                             <Typography>スキル情報がありません</Typography>
                           )}
 
                           <Typography color="secondary">担当工程</Typography>
-                          {data.process && data.process.length > 0 ? (
-                            <Box>
-                              <Box
-                                sx={{
-                                  display: 'flex',
-                                  flexWrap: 'wrap',
-                                  listStyle: 'none',
-                                  p: 0.5,
-                                  m: 0
-                                }}
-                                component="ul"
-                              >
-                                {data.process.map((process: any, index: number) => (
-                                  <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                                    <Chip variant="outlined" size="small" label={process} />
-                                  </ListItem>
-                                ))}
-                              </Box>
+                          {data.process && data.process.filter((process) => process !== null && process !== undefined).length > 0 ? (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                listStyle: 'none',
+                                p: 0.5,
+                                m: 0
+                              }}
+                              component="ul"
+                            >
+                              {data.process.map((process: any, index: number) => (
+                                <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
+                                  <Chip variant="outlined" size="small" label={process} />
+                                </ListItem>
+                              ))}
                             </Box>
                           ) : (
                             <Typography>担当工程情報がありません</Typography>
@@ -148,7 +144,7 @@ const CustomerView = ({ data }: Props) => {
                         <Divider orientation="vertical" flexItem />
                         <Stack spacing={0.5} alignItems="center">
                           <Typography color="secondary">役割</Typography>
-                          <Typography variant="h5">{data.project_position_name}</Typography>
+                          <Typography variant="h5">{data.project_position_description}</Typography>
                         </Stack>
                         <Divider orientation="vertical" flexItem />
                         <Stack spacing={0.5} alignItems="center">

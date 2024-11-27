@@ -13,6 +13,7 @@ export type SkillTableType = {
   skills?: skill[];
   process?: processType[];
   project_position_name?: string;
+  project_position_description?: string;
 };
 
 export type skill = {
