@@ -12,7 +12,7 @@ const TribeLogoIcon = () => {
     <Image
       src={logoIcon} // ロゴ画像
       alt="Tribe Logo Icon" // 画像の説明
-      width={35} // 幅
+      width={40} // 幅
       height={30} // 高さ
     />
   );
