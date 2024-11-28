@@ -1,13 +1,13 @@
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { useMediaQuery, Grid, Divider, List, ListItem, Stack, TableCell, TableRow, Typography } from '@mui/material';
+import { useMediaQuery, Grid, Divider, List, ListItem, Stack, TableCell, TableRow, Typography, Box, Chip } from '@mui/material';
 
 // プロジェクトのインポート
 import MainCard from 'components/MainCard';
 import Transitions from 'components/@extended/Transitions';
 
 // アセット
-import { SkillTableType, skill } from 'types/employee/skill-table';
+import { SkillTableType } from 'types/employee/skill-table';
 
 // ==============================|| 顧客 - 表示 ||============================== //
 interface Props {
@@ -16,6 +16,36 @@ interface Props {
 const CustomerView = ({ data }: Props) => {
   const theme = useTheme();
   const matchDownMD = useMediaQuery(theme.breakpoints.down('md'));
+
+  const formatDate = (isoDate: string) => {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString('ja-JP', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  };
+
+  // 期間を月数で計算
+  const calculateMonthsBetween = (startDate: string, endDate: string): number => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // 開始日と終了日の年月を取り出す
+    const startYear = start.getFullYear();
+    const startMonth = start.getMonth(); // 0-based index (0 = January)
+    const endYear = end.getFullYear();
+    const endMonth = end.getMonth();
+
+    // 月数の差を計算
+    const monthDifference = (endYear - startYear) * 12 + (endMonth - startMonth);
+
+    // 結果を返す
+    return monthDifference;
+  };
+
+  // 期間（月数）の計算
+  const monthsBetween = calculateMonthsBetween(formatDate(data.start_date), formatDate(data.end_date));
 
   return (
     <TableRow sx={{ '&:hover': { bgcolor: `transparent !important` }, overflow: 'hidden' }}>
@@ -53,6 +83,53 @@ const CustomerView = ({ data }: Props) => {
                           </Stack>
                         </Grid>
                       </Grid>
+                      <Grid item xs={12} md={8} sx={{ ml: 6 }}>
+                        <Stack spacing={2.5}>
+                          <Typography color="secondary">使用スキル</Typography>
+                          {data.skills && data.skills.filter((skill) => skill !== null && skill !== undefined).length > 0 ? (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                listStyle: 'none',
+                                p: 0.5,
+                                m: 0
+                              }}
+                              component="ul"
+                            >
+                              {data.skills.map((skills: any, index: number) => (
+                                <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
+                                  <Chip variant="outlined" size="small" label={skills} />
+                                </ListItem>
+                              ))}
+                            </Box>
+                          ) : (
+                            <Typography>スキル情報がありません</Typography>
+                          )}
+
+                          <Typography color="secondary">担当工程</Typography>
+                          {data.process && data.process.filter((process) => process !== null && process !== undefined).length > 0 ? (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                listStyle: 'none',
+                                p: 0.5,
+                                m: 0
+                              }}
+                              component="ul"
+                            >
+                              {data.process.map((process: any, index: number) => (
+                                <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
+                                  <Chip variant="outlined" size="small" label={process} />
+                                </ListItem>
+                              ))}
+                            </Box>
+                          ) : (
+                            <Typography>担当工程情報がありません</Typography>
+                          )}
+                        </Stack>
+                      </Grid>
                     </ListItem>
                   </List>
                 </MainCard>
@@ -62,12 +139,12 @@ const CustomerView = ({ data }: Props) => {
                       <Stack direction="row" justifyContent="space-around" alignItems="center">
                         <Stack spacing={0.5} alignItems="center">
                           <Typography color="secondary">期間</Typography>
-                          <Typography variant="h5">{data.people_number}ヵ月</Typography>
+                          <Typography variant="h5">{monthsBetween}ヵ月</Typography>
                         </Stack>
                         <Divider orientation="vertical" flexItem />
                         <Stack spacing={0.5} alignItems="center">
                           <Typography color="secondary">役割</Typography>
-                          <Typography variant="h5">{data.people_number}</Typography>
+                          <Typography variant="h5">{data.project_position_description}</Typography>
                         </Stack>
                         <Divider orientation="vertical" flexItem />
                         <Stack spacing={0.5} alignItems="center">
@@ -78,14 +155,6 @@ const CustomerView = ({ data }: Props) => {
                     </Grid>
                   </Grid>
                 </MainCard>
-                {data.skill && data.skill.length > 0 && (
-                  <MainCard title="使用スキル">
-                    {data.skill?.map((item: skill) => {
-                      // eslint-disable-next-line react/jsx-key
-                      return <Typography color="secondary">{`${item.name} (${item.technic_name})`}</Typography>;
-                    })}
-                  </MainCard>
-                )}
               </Stack>
             </Grid>
           </Grid>
