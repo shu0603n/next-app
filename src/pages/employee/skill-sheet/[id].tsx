@@ -21,8 +21,6 @@ import MainCard from 'components/MainCard';
 import TribeLogoSection from 'components/tribe-logo';
 import ExportPDFView from 'sections/apps/employee/skill-sheet/export-pdf';
 
-import { useSelector } from 'store';
-
 // assets
 import { DownloadOutlined, EditOutlined, PrinterFilled } from '@ant-design/icons';
 
@@ -33,8 +31,8 @@ const SkillSheet = () => {
   const router = useRouter();
   const { id } = router.query;
   const [projects, setProjects] = useState<Array<ProjectCard>>([]);
-  const [basics, setBasics] = useState<Array<BasicCard>>([]);
-  const { list } = useSelector((state) => state.invoice);
+  const [basics, setBasics] = useState<BasicCard>();
+  const [list, setList] = useState<SkillSheet>();
 
   const today = new Date().toLocaleDateString('ja-JP', {
     year: 'numeric',
@@ -43,6 +41,15 @@ const SkillSheet = () => {
   });
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
+
+  type SkillSheet = {
+    id?: number;
+    sei?: string;
+    mei?: string;
+    birthday?: number;
+    address?: string;
+    project?: Array<ProjectCard>;
+  };
 
   type ProjectCard = {
     id: number;
@@ -105,7 +112,7 @@ const SkillSheet = () => {
       Promise.all([fetchTableData(id), fetchBasicData(id)])
         .then(([tableData, basicData]) => {
           setProjects(tableData.data.rows);
-          setBasics(basicData.data.rows);
+          setBasics(basicData.data.rows[0]);
         })
         .catch((error) => {
           console.error('Error fetching data:', error);
@@ -114,6 +121,20 @@ const SkillSheet = () => {
       console.error('Invalid ID:', id);
     }
   }, [id]);
+
+  // `projects` と `basics` の両方がセットされたら `setList` を実行
+  useEffect(() => {
+    if (projects.length > 0 && basics) {
+      setList({
+        id: basics.id,
+        sei: basics.sei,
+        mei: basics.mei,
+        birthday: basics.birthday,
+        address: basics.address,
+        project: projects
+      });
+    }
+  }, [projects, basics]); // `projects` と `basics` が更新されたときに実行
 
   // search
   useEffect(() => {
@@ -145,28 +166,30 @@ const SkillSheet = () => {
     <Page title="SkillSheet">
       <MainCard content={false}>
         <Stack spacing={2.5}>
-          <Box sx={{ p: 2.5, pb: 0 }}>
-            <MainCard content={false} sx={{ p: 1.25, bgcolor: 'primary.lighter', borderColor: theme.palette.primary[100] }}>
-              <Stack direction="row" justifyContent="flex-end" spacing={1}>
-                <IconButton onClick={() => router.push(`/employee/detail/${id}/skill`)}>
-                  <EditOutlined style={{ color: theme.palette.grey[900] }} />
-                </IconButton>
-                <PDFDownloadLink document={<ExportPDFView list={list} />} fileName={`${list?.invoice_id}-${list?.customer_name}.pdf`}>
-                  <IconButton>
-                    <DownloadOutlined style={{ color: theme.palette.grey[900] }} />
+          {list?.id && (
+            <Box sx={{ p: 2.5, pb: 0 }}>
+              <MainCard content={false} sx={{ p: 1.25, bgcolor: 'primary.lighter', borderColor: theme.palette.primary[100] }}>
+                <Stack direction="row" justifyContent="flex-end" spacing={1}>
+                  <IconButton onClick={() => router.push(`/employee/detail/${id}/skill`)}>
+                    <EditOutlined style={{ color: theme.palette.grey[900] }} />
                   </IconButton>
-                </PDFDownloadLink>
-                <ReactToPrint
-                  trigger={() => (
+                  <PDFDownloadLink document={<ExportPDFView list={list} />} fileName={`${list?.sei}${list?.mei}-スキルシート.pdf`}>
                     <IconButton>
-                      <PrinterFilled style={{ color: theme.palette.grey[900] }} />
+                      <DownloadOutlined style={{ color: theme.palette.grey[900] }} />
                     </IconButton>
-                  )}
-                  content={() => componentRef.current}
-                />
-              </Stack>
-            </MainCard>
-          </Box>
+                  </PDFDownloadLink>
+                  <ReactToPrint
+                    trigger={() => (
+                      <IconButton>
+                        <PrinterFilled style={{ color: theme.palette.grey[900] }} />
+                      </IconButton>
+                    )}
+                    content={() => componentRef.current}
+                  />
+                </Stack>
+              </MainCard>
+            </Box>
+          )}
           <Box sx={{ p: 2.5 }} id="print" ref={componentRef}>
             <Grid container spacing={2.5}>
               <Grid item xs={12}>
@@ -175,7 +198,6 @@ const SkillSheet = () => {
                     <Stack direction="row" spacing={2}>
                       <TribeLogoSection />
                     </Stack>
-                    <Typography color="secondary">{list?.invoice_id}</Typography>
                   </Box>
                   <Box>
                     <Stack direction="row" spacing={1} justifyContent="flex-end">
@@ -190,11 +212,11 @@ const SkillSheet = () => {
                   <Stack spacing={1}>
                     <Typography variant="h5">エンジニア情報</Typography>
                     <FormControl sx={{ width: '100%' }}>
-                      {basics.length > 0 ? (
+                      {basics ? (
                         <>
-                          <Typography color="secondary">氏名 : {`${basics[0].sei} ${basics[0].mei}`}</Typography>
-                          <Typography color="secondary">年齢 : {calculateAge(basics[0].birthday)}歳</Typography>
-                          <Typography color="secondary">住所 : {basics[0].address}</Typography>
+                          <Typography color="secondary">氏名 : {`${basics.sei} ${basics.mei}`}</Typography>
+                          <Typography color="secondary">年齢 : {calculateAge(basics.birthday)}歳</Typography>
+                          <Typography color="secondary">住所 : {basics.address}</Typography>
                         </>
                       ) : (
                         <Typography color="secondary">読み込み中...</Typography>
