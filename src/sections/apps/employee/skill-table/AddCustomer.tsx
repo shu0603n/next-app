@@ -46,7 +46,6 @@ import { DeleteFilled } from '@ant-design/icons';
 import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
-import { CloseOutlined } from '@ant-design/icons';
 import { SkillTableType, skill, processType, projectPositionType, clientType } from 'types/employee/skill-table';
 
 // constant
@@ -72,6 +71,8 @@ const getInitialValues = (customer: FormikValues | null) => {
     newCustomer.client_name = customer.client_name;
     newCustomer.description = customer.description;
     newCustomer.people_number = customer.people_number;
+    newCustomer.skills = customer.skills || [];
+    newCustomer.process = customer.process || [];
     newCustomer.project_position_name = customer.project_position_name;
     return _.merge({}, newCustomer, customer);
   }
@@ -249,16 +250,17 @@ const AddCustomer = ({
     }
   }
 
-  const message = `■フロントエンド開発
+  const message = `
+  ■フロントエンド開発
   ユーザーインターフェース（UI）の設計と実装。HTML、CSS、JavaScriptを使用して、見栄えの良いウェブページを構築します。
   レスポンシブデザインを確保し、異なる画面サイズとデバイスでの適切な表示を保証します。
   フレームワーク（例: React、Angular、Vue.js）を使用して、動的なコンポーネントを開発し、ユーザーエクスペリエンスを向上させます。
 
   ■バックエンド開発
-
   サーバーサイドプログラムを設計・実装し、データベースとの通信を可能にします。主要なバックエンド言語（例: Node.js、Python、Ruby）を使用します。
   RESTful APIエンドポイントを設計し、データの受信と送信を管理します。セキュリティを確保し、APIエンドポイントを守ります。
-  データベースの設計と管理。SQLデータベース（例: MySQL、PostgreSQL）やNoSQLデータベース（例: MongoDB）を使用します。`;
+  データベースの設計と管理。SQLデータベース（例: MySQL、PostgreSQL）やNoSQLデータベース（例: MongoDB）を使用します。
+  `;
 
   return (
     <>
@@ -416,10 +418,8 @@ const AddCustomer = ({
                           onBlur={formik.handleBlur}
                           getOptionLabel={(option) => option}
                           onChange={(event, newValue) => {
-                            const jobExist = skills.includes(newValue[newValue.length - 1]);
-                            if (!jobExist) {
-                              setFieldValue('skills', newValue);
-                            } else {
+                            const exist = skills.includes(newValue[newValue.length - 1]);
+                            if (exist) {
                               setFieldValue('skills', newValue);
                             }
                           }}
@@ -436,7 +436,7 @@ const AddCustomer = ({
                           renderOption={(props, option) => {
                             return (
                               <Box component="li" {...props}>
-                                {!skills.some((v) => option.includes(v)) ? `Add "${option}"` : option}
+                                {!skills.some((v) => option.includes(v)) ? `絞り込み:「${option}」` : option}
                               </Box>
                             );
                           }}
@@ -444,36 +444,10 @@ const AddCustomer = ({
                             <TextField
                               {...params}
                               placeholder="使用したスキルを入力してください"
-                              {...getFieldProps('skills')}
                               error={formik.touched.skills && Boolean(formik.errors.skills)}
                               helperText={TagsError}
                             />
                           )}
-                          renderTags={(value, getTagProps) =>
-                            value.map((option, index) => {
-                              let error = false;
-                              if (formik.touched.skills && formik.errors.skills && typeof formik.errors.skills !== 'string') {
-                                if (typeof formik.errors.skills[index] === 'object') error = true;
-                              }
-
-                              return (
-                                // eslint-disable-next-line react/jsx-key
-                                <Chip
-                                  {...getTagProps({ index })}
-                                  variant="combined"
-                                  color={error ? 'error' : 'secondary'}
-                                  label={
-                                    <Typography variant="caption" color="secondary.dark">
-                                      {option}
-                                    </Typography>
-                                  }
-                                  // eslint-disable-next-line react/jsx-no-undef
-                                  deleteIcon={<CloseOutlined style={{ fontSize: '0.875rem' }} />}
-                                  size="small"
-                                />
-                              );
-                            })
-                          }
                         />
                         <Stack
                           direction="row"
@@ -510,10 +484,8 @@ const AddCustomer = ({
                           onBlur={formik.handleBlur}
                           getOptionLabel={(option) => option}
                           onChange={(event, newValue) => {
-                            const jobExist = process.includes(newValue[newValue.length - 1]);
-                            if (!jobExist) {
-                              setFieldValue('process', newValue);
-                            } else {
+                            const exist = process.includes(newValue[newValue.length - 1]);
+                            if (exist) {
                               setFieldValue('process', newValue);
                             }
                           }}
@@ -530,7 +502,7 @@ const AddCustomer = ({
                           renderOption={(props, option) => {
                             return (
                               <Box component="li" {...props}>
-                                {!process.some((v) => option.includes(v)) ? `Add "${option}"` : option}
+                                {!process.some((v) => option.includes(v)) ? `絞り込み:「${option}」` : option}
                               </Box>
                             );
                           }}
@@ -538,36 +510,10 @@ const AddCustomer = ({
                             <TextField
                               {...params}
                               placeholder="担当した工程を入力してください"
-                              {...getFieldProps('process')}
                               error={formik.touched.process && Boolean(formik.errors.process)}
                               helperText={TagsError}
                             />
                           )}
-                          renderTags={(value, getTagProps) =>
-                            value.map((option, index) => {
-                              let error = false;
-                              if (formik.touched.process && formik.errors.process && typeof formik.errors.process !== 'string') {
-                                if (typeof formik.errors.process[index] === 'object') error = true;
-                              }
-
-                              return (
-                                // eslint-disable-next-line react/jsx-key
-                                <Chip
-                                  {...getTagProps({ index })}
-                                  variant="combined"
-                                  color={error ? 'error' : 'secondary'}
-                                  label={
-                                    <Typography variant="caption" color="secondary.dark">
-                                      {option}
-                                    </Typography>
-                                  }
-                                  // eslint-disable-next-line react/jsx-no-undef
-                                  deleteIcon={<CloseOutlined style={{ fontSize: '0.875rem' }} />}
-                                  size="small"
-                                />
-                              );
-                            })
-                          }
                         />
                         <Stack
                           direction="row"

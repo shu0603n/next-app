@@ -1,6 +1,7 @@
 export type ParameterType = {
   id: number;
   name: string;
+  description?: string;
 };
 
 export type EmployeeParameterType = {

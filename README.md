@@ -76,12 +76,11 @@ DATABASE="verceldb"
 
 # Prisma マイグレーション方法
 
+## DBに変更を加えた後は以下を実行する
 db から prisma ファイルを生成
 `yarn prisma db pull`
 prisma ファイルを元にローカル prisma を更新
-（※DB の内容が初期化されるため、本番環境には行わないこと。）
 `yarn prisma generate`
-`yarn prisma generate <テーブル名>`
 
 # よくあるトラブル
 

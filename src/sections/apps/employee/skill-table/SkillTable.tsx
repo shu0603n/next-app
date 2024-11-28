@@ -52,7 +52,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
-  const sortBy = { id: 'project_title', desc: false };
+  const sortBy = { id: 'start_date', desc: true };
 
   const {
     getTableProps,
@@ -103,8 +103,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     } else {
       setHiddenColumns([
         `id`,
+        'client_name',
         'people_number',
-        `end_date`,
         `description`,
         `project_position_id`,
         'project_position_name',

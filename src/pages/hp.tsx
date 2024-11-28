@@ -88,7 +88,7 @@ const Hp = () => {
                         </Slide>
                       ))
                   ) : (
-                    <EmptyUserCard title={'You have not created any customer yet.'} />
+                    <EmptyUserCard title={'読み込み中...'} />
                   )}
                 </Grid>
               </Grid>

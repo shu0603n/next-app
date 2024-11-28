@@ -68,6 +68,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
       employee_project.employee_id = ${employeeId}
     GROUP BY 
       employee_project.id, client.name, pp.name, pp.description;
+    ORDER BY employee_project.start_date DESC;
     `;
 
     // 同時に実行して待つ
