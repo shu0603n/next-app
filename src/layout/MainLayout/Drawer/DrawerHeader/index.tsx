@@ -4,7 +4,7 @@ import { useMediaQuery } from '@mui/material';
 
 // project import
 import DrawerHeaderStyled from './DrawerHeaderStyled';
-import Logo from 'components/logo';
+import Logo from 'components/tribe-logo';
 import useConfig from 'hooks/useConfig';
 
 // types

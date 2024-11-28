@@ -8,7 +8,7 @@ import EmptyUserCard from 'components/cards/skeleton/EmptyUserCard';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Box, Slide, Grid, IconButton, Chip, FormControl, Button, Stack, Typography, Divider } from '@mui/material';
+import { Box, Slide, Grid, IconButton, FormControl, Stack, Typography } from '@mui/material';
 
 // third-party
 import ReactToPrint from 'react-to-print';
@@ -18,7 +18,7 @@ import { PDFDownloadLink } from '@react-pdf/renderer';
 import Layout from 'layout';
 import Page from 'components/Page';
 import MainCard from 'components/MainCard';
-import LogoSection from 'components/logo';
+import TribeLogoSection from 'components/tribe-logo';
 import ExportPDFView from 'sections/apps/employee/skill-sheet/export-pdf';
 
 import { useSelector } from 'store';
@@ -173,8 +173,7 @@ const SkillSheet = () => {
                 <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between">
                   <Box>
                     <Stack direction="row" spacing={2}>
-                      <LogoSection />
-                      <Chip label="Paid" variant="light" color="success" size="small" />
+                      <TribeLogoSection />
                     </Stack>
                     <Typography color="secondary">{list?.invoice_id}</Typography>
                   </Box>
@@ -230,18 +229,8 @@ const SkillSheet = () => {
                   )}
                 </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <Divider sx={{ borderWidth: 1 }} />
-              </Grid>
             </Grid>
           </Box>
-          <Stack direction="row" justifyContent="flex-end" spacing={2} sx={{ p: 2.5, a: { textDecoration: 'none', color: 'inherit' } }}>
-            <PDFDownloadLink document={<ExportPDFView list={list} />} fileName={`${list?.invoice_id}-${list?.customer_name}.pdf`}>
-              <Button variant="contained" color="primary">
-                Download
-              </Button>
-            </PDFDownloadLink>
-          </Stack>
         </Stack>
       </MainCard>
     </Page>

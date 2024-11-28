@@ -7,7 +7,7 @@ import { Box, Grid } from '@mui/material';
 import AuthCard from './AuthCard';
 import AuthBackground from './AuthBackground';
 import AuthFooter from 'components/cards/AuthFooter';
-import Logo from 'components/logo';
+import Logo from 'components/tribe-logo';
 
 interface Props {
   children: ReactNode;

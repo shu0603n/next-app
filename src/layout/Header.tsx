@@ -31,7 +31,7 @@ import { APP_DEFAULT_PATH } from 'config';
 import IconButton from 'components/@extended/IconButton';
 
 import AnimateButton from 'components/@extended/AnimateButton';
-import Logo from 'components/logo';
+import Logo from 'components/tribe-logo';
 
 // types
 import { ThemeMode } from 'types/config';
