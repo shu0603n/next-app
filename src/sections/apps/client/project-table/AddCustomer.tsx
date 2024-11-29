@@ -36,7 +36,7 @@ import * as Yup from 'yup';
 import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
 
 // project imports
-import AlertCustomerDelete from './AlertCustomerDelete';
+// import AlertCustomerDelete from './AlertCustomerDelete';
 import IconButton from 'components/@extended/IconButton';
 
 // assets
@@ -46,7 +46,7 @@ import { DeleteFilled } from '@ant-design/icons';
 import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
-import { SkillTableType, skill, processType, projectPositionType, clientType } from 'types/employee/skill-table';
+import { ProjectTableType } from 'types/client/project-table';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
@@ -54,6 +54,8 @@ const getInitialValues = (customer: FormikValues | null) => {
     id: null as number | null,
     start_date: null as Date | null,
     end_date: null as Date | null,
+    working_start_time: '',
+    working_end_time: '',
     project_title: '',
     client_name: ``,
     description: '',
@@ -67,6 +69,8 @@ const getInitialValues = (customer: FormikValues | null) => {
     newCustomer.id = customer.id;
     newCustomer.start_date = customer.start_date;
     newCustomer.end_date = customer.end_date;
+    newCustomer.working_start_time = customer.working_start_time;
+    newCustomer.working_end_time = customer.working_end_time;
     newCustomer.project_title = customer.project_title;
     newCustomer.client_name = customer.client_name;
     newCustomer.description = customer.description;
@@ -87,34 +91,13 @@ const filterSkills = createFilterOptions<string>();
 export interface Props {
   customer?: any;
   onCancel: (status: boolean) => void;
-  reloadDataAfterAdd: (data: SkillTableType[]) => void;
-  candidate_skills: skill[];
-  candidate_processes: processType[];
-  candidate_roles: projectPositionType[];
-  candidate_client: clientType[];
+  reloadDataAfterAdd: (data: ProjectTableType[]) => void;
 }
 
-const AddCustomer = ({
-  customer,
-  onCancel,
-  reloadDataAfterAdd,
-  candidate_skills,
-  candidate_processes,
-  candidate_roles,
-  candidate_client
-}: Props) => {
+const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
   const isCreating = !customer;
   const router = useRouter();
   const id = router.query.id as string;
-
-  // candidate_flagがtrueのものだけ抽出
-  const filteredSkills = candidate_skills.filter((skill) => skill.candidate_flag);
-  const skills = candidate_skills.map((skill) => String(skill.name));
-  const CandidateSkillList = filteredSkills.map((skill) => skill.name);
-
-  const process = candidate_processes.map((process) => String(process.name));
-  const role = candidate_roles.map((role) => String(role.name));
-  const client = candidate_client.map((client) => String(client.name));
 
   const CustomerSchema = Yup.object().shape({
     project_title: Yup.string().max(255).required('プロジェクト名は必須です')
@@ -294,6 +277,44 @@ const AddCustomer = ({
                         />
                       </Stack>
                     </Grid>
+                    <Grid item xs={6}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>就業開始時刻</InputLabel>
+                        <TextField
+                          id="working_start_time"
+                          placeholder="Alarm Clock"
+                          type="time"
+                          InputLabelProps={{
+                            shrink: true
+                          }}
+                          inputProps={{
+                            step: 300 // 5 min
+                          }}
+                          sx={{ width: 150 }}
+                          value={getFieldProps('working_start_time').value ? new Date(getFieldProps('working_start_time').value) : null}
+                          onChange={(newValue) => setFieldValue('working_start_time', newValue)}
+                        />
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Stack spacing={1.25}>
+                        <InputLabel>就業終了時刻</InputLabel>
+                        <TextField
+                          id="working_end_time"
+                          placeholder="Alarm Clock"
+                          type="time"
+                          InputLabelProps={{
+                            shrink: true
+                          }}
+                          inputProps={{
+                            step: 300 // 5 min
+                          }}
+                          sx={{ width: 150 }}
+                          {...getFieldProps('working_end_time')}
+                          onChange={(event: any) => setFieldValue('working_end_time', event.target.value as string)}
+                        />
+                      </Stack>
+                    </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-project_title">プロジェクト名</InputLabel>
@@ -305,39 +326,6 @@ const AddCustomer = ({
                           error={Boolean(touched.project_title && errors.project_title)}
                           helperText={touched.project_title && errors.project_title}
                         />
-                      </Stack>
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-client">企業名</InputLabel>
-                        <FormControl fullWidth>
-                          <Select
-                            id="column-hiding"
-                            displayEmpty
-                            {...getFieldProps('client_name')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('client_name', event.target.value as string)}
-                            input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
-                            renderValue={(selected) => {
-                              if (!selected) {
-                                return <Typography variant="subtitle1">企業を選択</Typography>;
-                              }
-
-                              return <Typography variant="subtitle2">{selected}</Typography>;
-                            }}
-                          >
-                            {client.map((column: any) => (
-                              <MenuItem key={column} value={column}>
-                                <ListItemText primary={column} />
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                        {touched.client_name && errors.client_name && (
-                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.client_name}
-                          </FormHelperText>
-                        )}
                       </Stack>
                     </Grid>
 
@@ -367,178 +355,6 @@ const AddCustomer = ({
                           error={Boolean(touched.people_number && errors.people_number)}
                           helperText={touched.people_number && errors.people_number}
                         />
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-role">役割</InputLabel>
-                        <FormControl fullWidth>
-                          <Select
-                            id="column-hiding"
-                            displayEmpty
-                            {...getFieldProps('project_position_name')}
-                            onChange={(event: SelectChangeEvent<string>) =>
-                              setFieldValue('project_position_name', event.target.value as string)
-                            }
-                            input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
-                            renderValue={(selected) => {
-                              if (!selected) {
-                                return <Typography variant="subtitle1">役割を選択</Typography>;
-                              }
-
-                              return <Typography variant="subtitle2">{selected}</Typography>;
-                            }}
-                          >
-                            {role.map((column: any) => (
-                              <MenuItem key={column} value={column}>
-                                <ListItemText primary={column} />
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                        {touched.project_position_name && errors.project_position_name && (
-                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.project_position_name}
-                          </FormHelperText>
-                        )}
-                      </Stack>
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-orderStatus">スキル</InputLabel>
-                        <Autocomplete
-                          id="skills"
-                          multiple
-                          fullWidth
-                          autoHighlight
-                          freeSolo
-                          disableCloseOnSelect
-                          options={skills}
-                          value={formik.values.skills}
-                          onBlur={formik.handleBlur}
-                          getOptionLabel={(option) => option}
-                          onChange={(event, newValue) => {
-                            const exist = skills.includes(newValue[newValue.length - 1]);
-                            if (exist) {
-                              setFieldValue('skills', newValue);
-                            }
-                          }}
-                          filterOptions={(options, params) => {
-                            const filtered = filterSkills(options, params);
-                            const { inputValue } = params;
-                            const isExisting = options.some((option) => inputValue === option);
-                            if (inputValue !== '' && !isExisting) {
-                              filtered.push(inputValue);
-                            }
-
-                            return filtered;
-                          }}
-                          renderOption={(props, option) => {
-                            return (
-                              <Box component="li" {...props}>
-                                {!skills.some((v) => option.includes(v)) ? `絞り込み:「${option}」` : option}
-                              </Box>
-                            );
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="使用したスキルを入力してください"
-                              error={formik.touched.skills && Boolean(formik.errors.skills)}
-                              helperText={TagsError}
-                            />
-                          )}
-                        />
-                        <Stack
-                          direction="row"
-                          spacing={1}
-                          alignItems="center"
-                          sx={{ mt: 1.5, flexWrap: { xs: 'wrap', sm: 'inherit' }, gap: { xs: 1, sm: 0 } }}
-                        >
-                          <Typography variant="caption">候補:</Typography>
-                          {CandidateSkillList.map((option, index) => (
-                            <Chip
-                              key={index}
-                              variant="outlined"
-                              onClick={() => setFieldValue('skills', [...formik.values.skills, option])}
-                              label={<Typography variant="caption">{option}</Typography>}
-                              size="small"
-                            />
-                          ))}
-                        </Stack>
-                      </Stack>
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-orderStatus">担当工程</InputLabel>
-                        <Autocomplete
-                          id="process"
-                          multiple
-                          fullWidth
-                          autoHighlight
-                          freeSolo
-                          disableCloseOnSelect
-                          options={process}
-                          value={formik.values.process}
-                          onBlur={formik.handleBlur}
-                          getOptionLabel={(option) => option}
-                          onChange={(event, newValue) => {
-                            const exist = process.includes(newValue[newValue.length - 1]);
-                            if (exist) {
-                              setFieldValue('process', newValue);
-                            }
-                          }}
-                          filterOptions={(options, params) => {
-                            const filtered = filterprocess(options, params);
-                            const { inputValue } = params;
-                            const isExisting = options.some((option) => inputValue === option);
-                            if (inputValue !== '' && !isExisting) {
-                              filtered.push(inputValue);
-                            }
-
-                            return filtered;
-                          }}
-                          renderOption={(props, option) => {
-                            return (
-                              <Box component="li" {...props}>
-                                {!process.some((v) => option.includes(v)) ? `絞り込み:「${option}」` : option}
-                              </Box>
-                            );
-                          }}
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              placeholder="担当した工程を入力してください"
-                              error={formik.touched.process && Boolean(formik.errors.process)}
-                              helperText={TagsError}
-                            />
-                          )}
-                        />
-                        <Stack
-                          direction="row"
-                          spacing={1}
-                          alignItems="center"
-                          sx={{ mt: 1.5, flexWrap: { xs: 'wrap', sm: 'inherit' }, gap: { xs: 1, sm: 0 } }}
-                        >
-                          <Typography variant="caption">候補:</Typography>
-                          {process
-                            .filter(
-                              (process: string) =>
-                                formik.values.process && !formik.values.process.map((item) => item).includes(process as never)
-                            )
-                            .slice(0, 5)
-                            .map((option, index) => (
-                              <Chip
-                                key={index}
-                                variant="outlined"
-                                onClick={() => setFieldValue('process', [...formik.values.process, option])}
-                                label={<Typography variant="caption">{option}</Typography>}
-                                size="small"
-                              />
-                            ))}
-                        </Stack>
                       </Stack>
                     </Grid>
 
@@ -582,14 +398,14 @@ const AddCustomer = ({
           </Form>
         </LocalizationProvider>
       </FormikProvider>
-      {!isCreating && (
+      {/* {!isCreating && (
         <AlertCustomerDelete
           title={customer.fatherName}
           open={openAlert}
           handleClose={handleAlertClose}
           reloadDataAfterDelete={(data: SkillTableType[]) => {}}
         />
-      )}
+      )} */}
     </>
   );
 };

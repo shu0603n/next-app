@@ -34,8 +34,9 @@ import AlertCustomerDelete from 'sections/apps/client/AlertCustomerDelete';
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
-import { EditTwoTone, PlusOutlined, DeleteTwoTone } from '@ant-design/icons';
+import { PlusOutlined, DeleteTwoTone } from '@ant-design/icons';
 import { ClientType } from 'types/client/client';
+import { useRouter } from 'next/router';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -52,6 +53,8 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: 'id', desc: false };
+
+  const router = useRouter();
 
   const {
     getTableProps,
@@ -83,6 +86,10 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
     usePagination,
     useRowSelect
   );
+
+  const handleChangeDetail = (newValue: string) => {
+    router.push(`/client/detail/${newValue}/basic`);
+  };
 
   useEffect(() => {
     if (matchDownSM) {
@@ -140,8 +147,8 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
                 <Fragment key={i}>
                   <TableRow
                     {...row.getRowProps()}
-                    onClick={() => {
-                      row.toggleRowSelected();
+                    onClick={(e: MouseEvent<HTMLTableRowElement>) => {
+                      handleChangeDetail(row.values.id);
                     }}
                     sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                   >
@@ -253,29 +260,12 @@ const CustomerClientPage = () => {
         disableSortBy: true
       },
       {
-        Header: 'メールアドレス',
-        accessor: 'email',
-        disableSortBy: true
-      },
-      {
-        Header: '詳細',
+        Header: 'アクション',
         className: 'cell-center',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           return (
             <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
-              <Tooltip title="編集">
-                <IconButton
-                  color="primary"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    setCustomer(row.values);
-                    handleAdd();
-                  }}
-                >
-                  <EditTwoTone twoToneColor={theme.palette.primary.main} />
-                </IconButton>
-              </Tooltip>
               <Tooltip title="Delete">
                 <IconButton
                   color="error"
