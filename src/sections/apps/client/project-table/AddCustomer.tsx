@@ -46,38 +46,41 @@ import { DeleteFilled } from '@ant-design/icons';
 import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
-import { ProjectTableType } from 'types/client/project-table';
+import { ProjectTableType, clientType, employeeType } from 'types/client/project-table';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
   const newCustomer = {
     id: null as number | null,
+    name: ``,
     start_date: null as Date | null,
     end_date: null as Date | null,
     working_start_time: '',
     working_end_time: '',
     project_title: '',
-    client_name: ``,
     description: '',
     people_number: '',
     skills: [],
     process: [],
-    project_position_name: ''
+    client: '',
+    project_position_name: '',
+    employee: []
   };
 
   if (customer) {
     newCustomer.id = customer.id;
+    newCustomer.name = customer.name;
     newCustomer.start_date = customer.start_date;
     newCustomer.end_date = customer.end_date;
     newCustomer.working_start_time = customer.working_start_time;
     newCustomer.working_end_time = customer.working_end_time;
     newCustomer.project_title = customer.project_title;
-    newCustomer.client_name = customer.client_name;
     newCustomer.description = customer.description;
     newCustomer.people_number = customer.people_number;
     newCustomer.skills = customer.skills || [];
     newCustomer.process = customer.process || [];
     newCustomer.project_position_name = customer.project_position_name;
+    newCustomer.employee = customer.employee || [];
     return _.merge({}, newCustomer, customer);
   }
 
@@ -92,12 +95,17 @@ export interface Props {
   customer?: any;
   onCancel: (status: boolean) => void;
   reloadDataAfterAdd: (data: ProjectTableType[]) => void;
+  candidate_client: clientType[];
+  candidate_employee: employeeType[];
 }
 
-const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
+const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd, candidate_client, candidate_employee }: Props) => {
   const isCreating = !customer;
   const router = useRouter();
   const id = router.query.id as string;
+
+  const client = candidate_client.map((client) => String(client.name));
+  const employee = candidate_employee.map((employee) => String(employee.sei));
 
   const CustomerSchema = Yup.object().shape({
     project_title: Yup.string().max(255).required('プロジェクト名は必須です')
@@ -249,6 +257,7 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
   return (
     <>
       <FormikProvider value={formik}>
+        {JSON.stringify(getInitialValues(customer))}
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <DialogTitle>{customer ? 'スキル情報の編集' : '新しいスキルの追加'}</DialogTitle>
@@ -291,8 +300,8 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
                             step: 300 // 5 min
                           }}
                           sx={{ width: 150 }}
-                          value={getFieldProps('working_start_time').value ? new Date(getFieldProps('working_start_time').value) : null}
-                          onChange={(newValue) => setFieldValue('working_start_time', newValue)}
+                          {...getFieldProps('working_start_time')}
+                          onChange={(event: any) => setFieldValue('working_start_time', event.target.value as string)}
                         />
                       </Stack>
                     </Grid>
@@ -321,14 +330,77 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd }: Props) => {
                         <TextField
                           fullWidth
                           id="customer-project_title"
-                          placeholder="企業名を入力"
+                          placeholder="プロジェクト名を入力"
                           {...getFieldProps('project_title')}
                           error={Boolean(touched.project_title && errors.project_title)}
                           helperText={touched.project_title && errors.project_title}
                         />
                       </Stack>
                     </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="customer-client">企業名</InputLabel>
+                        <FormControl fullWidth>
+                          <Select
+                            id="column-hiding"
+                            displayEmpty
+                            {...getFieldProps('name')}
+                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('name', event.target.value as string)}
+                            input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
+                            renderValue={(selected) => {
+                              if (!selected) {
+                                return <Typography variant="subtitle1">企業を選択</Typography>;
+                              }
 
+                              return <Typography variant="subtitle2">{selected}</Typography>;
+                            }}
+                          >
+                            {client.map((column: any) => (
+                              <MenuItem key={column} value={column}>
+                                <ListItemText primary={column} />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {touched.name && errors.name && (
+                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
+                            {errors.name}
+                          </FormHelperText>
+                        )}
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Stack spacing={1.25}>
+                        <InputLabel htmlFor="customer-employee">担当者</InputLabel>
+                        <FormControl fullWidth>
+                          <Select
+                            id="column-hiding"
+                            displayEmpty
+                            {...getFieldProps('employee')}
+                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('employee', event.target.value as string)}
+                            input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
+                            renderValue={(selected) => {
+                              if (!selected) {
+                                return <Typography variant="subtitle1">担当者を選択</Typography>;
+                              }
+
+                              return <Typography variant="subtitle2">{selected}</Typography>;
+                            }}
+                          >
+                            {employee.map((column: any) => (
+                              <MenuItem key={column} value={column}>
+                                <ListItemText primary={column} />
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {touched.employee && errors.employee && (
+                          <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
+                            {errors.employee}
+                          </FormHelperText>
+                        )}
+                      </Stack>
+                    </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-description">業務内容</InputLabel>

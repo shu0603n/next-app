@@ -11,3 +11,13 @@ export type ProjectTableType = {
   working_address: string;
   holiday: string;
 };
+
+export type clientType = {
+  id: number;
+  name: string;
+};
+
+export type employeeType = {
+  id: number;
+  sei: string;
+};

@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { Grid } from '@mui/material';
 import ProjectTable from './project-table/ProjectTable';
 import { useState, useEffect } from 'react';
-import { ProjectTableType } from 'types/client/project-table';
+import { ProjectTableType, clientType, employeeType } from 'types/client/project-table';
 
 // アセット
 
@@ -26,6 +26,8 @@ async function fetchTableData(id: string) {
 
 const TabRole = () => {
   const [data, setData] = useState<ProjectTableType[]>([]);
+  const [candidate_client, setCandidate_client] = useState<clientType[]>([]);
+  const [candidate_employee, setCandidate_employee] = useState<employeeType[]>([]);
   const router = useRouter();
   const id = router.query.id as string;
 
@@ -34,6 +36,8 @@ const TabRole = () => {
     fetchTableData(id)
       .then((fetchedData) => {
         setData(fetchedData.data.rows);
+        setCandidate_client(fetchedData.client);
+        setCandidate_employee(fetchedData.employee);
       })
       .catch((error) => {
         // エラーハンドリング
@@ -45,7 +49,7 @@ const TabRole = () => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
-        <ProjectTable data={data} />
+        <ProjectTable data={data} candidate_client={candidate_client} candidate_employee={candidate_employee} />
       </Grid>
     </Grid>
   );

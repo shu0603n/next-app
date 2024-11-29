@@ -35,7 +35,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { ProjectTableType } from 'types/client/project-table';
+import { ProjectTableType, clientType, employeeType } from 'types/client/project-table';
 
 // ==============================|| REACT TABLE - EDITABLE ROW ||============================== //
 
@@ -90,9 +90,11 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     if (matchDownSM) {
       setHiddenColumns([
         `id`,
+        `name`,
         'start_date',
         'client_name',
-        'people_number',
+        'working_start_time',
+        `working_end_time`,
         `end_date`,
         `description`,
         `project_position_id`,
@@ -103,8 +105,10 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     } else {
       setHiddenColumns([
         `id`,
+        `name`,
         'client_name',
-        'people_number',
+        'working_start_time',
+        `working_end_time`,
         `description`,
         `project_position_id`,
         'project_position_name',
@@ -193,7 +197,15 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 }
 
 // ==============================|| CUSTOMER - LIST ||============================== //
-const SkillTable = ({ data }: { data: ProjectTableType[] }) => {
+const ProjectTable = ({
+  data,
+  candidate_client,
+  candidate_employee
+}: {
+  data: ProjectTableType[];
+  candidate_client: clientType[];
+  candidate_employee: employeeType[];
+}) => {
   const theme = useTheme();
 
   const [open, setOpen] = useState<boolean>(false);
@@ -256,6 +268,10 @@ const SkillTable = ({ data }: { data: ProjectTableType[] }) => {
         accessor: 'id'
       },
       {
+        Header: '企業名',
+        accessor: 'name'
+      },
+      {
         Header: '開始日',
         accessor: 'start_date'
       },
@@ -276,8 +292,12 @@ const SkillTable = ({ data }: { data: ProjectTableType[] }) => {
         accessor: 'client_name'
       },
       {
-        Header: '人数',
-        accessor: 'people_number'
+        Header: '業務開始時間',
+        accessor: 'working_start_time'
+      },
+      {
+        Header: '業務終了時間',
+        accessor: 'working_end_time'
       },
       {
         Header: '役割ID',
@@ -377,10 +397,16 @@ const SkillTable = ({ data }: { data: ProjectTableType[] }) => {
         sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
         aria-describedby="alert-dialog-slide-description"
       >
-        <AddCustomer customer={customer} onCancel={handleAdd} reloadDataAfterAdd={handleReloadData} />
+        <AddCustomer
+          customer={customer}
+          onCancel={handleAdd}
+          reloadDataAfterAdd={handleReloadData}
+          candidate_client={candidate_client}
+          candidate_employee={candidate_employee}
+        />
       </Dialog>
     </MainCard>
   );
 };
 
-export default SkillTable;
+export default ProjectTable;
