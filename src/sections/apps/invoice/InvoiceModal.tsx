@@ -22,7 +22,7 @@ import { PDFDownloadLink } from '@react-pdf/renderer';
 import { format } from 'date-fns';
 
 // project import
-import Logo from 'components/logo';
+import Logo from 'components/tribe-logo';
 import ExportPDFView from './export-pdf';
 
 // assets

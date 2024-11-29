@@ -6,7 +6,7 @@ import { Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 import { format } from 'date-fns';
 
 // assets
-const Logo = '/assets/images/logo.png';
+const Logo = '/assets/images/tribe-logo.png';
 
 // types
 import { InvoiceList } from 'types/invoice';

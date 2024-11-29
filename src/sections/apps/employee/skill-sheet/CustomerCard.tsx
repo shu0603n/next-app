@@ -49,7 +49,12 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
             <List sx={{ width: 1, p: 0 }}>
               <ListItemText
                 primary={
-                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: '100%' }}>
+                  <Stack
+                    direction={{ xs: 'column', sm: 'row' }} // xsでは縦表示、sm以上では横表示
+                    justifyContent={{ xs: 'flex-start', sm: 'space-between' }} // xsでは左揃え
+                    alignItems="flex-start" // xsでもsmでも左揃え
+                    sx={{ width: '100%' }}
+                  >
                     <Typography variant="h4" component="span">
                       <Typography variant="h3" component="span" color="primary">
                         {customer.project_title || ''}
@@ -60,6 +65,7 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                       {customer.end_date ? formatDate(customer.end_date) : '現在就業中'}
                     </Typography>
                   </Stack>
+
                 }
                 secondary={
                   <Typography variant="caption" color="secondary">
@@ -142,18 +148,6 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
             )}
           </Grid>
         </Grid>
-        <Stack
-          direction="row"
-          className="hideforPDf"
-          alignItems="center"
-          spacing={1}
-          justifyContent="space-between"
-          sx={{ mt: 'auto', mb: 0, pt: 2.25 }}
-        >
-          <Typography variant="caption" color="secondary">
-            Updated in {customer.time}
-          </Typography>
-        </Stack>
       </MainCard>
 
       {/* edit customer dialog */}

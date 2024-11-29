@@ -5,7 +5,7 @@ import { useTheme } from '@mui/material/styles';
 import { Button, Grid, List, ListItem, ListItemIcon, ListItemText, Stack, Switch, Typography } from '@mui/material';
 
 // project import
-import Logo from 'components/logo';
+import Logo from 'components/tribe-logo';
 import Layout from 'layout';
 import Page from 'components/Page';
 import MainCard from 'components/MainCard';

@@ -12,6 +12,7 @@ import productReducer from './product';
 import cartReducer from './cart';
 import kanban from './kanban';
 import invoice from './invoice';
+import skillSheet from './skillSheet';
 
 // ==============================|| COMBINE REDUCERS ||============================== //
 
@@ -30,7 +31,8 @@ const reducers = combineReducers({
   ),
   product: productReducer,
   kanban,
-  invoice
+  invoice,
+  skillSheet
 });
 
 export default reducers;

@@ -43,30 +43,31 @@ export default async function handler(request: NextApiRequest, response: NextApi
     });
 
     const data = await sql`
-    SELECT 
-        employee_project.*,
-        client.name AS client_name,
-	    pp.name AS project_position_name,
-        array_agg(DISTINCT s.name) AS skills,
-        array_agg(DISTINCT p.name) AS process
+SELECT 
+      employee_project.*,
+      client.name AS client_name,
+      pp.name AS project_position_name,
+      pp.description AS project_position_description,
+      array_agg(DISTINCT s.name) AS skills,
+      array_agg(DISTINCT p.name) AS process
     FROM 
-        employee_project
+      employee_project
     LEFT JOIN 
-        client ON employee_project.client_id = client.id
+      client ON employee_project.client_id = client.id
     LEFT JOIN 
-        employee_project_skills eps ON employee_project.id = eps.employee_project_id
+      employee_project_skills eps ON employee_project.id = eps.employee_project_id
     LEFT JOIN 
-        skill s ON eps.skill_id = s.id
+      skill s ON eps.skill_id = s.id
     LEFT JOIN
-        employee_project_processes epp ON employee_project.id = epp.employee_project_id
+      employee_project_processes epp ON employee_project.id = epp.employee_project_id
+    LEFT JOIN 
+      process p ON epp.process_id = p.id
     LEFT JOIN
-        process p ON epp.process_id = p.id
-    LEFT JOIN
-	    project_position pp ON employee_project.project_position_id = pp.id
+      project_position pp ON employee_project.project_position_id = pp.id
     WHERE 
-        employee_project.employee_id = ${employeeId} 
+      employee_project.employee_id = ${employeeId}
     GROUP BY 
-        employee_project.id, client.name, pp.name
+      employee_project.id, client.name, pp.name, pp.description
     ORDER BY employee_project.start_date DESC;
     `;
 

@@ -32,7 +32,7 @@ import Layout from 'layout';
 import Page from 'components/Page';
 import Loader from 'components/Loader';
 import MainCard from 'components/MainCard';
-import LogoSection from 'components/logo';
+import TribeLogoSection from 'components/tribe-logo';
 import ExportPDFView from 'sections/apps/invoice/export-pdf';
 
 import { dispatch, useSelector } from 'store';
@@ -115,7 +115,7 @@ const Details = () => {
                 <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between">
                   <Box>
                     <Stack direction="row" spacing={2}>
-                      <LogoSection />
+                      <TribeLogoSection />
                       <Chip label="Paid" variant="light" color="success" size="small" />
                     </Stack>
                     <Typography color="secondary">{list?.invoice_id}</Typography>
