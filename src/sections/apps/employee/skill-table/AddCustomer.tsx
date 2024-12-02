@@ -29,6 +29,7 @@ import {
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 import { alertSnackBar } from 'function/alert/alertSnackBar';
 
 // third-party
@@ -48,7 +49,7 @@ import SkillAddCustomer from 'sections/apps/parameter/skill/AddCustomer';
 import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
-import { SkillTableType, skill, processType, projectPositionType, clientType } from 'types/employee/skill-table';
+import { ClientType, ProcessType, SkillTableType, SkillType } from 'types/employee/skill-table';
 import { ParameterType } from 'types/parameter/parameter';
 
 // constant
@@ -91,11 +92,11 @@ export interface Props {
   customer?: any;
   onCancel: (status: boolean) => void;
   reloadDataAfterAdd: (data: SkillTableType[]) => void;
-  candidate_skills: skill[];
+  candidate_skills: SkillType[];
   candidate_technics: ParameterType[];
-  candidate_processes: processType[];
-  candidate_roles: projectPositionType[];
-  candidate_client: clientType[];
+  candidate_processes: ProcessType[];
+  candidate_roles: ParameterType[];
+  candidate_client: ClientType[];
 }
 
 const AddCustomer = ({
@@ -113,13 +114,12 @@ const AddCustomer = ({
   const id = router.query.id as string;
 
   // candidate_flagがtrueのものだけ抽出
-  const filteredSkills = candidate_skills.filter((skill) => skill.candidate_flag);
-  const skills = candidate_skills.map((skill) => String(skill.name));
-  const CandidateSkillList = filteredSkills.map((skill) => skill.name);
+  const skills = candidate_skills.map((skill) => String(skill.skill?.name));
+  const CandidateSkillList = candidate_skills.filter((skill) => skill.skill?.candidate_flag).map((skill) => skill.skill?.name);
 
-  const process = candidate_processes.map((process) => String(process.name));
-  const role = candidate_roles.map((role) => String(role.name));
-  const client = candidate_client.map((client) => String(client.name));
+  const process = candidate_processes.map((process) => String(process.process?.name));
+  const role = candidate_roles.map((role) => String(role?.name));
+  const client = candidate_client.map((client) => String(client?.name));
 
   const CustomerSchema = Yup.object().shape({
     project_title: Yup.string().max(255).required('プロジェクト名は必須です')
@@ -209,6 +209,16 @@ const AddCustomer = ({
     }
   });
 
+  // 9時間を加算する関数
+  const addNineHours = (date: Date | null) => {
+    if (date === null) {
+      return null; // dateがnullの場合、nullを返す
+    }
+    const newDate = new Date(date);
+    newDate.setHours(newDate.getHours() + 9);
+    return newDate;
+  };
+
   useEffect(() => {
     if (isCreating) {
       // 新規作成時はフォームをリセットして初期値を設定
@@ -250,7 +260,7 @@ const AddCustomer = ({
   return (
     <>
       <FormikProvider value={formik}>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <DialogTitle>{customer ? 'スキル情報の編集' : '新しいスキルの追加'}</DialogTitle>
             <Divider />
@@ -264,7 +274,7 @@ const AddCustomer = ({
                         <DatePicker
                           format="yyyy/MM/dd"
                           value={getFieldProps('start_date').value ? new Date(getFieldProps('start_date').value) : null}
-                          onChange={(newValue) => setFieldValue('start_date', newValue)}
+                          onChange={(newValue) => setFieldValue('start_date', addNineHours(newValue))}
                         />
                       </Stack>
                     </Grid>
@@ -274,7 +284,9 @@ const AddCustomer = ({
                         <DatePicker
                           format="yyyy/MM/dd"
                           value={getFieldProps('end_date').value ? new Date(getFieldProps('end_date').value) : null}
-                          onChange={(newValue) => setFieldValue('end_date', newValue)}
+                          onChange={(newValue) => {
+                            setFieldValue('end_date', addNineHours(newValue));
+                          }}
                         />
                       </Stack>
                     </Grid>
@@ -430,7 +442,7 @@ const AddCustomer = ({
                               {...params}
                               placeholder="使用したスキルを入力してください"
                               error={formik.touched.skills && Boolean(formik.errors.skills)}
-                              helperText={TagsError}
+                              helperText={TagsError} // エラーメッセージ
                             />
                           )}
                         />
@@ -438,14 +450,21 @@ const AddCustomer = ({
                           direction="row"
                           spacing={1}
                           alignItems="center"
-                          sx={{ mt: 1.5, flexWrap: { xs: 'wrap', sm: 'inherit' }, gap: { xs: 1, sm: 0 } }}
+                          sx={{
+                            mt: 1.5,
+                            flexWrap: { xs: 'wrap', sm: 'inherit' },
+                            gap: { xs: 1, sm: 0 },
+                          }}
                         >
                           <Typography variant="caption">候補:</Typography>
                           {CandidateSkillList.map((option, index) => (
                             <Chip
                               key={index}
                               variant="outlined"
-                              onClick={() => setFieldValue('skills', [...formik.values.skills, option])}
+                              onClick={() => {
+                                // 候補スキルを選択すると、フォームに追加
+                                formik.setFieldValue('skills', [...formik.values.skills, option]);
+                              }}
                               label={<Typography variant="caption">{option}</Typography>}
                               size="small"
                             />

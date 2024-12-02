@@ -3,6 +3,7 @@ import { useState } from 'react';
 // material-ui
 import { Typography } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 
@@ -16,7 +17,7 @@ export default function CalendarsRangePicker() {
 
   return (
     <MainCard title="Calendars Range Picker">
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
         <DateRangePicker
           calendars={1}
           value={value}

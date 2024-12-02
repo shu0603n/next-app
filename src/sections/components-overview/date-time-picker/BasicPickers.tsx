@@ -3,6 +3,7 @@ import { useState } from 'react';
 // material-ui
 import { Stack } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -23,7 +24,7 @@ export default function BasicDateTimePickers() {
 
   return (
     <MainCard title="Basic Picker">
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
         <Stack spacing={3}>
           <DesktopDatePicker format="MM/dd/yyyy" value={value} onChange={handleChange} />
           <MobileDatePicker format="MM/dd/yyyy" value={value} onChange={handleChange} />

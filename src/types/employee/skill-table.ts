@@ -1,40 +1,29 @@
+import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
+
 export type SkillTableType = {
   id: number;
   employee_id: number;
-  employee_project_skills_id: number;
   start_date: string;
   end_date: string;
   project_title: string;
   description: string;
   people_number: number;
-  client_id: number;
-  process_list_id: number;
+  client?: ClientType;
   client_name: string;
-  skills?: skill[];
-  process?: processType[];
-  project_position_name?: string;
-  project_position_description?: string;
+  project_position?: ParameterType;
+  employee_project_skills?: Array<SkillType>;
+  employee_project_processes?: Array<ProcessType>;
 };
 
-export type skill = {
-  id: number;
-  name: number;
-  technic_name?: string;
-  candidate_flag: boolean;
+export type SkillType = {
+  skill: SkillParameterType;
 };
 
-export type processType = {
-  id: number;
-  name: number;
+export type ProcessType = {
+  process: ParameterType;
 };
 
-export type projectPositionType = {
-  id: number;
-  name: string;
-  description: string;
-};
-
-export type clientType = {
+export type ClientType = {
   id: number;
   name: string;
   name_k: string;

@@ -69,7 +69,7 @@ const TabProfile = () => {
   const getUpdateData = () => {
     fetchTableData(id)
       .then((data) => {
-        setData(data.data.rows[0]);
+        setData(data.data);
       })
       .catch((error) => {
         // エラーハンドリング
@@ -152,14 +152,14 @@ const TabProfile = () => {
                     <Grid item xs={12}>
                       <Grid item xs={12}>
                         <Stack direction="row" justifyContent="flex-end">
-                          <Chip label={data.employment_name} size="small" color="primary" />
+                          <Chip label={data.employment.name} size="small" color="primary" />
                         </Stack>
                       </Grid>
                       <Stack spacing={2.5} alignItems="center">
                         <Avatar alt="Avatar 1" size="xl" src={`/assets/images/users/avatar-${data.avatar}.png`} />
                         <Stack spacing={0.5} alignItems="center">
                           <Typography variant="h5">{`${data.sei} ${data.mei}`}</Typography>
-                          <Typography color="secondary">{data.position_name}</Typography>
+                          <Typography color="secondary">{data.position.name}</Typography>
                         </Stack>
                       </Stack>
                     </Grid>
@@ -223,9 +223,9 @@ const TabProfile = () => {
               <Grid item xs={12}>
                 <MainCard title="Skills">
                   <Grid container spacing={1.25}>
-                    {skill.map((val) => (
+                    {skill.map((val, i) => (
                       // eslint-disable-next-line react/jsx-key
-                      <Fragment>
+                      <Fragment key={`skill-${i}`}>
                         <Grid item xs={6}>
                           <Typography color="secondary">{val.skill_name}</Typography>
                         </Grid>

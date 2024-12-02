@@ -3,6 +3,7 @@ import { useState } from 'react';
 // material-ui
 import { Stack, Typography } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -22,7 +23,7 @@ export default function DisabledPickers() {
     <MainCard title="Disabled Pickers">
       <Stack spacing={3}>
         <Typography variant="h6">Date Picker</Typography>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
           <DatePicker
             disabled
             value={value}
@@ -60,7 +61,7 @@ export default function DisabledPickers() {
         </LocalizationProvider>
 
         <Typography variant="h6">Date Time Picker</Typography>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
           <DateTimePicker
             disabled
             value={value}

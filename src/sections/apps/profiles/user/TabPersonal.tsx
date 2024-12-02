@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 
 // third party
 import * as Yup from 'yup';
@@ -287,7 +288,7 @@ const TabPersonal = () => {
                           </MenuItem>
                         ))}
                       </Select>
-                      <LocalizationProvider dateAdapter={AdapterDateFns}>
+                      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
                         <DatePicker
                           sx={{ width: 1 }}
                           views={['year']}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 // material-ui
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
@@ -15,7 +16,7 @@ export default function HelperText() {
 
   return (
     <MainCard title="Helper Text">
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
         <DatePicker
           label="Helper Text"
           value={value}

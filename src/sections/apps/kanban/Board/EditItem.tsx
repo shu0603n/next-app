@@ -19,6 +19,7 @@ import {
   TextField
 } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
@@ -105,7 +106,7 @@ const EditItem = ({ item, profiles, userStory, columns, handleDrawerOpen }: Prop
 
   return (
     <form onSubmit={formik.handleSubmit}>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
         <Grid container spacing={2.5}>
           <Grid item xs={12}>
             <Stack spacing={1}>

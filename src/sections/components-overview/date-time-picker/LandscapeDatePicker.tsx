@@ -3,6 +3,7 @@ import { useState } from 'react';
 // material-ui
 import { Box } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 
@@ -19,7 +20,7 @@ export default function LandscapeDatePicker() {
 
   return (
     <MainCard title="Landscape">
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
         <Box sx={{ '.MuiCalendarPicker-root': { width: '100%' }, '.MuiPickersCalendarHeader-labelContainer': { maxHeight: 40 } }}>
           <StaticDatePicker<Date>
             orientation="landscape"

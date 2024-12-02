@@ -21,6 +21,7 @@ import {
 } from '@mui/material';
 import { LocalizationProvider, MobileDateTimePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 
 // third-party
 import _ from 'lodash';
@@ -240,7 +241,7 @@ const AddEventFrom = ({ event, range, onCancel }: AddEventFormProps) => {
 
   return (
     <FormikProvider value={formik}>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
         <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
           <DialogTitle>{event ? 'Edit Event' : 'Add Event'}</DialogTitle>
           <Divider />

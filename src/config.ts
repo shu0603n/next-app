@@ -15,7 +15,7 @@ export const DRAWER_WIDTH = 260;
 
 const config: DefaultConfigProps = {
   fontFamily: `'Public Sans', sans-serif`,
-  i18n: 'jp',
+  i18n: 'ja',
   menuOrientation: MenuOrientation.VERTICAL,
   miniDrawer: false,
   container: true,
