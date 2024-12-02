@@ -10,14 +10,36 @@ export type ProjectTableType = {
   working_postal_code: string;
   working_address: string;
   holiday: string;
+  contract_name: string;
+  fertilizer_type: string;
+  trial_period_duration: String;
+  training_schedule: String;
+  training_memo: String;
 };
 
-export type clientType = {
+export type ClientType = {
+  id: number;
+  client_name: string;
+};
+
+export type EmployeeType = {
+  id: number;
+  sei: string;
+};
+
+export type ContractType = {
   id: number;
   name: string;
 };
 
-export type employeeType = {
+export type SkillType = {
   id: number;
-  sei: string;
+  name: string;
+  technic_name?: string;
+  candidate_flag: boolean;
+};
+
+export type ProcessType = {
+  id: number;
+  name: string;
 };

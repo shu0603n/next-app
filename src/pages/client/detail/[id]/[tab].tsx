@@ -11,7 +11,8 @@ import Layout from 'layout';
 import Page from 'components/Page';
 import MainCard from 'components/MainCard';
 import TabProfile from 'sections/apps/client/TabProfile';
-import Tabproject from 'sections/apps/client/TabProject';
+import TabProject from 'sections/apps/client/TabProject';
+import TabHistory from 'sections/apps/client/TabHistory';
 
 // assets
 import { FileTextOutlined, UserOutlined } from '@ant-design/icons';
@@ -36,11 +37,13 @@ const ClientDetail = () => {
           <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto" aria-label="account profile tab">
             <Tab label="プロフィール" icon={<UserOutlined />} value="basic" iconPosition="start" />
             <Tab label="案件一覧" icon={<FileTextOutlined />} value="project" iconPosition="start" />
+            <Tab label="対応履歴" icon={<FileTextOutlined />} value="history" iconPosition="start" />
           </Tabs>
         </Box>
         <Box sx={{ mt: 2.5 }}>
           {tab === 'basic' && <TabProfile />}
-          {tab === 'project' && <Tabproject />}
+          {tab === 'project' && <TabProject />}
+          {tab === 'history' && <TabHistory />}
         </Box>
       </MainCard>
     </Page>

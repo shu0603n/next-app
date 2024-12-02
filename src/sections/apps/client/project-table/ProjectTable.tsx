@@ -28,14 +28,14 @@ import { CSVExport, HeaderSort, SortingSelect, TablePagination, TableRowSelectio
 
 import AddCustomer from 'sections/apps/client/project-table/AddCustomer';
 import CustomerView from 'sections/apps/client/project-table/CustomerView';
-import AlertCustomerDelete from 'sections/apps/employee/skill-table/AlertCustomerDelete';
+import AlertCustomerDelete from 'sections/apps/client/project-table/AlertCustomerDelete';
 
 // import makeData from 'data/react-table';
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { ProjectTableType, clientType, employeeType } from 'types/client/project-table';
+import { ProjectTableType, ClientType, EmployeeType, ContractType, SkillType, ProcessType } from 'types/client/project-table';
 
 // ==============================|| REACT TABLE - EDITABLE ROW ||============================== //
 
@@ -90,30 +90,82 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
     if (matchDownSM) {
       setHiddenColumns([
         `id`,
-        `name`,
+        `client_name`,
         'start_date',
-        'client_name',
         'working_start_time',
         `working_end_time`,
         `end_date`,
         `description`,
-        `project_position_id`,
-        'project_position_name',
+        `sei`,
+        'dispatch_source',
         `skills`,
-        `process`
+        `processes`,
+        `contract_name`,
+        `working_postal_code`,
+        `fertilizer_type`,
+        `working_address`,
+        `holiday`,
+        `trial_period_duration`,
+        `training_schedule`,
+        `training_memo`,
+        `contract_period`,
+        'working_days_count',
+        'working_days_list',
+        'working_hours_per_day',
+        'work_notes',
+        'price_type',
+        `price`,
+        'transportation_expenses',
+        'overtime_hours',
+        'welfare_programs',
+        'work_environment_description',
+        'dress_code',
+        'gender_ratio',
+        'environmental_notes',
+        `special_notes`,
+        `hr_requirements`,
+        `gender_requirements`,
+        `age_requirements`,
+        `recruitment_count`
       ]);
     } else {
       setHiddenColumns([
         `id`,
-        `name`,
-        'client_name',
+        `client_name`,
         'working_start_time',
         `working_end_time`,
         `description`,
-        `project_position_id`,
-        'project_position_name',
+        `sei`,
+        'dispatch_source',
         `skills`,
-        `process`
+        `processes`,
+        `contract_name`,
+        `working_postal_code`,
+        `fertilizer_type`,
+        `working_address`,
+        `holiday`,
+        `trial_period_duration`,
+        `training_schedule`,
+        `training_memo`,
+        `contract_period`,
+        'working_days_count',
+        'working_days_list',
+        'working_hours_per_day',
+        'work_notes',
+        'price_type',
+        `price`,
+        'transportation_expenses',
+        'overtime_hours',
+        'welfare_programs',
+        'work_environment_description',
+        'dress_code',
+        'gender_ratio',
+        'environmental_notes',
+        `special_notes`,
+        `hr_requirements`,
+        `gender_requirements`,
+        `age_requirements`,
+        `recruitment_count`
       ]);
     }
     // eslint-disable-next-line
@@ -200,11 +252,17 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 const ProjectTable = ({
   data,
   candidate_client,
-  candidate_employee
+  candidate_employee,
+  candidate_contract,
+  candidate_skills,
+  candidate_processes
 }: {
   data: ProjectTableType[];
-  candidate_client: clientType[];
-  candidate_employee: employeeType[];
+  candidate_client: ClientType[];
+  candidate_employee: EmployeeType[];
+  candidate_contract: ContractType[];
+  candidate_skills: SkillType[];
+  candidate_processes: ProcessType[];
 }) => {
   const theme = useTheme();
 
@@ -268,10 +326,6 @@ const ProjectTable = ({
         accessor: 'id'
       },
       {
-        Header: '企業名',
-        accessor: 'name'
-      },
-      {
         Header: '開始日',
         accessor: 'start_date'
       },
@@ -300,12 +354,120 @@ const ProjectTable = ({
         accessor: 'working_end_time'
       },
       {
-        Header: '役割ID',
-        accessor: `project_position_id`
+        Header: '担当者',
+        accessor: `sei`
       },
       {
-        Header: '役割',
-        accessor: 'project_position_name'
+        Header: '派遣元',
+        accessor: 'dispatch_source'
+      },
+      {
+        Header: '契約区分',
+        accessor: 'contract_name'
+      },
+      {
+        Header: '郵便番号',
+        accessor: 'working_postal_code'
+      },
+      {
+        Header: '最寄り駅',
+        accessor: 'fertilizer_type'
+      },
+      {
+        Header: '住所',
+        accessor: 'working_address'
+      },
+      {
+        Header: '休日',
+        accessor: 'holiday'
+      },
+      {
+        Header: '試用期間',
+        accessor: 'trial_period_duration'
+      },
+      {
+        Header: '研修日程',
+        accessor: 'training_schedule'
+      },
+      {
+        Header: '研修備考',
+        accessor: 'training_memo'
+      },
+      {
+        Header: '就業期間',
+        accessor: 'contract_period'
+      },
+      {
+        Header: '勤務日数',
+        accessor: 'working_days_count'
+      },
+      {
+        Header: '勤務曜日',
+        accessor: 'working_days_list'
+      },
+      {
+        Header: '勤務時間',
+        accessor: 'working_hours_per_day'
+      },
+      {
+        Header: '勤務備考',
+        accessor: 'work_notes'
+      },
+      {
+        Header: '計算方法',
+        accessor: 'price_type'
+      },
+      {
+        Header: '金額',
+        accessor: 'price'
+      },
+      {
+        Header: '交通費',
+        accessor: 'transportation_expenses'
+      },
+      {
+        Header: '時間外労働',
+        accessor: 'overtime_hours'
+      },
+      {
+        Header: '福利厚生',
+        accessor: 'welfare_programs'
+      },
+      {
+        Header: '職場環境',
+        accessor: 'work_environment_description'
+      },
+      {
+        Header: '服装',
+        accessor: 'dress_code'
+      },
+      {
+        Header: '男女比',
+        accessor: 'gender_ratio'
+      },
+      {
+        Header: '環境備考',
+        accessor: 'environmental_notes'
+      },
+      {
+        Header: '特記事項',
+        accessor: 'special_notes'
+      },
+      {
+        Header: '人材要件',
+        accessor: 'hr_requirements'
+      },
+      {
+        Header: '男女',
+        accessor: 'gender_requirements'
+      },
+      {
+        Header: '年齢',
+        accessor: 'age_requirements'
+      },
+      {
+        Header: '募集人数',
+        accessor: 'recruitment_count'
       },
       {
         Header: 'スキル',
@@ -314,7 +476,7 @@ const ProjectTable = ({
       },
       {
         Header: '担当工程',
-        accessor: 'process'
+        accessor: 'processes'
       },
 
       {
@@ -376,6 +538,7 @@ const ProjectTable = ({
   const renderRowSubComponent = useCallback(({ row }: { row: Row<{}> }) => <CustomerView data={data[Number(row.id)]} />, [data]);
   return (
     <MainCard content={false}>
+      {JSON.stringify(data[1])}
       <ScrollX>
         <ReactTable
           columns={columns}
@@ -385,7 +548,7 @@ const ProjectTable = ({
           getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
         />
       </ScrollX>
-      {/* <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} reloadDataAfterDelete={handleReloadData} /> */}
+      <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} reloadDataAfterDelete={handleReloadData} />
       {/* add customer dialog */}
       <Dialog
         maxWidth="sm"
@@ -403,6 +566,9 @@ const ProjectTable = ({
           reloadDataAfterAdd={handleReloadData}
           candidate_client={candidate_client}
           candidate_employee={candidate_employee}
+          candidate_contract={candidate_contract}
+          candidate_skills={candidate_skills}
+          candidate_processes={candidate_processes}
         />
       </Dialog>
     </MainCard>

@@ -7,14 +7,14 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
-import { ProjectTableType } from 'types/employee/skill-table';
+import { SkillTableType } from 'types/employee/skill-table';
 
 // types
 interface Props {
   title: string;
   open: boolean;
   handleClose: (status: boolean) => void;
-  reloadDataAfterDelete: (data: ProjectTableType[]) => void;
+  reloadDataAfterDelete: (data: SkillTableType[]) => void;
 }
 
 // ==============================|| 顧客 - 削除 ||============================== //
