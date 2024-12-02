@@ -2,11 +2,10 @@ import { ReactElement } from 'react';
 
 // next
 import { NextPageContext } from 'next';
-import NextLink from 'next/link';
 import { getProviders, getCsrfToken } from 'next-auth/react';
 
 // material-ui
-import { Grid, Link, Stack, Typography } from '@mui/material';
+import { Grid, Stack, Typography } from '@mui/material';
 
 // project import
 import Layout from 'layout';
