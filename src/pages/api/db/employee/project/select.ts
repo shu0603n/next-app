@@ -14,6 +14,14 @@ export default async function handler(request: NextApiRequest, response: NextApi
       }
     });
 
+    const technicPromise = prisma.technic.findMany({
+      select: {
+        id: true,
+        name: true
+      }
+    });
+
+
     const processPromise = prisma.process.findMany({
       select: {
         id: true,
@@ -73,11 +81,12 @@ SELECT
 
     // 同時に実行して待つ
     const [skill] = await Promise.all([skillPromise]);
+    const [technic] = await Promise.all([technicPromise]);
     const [process] = await Promise.all([processPromise]);
     const [role] = await Promise.all([project_positionPromise]);
     const [client] = await Promise.all([clientPromisep]);
 
-    return response.status(200).json({ data, skill, process, role, client });
+    return response.status(200).json({ data, skill, technic, process, role, client });
   } catch (error) {
     console.error('エラーが発生しました:', error);
     return response.status(500).json({ error: 'データを取得できませんでした。' });

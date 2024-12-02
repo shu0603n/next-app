@@ -4,6 +4,7 @@ import { Grid } from '@mui/material';
 import SkillTable from './skill-table/SkillTable';
 import { useState, useEffect } from 'react';
 import { SkillTableType, skill, processType, projectPositionType, clientType } from 'types/employee/skill-table';
+import { ParameterType } from 'types/parameter/parameter';
 
 // アセット
 
@@ -27,6 +28,7 @@ async function fetchTableData(id: string) {
 const TabRole = () => {
   const [data, setData] = useState<SkillTableType[]>([]);
   const [candidate_skills, setCandidate_skills] = useState<skill[]>([]);
+  const [candidate_technics, setCandidate_technics] = useState<ParameterType[]>([]);
   const [candidate_processes, setCandidate_processes] = useState<processType[]>([]);
   const [candidate_roles, setCandidate_roles] = useState<projectPositionType[]>([]);
   const [candidate_client, setCandidate_client] = useState<clientType[]>([]);
@@ -39,6 +41,7 @@ const TabRole = () => {
       .then((fetchedData) => {
         setData(fetchedData.data.rows);
         setCandidate_skills(fetchedData.skill);
+        setCandidate_technics(fetchedData.technic);
         setCandidate_processes(fetchedData.process);
         setCandidate_roles(fetchedData.role);
         setCandidate_client(fetchedData.client);
@@ -56,6 +59,7 @@ const TabRole = () => {
         <SkillTable
           data={data}
           candidate_skills={candidate_skills}
+          candidate_technics={candidate_technics}
           candidate_processes={candidate_processes}
           candidate_roles={candidate_roles}
           candidate_client={candidate_client}
