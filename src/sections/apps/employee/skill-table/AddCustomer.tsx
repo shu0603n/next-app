@@ -1,10 +1,11 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-
+import { PopupTransition } from 'components/@extended/Transitions';
 // material-ui
 import {
   Box,
   Button,
+  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -40,13 +41,15 @@ import AlertCustomerDelete from './AlertCustomerDelete';
 import IconButton from 'components/@extended/IconButton';
 
 // assets
-import { DeleteFilled } from '@ant-design/icons';
+import { PlusOutlined, DeleteFilled } from '@ant-design/icons';
+import SkillAddCustomer from 'sections/apps/parameter/skill/AddCustomer';
 
 // material-ui
 import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
 import { SkillTableType, skill, processType, projectPositionType, clientType } from 'types/employee/skill-table';
+import { ParameterType } from 'types/parameter/parameter';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
@@ -89,6 +92,7 @@ export interface Props {
   onCancel: (status: boolean) => void;
   reloadDataAfterAdd: (data: SkillTableType[]) => void;
   candidate_skills: skill[];
+  candidate_technics: ParameterType[];
   candidate_processes: processType[];
   candidate_roles: projectPositionType[];
   candidate_client: clientType[];
@@ -99,6 +103,7 @@ const AddCustomer = ({
   onCancel,
   reloadDataAfterAdd,
   candidate_skills,
+  candidate_technics,
   candidate_processes,
   candidate_roles,
   candidate_client
@@ -118,35 +123,6 @@ const AddCustomer = ({
 
   const CustomerSchema = Yup.object().shape({
     project_title: Yup.string().max(255).required('プロジェクト名は必須です')
-    // orderStatus: Yup.string().required('ステータスは必須です'),
-    // location: Yup.string().max(500),
-    // role: Yup.string()
-    //   .trim()
-    //   .required('役割の選択は必須です')
-    //   .matches(/^[a-z\d\-/#_\s]+$/i, 'アルファベットと数字しか許可されていません')
-    //   .max(50, '役割は最大50文字までです'),
-    // skills: Yup.array()
-    //   .of(
-    //     Yup.string()
-    //       .trim()
-    //       .required('タグに先頭の空白があります')
-    //       .matches(/^[a-z\d\-/#.&_\s]+$/i, 'アルファベットと数字しか許可されていません')
-    //       .max(50, 'スキルタグは最大50文字までです')
-    //   )
-    //   .required('スキルの選択は必須です')
-    //   // .min(3, 'スキルタグは少なくとも3つ必要です')
-    //   .max(15, '最大で15個のスキルを選択してください'),
-    // process: Yup.array()
-    //   .of(
-    //     Yup.string()
-    //       .trim()
-    //       .required('タグに先頭の空白があります')
-    //       .matches(/^[a-z\d\-/#.&_\s]+$/i, 'アルファベットと数字しか許可されていません')
-    //       .max(50, '担当工程タグは最大50文字までです')
-    //   )
-    //   .required('担当工程の選択は必須です')
-    //   // .min(3, 'スキルタグは少なくとも3つ必要です')
-    //   .max(15, '最大で15個の担当工程を選択してください')
   });
 
   const [openAlert, setOpenAlert] = useState(false);
@@ -155,6 +131,15 @@ const AddCustomer = ({
   const handleAlertClose = () => {
     setOpenAlert(!openAlert);
     onCancel(false);
+  };
+  const [skillAdd, setSkillAdd] = useState<boolean>(false);
+
+  const handleSkillAdd = () => {
+    setSkillAdd(!skillAdd);
+  };
+
+  const skillReload = () => {
+    alert('再取得処理を追加');
   };
 
   const formik = useFormik({
@@ -467,6 +452,11 @@ const AddCustomer = ({
                           ))}
                         </Stack>
                       </Stack>
+                      <Tooltip title="スキルを追加">
+                        <IconButton shape="rounded" variant="contained" onClick={handleSkillAdd}>
+                          <PlusOutlined />
+                        </IconButton>
+                      </Tooltip>
                     </Grid>
 
                     <Grid item xs={12}>
@@ -581,6 +571,19 @@ const AddCustomer = ({
           </Form>
         </LocalizationProvider>
       </FormikProvider>
+      <Dialog
+        maxWidth="sm"
+        TransitionComponent={PopupTransition}
+        keepMounted
+        onClose={handleSkillAdd}
+        open={skillAdd}
+        sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
+        aria-describedby="alert-dialog-slide-description"
+      >
+        {skillAdd && (
+          <SkillAddCustomer customer={customer} technicAll={candidate_technics} onCancel={handleSkillAdd} onReload={skillReload} />
+        )}
+      </Dialog>
       {!isCreating && (
         <AlertCustomerDelete
           title={customer.fatherName}

@@ -316,6 +316,18 @@ const CustomerSkillPage = () => {
           >
             {add && <AddCustomer customer={customer} technicAll={technicTableData} onCancel={handleAdd} onReload={setTableData} />}
           </Dialog>
+          <Dialog
+            maxWidth="sm"
+            TransitionComponent={PopupTransition}
+            keepMounted
+            fullWidth
+            onClose={handleAdd}
+            open={add}
+            sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
+            aria-describedby="alert-dialog-slide-description"
+          >
+            {add && <AddCustomer customer={customer} technicAll={technicTableData} onCancel={handleAdd} onReload={setTableData} />}
+          </Dialog>
         </MainCard>
       )}
     </Page>
