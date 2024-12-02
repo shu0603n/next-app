@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 // next
-import NextLink from 'next/link';
-import { useSession, signIn } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 
 // material-ui
 import {
@@ -11,7 +10,6 @@ import {
   FormControlLabel,
   FormHelperText,
   Grid,
-  Link,
   InputAdornment,
   InputLabel,
   OutlinedInput,
@@ -37,9 +35,16 @@ const AuthLogin = ({ providers, csrfToken }: any) => {
   const [checked, setChecked] = React.useState(false);
   const [capsWarning, setCapsWarning] = React.useState(false);
 
-  const { data: session } = useSession();
-
   const [showPassword, setShowPassword] = React.useState(false);
+
+  useEffect(() => {
+    // ログイン情報が保存されている場合は読み込み
+    const savedEmail = localStorage.getItem('savedEmail');
+    if (savedEmail) {
+      setChecked(true);
+    }
+  }, []);
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -69,6 +74,11 @@ const AuthLogin = ({ providers, csrfToken }: any) => {
           password: Yup.string().max(255).required('パスワードは必須です')
         })}
         onSubmit={(values, { setErrors, setSubmitting }) => {
+          if (checked) {
+            localStorage.setItem('savedEmail', values.email); // メールを保存
+          } else {
+            localStorage.removeItem('savedEmail'); // チェックが外れている場合は削除
+          }
           signIn('login', {
             redirect: false,
             email: values.email,
@@ -77,10 +87,8 @@ const AuthLogin = ({ providers, csrfToken }: any) => {
           }).then((res: any) => {
             if (res?.error) {
               setErrors({ submit: res.error });
-              setSubmitting(false);
-            } else {
-              setSubmitting(false);
             }
+            setSubmitting(false);
           });
         }}
       >
@@ -168,11 +176,6 @@ const AuthLogin = ({ providers, csrfToken }: any) => {
                     }
                     label={<Typography variant="h6">ログイン情報を保持する</Typography>}
                   />
-                  <NextLink href={session ? '/auth/forgot-password' : '/forgot-password'} passHref legacyBehavior>
-                    <Link variant="h6" color="text.primary">
-                      パスワードを忘れた方
-                    </Link>
-                  </NextLink>
                 </Stack>
               </Grid>
               {errors.submit && (
