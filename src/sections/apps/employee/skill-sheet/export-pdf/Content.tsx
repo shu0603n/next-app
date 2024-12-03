@@ -6,6 +6,7 @@ import { Text, View, StyleSheet, Font } from '@react-pdf/renderer';
 
 // types
 import { SkillSheetList } from 'types/skillSheet';
+import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
 
 // フォント登録
 Font.register({
@@ -198,14 +199,14 @@ const Content = ({ list }: Props) => {
               <Text style={styles.tableCell}>{row.end_date}</Text>
             </View>
             <View style={styles.flex05}>
-              {row.skills.map((skill: string, index: number) => (
+              {row.employee_project_skills.map((skill: SkillParameterType, index: number) => (
                 <Text key={`skill-${index}`} style={styles.tableCell}>
-                  {skill}
+                  {skill.name}
                 </Text>
               ))}
-              {row.process.map((proces: string, index: number) => (
+              {row.employee_project_processes.map((proces: ParameterType, index: number) => (
                 <Text key={`process-${index}`} style={styles.tableCell}>
-                  {proces}
+                  {proces.name}
                 </Text>
               ))}
             </View>

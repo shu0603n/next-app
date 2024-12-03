@@ -10,21 +10,10 @@ import { Box, Chip, Dialog, Divider, Grid, List, ListItem, ListItemText, Stack, 
 import AddCustomer from 'sections/apps/customer/AddCustomer';
 import MainCard from 'components/MainCard';
 import { PopupTransition } from 'components/@extended/Transitions';
+import { ProjectCardType } from 'types/skillSheet';
+import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
 
 // ==============================|| CUSTOMER - CARD ||============================== //
-
-type ProjectCard = {
-  id: number;
-  start_date: string;
-  end_date: string;
-  people: number;
-  client: string;
-  project_title: string;
-  description: string;
-  skills: string[];
-  process: string[];
-  time: string;
-};
 
 const formatDate = (isoDate: string) => {
   const date = new Date(isoDate);
@@ -35,7 +24,7 @@ const formatDate = (isoDate: string) => {
   });
 };
 
-const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
+const CustomerCard = ({ customer }: { customer: ProjectCardType }) => {
   const [add, setAdd] = useState<boolean>(false);
   const handleAdd = () => {
     setAdd(!add);
@@ -68,7 +57,7 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                 }
                 secondary={
                   <Typography variant="caption" color="secondary">
-                    {customer.client}
+                    {customer.client?.name}
                   </Typography>
                 }
               />
@@ -95,7 +84,7 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
             </Grid>
           </Grid>
           <Grid item xs={12} md={5}>
-            {customer.skills?.some((skill) => skill) && (
+            {customer.employee_project_skills?.some((skill) => skill) && (
               <Grid item xs={12}>
                 <Typography variant="h5" component="span">
                   使用スキル
@@ -111,16 +100,16 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                     }}
                     component="ul"
                   >
-                    {customer.skills.map((skill: string, index: number) => (
+                    {customer.employee_project_skills.map((skill: SkillParameterType, index: number) => (
                       <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                        <Chip color="secondary" variant="outlined" size="small" label={skill} />
+                        <Chip color="secondary" variant="outlined" size="small" label={skill.name} />
                       </ListItem>
                     ))}
                   </Box>
                 </Box>
               </Grid>
             )}
-            {customer.process?.some((process) => process) && (
+            {customer.employee_project_processes?.some((employee_project_processes) => process) && (
               <Grid item xs={12}>
                 <Typography variant="h5" component="span">
                   担当工程
@@ -136,9 +125,9 @@ const CustomerCard = ({ customer }: { customer: ProjectCard }) => {
                     }}
                     component="ul"
                   >
-                    {customer.process.map((skill: string, index: number) => (
+                    {customer.employee_project_processes.map((process: ParameterType, index: number) => (
                       <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                        <Chip color="secondary" variant="outlined" size="small" label={skill} />
+                        <Chip color="secondary" variant="outlined" size="small" label={process.name} />
                       </ListItem>
                     ))}
                   </Box>
