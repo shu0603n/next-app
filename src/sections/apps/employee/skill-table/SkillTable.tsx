@@ -36,8 +36,8 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { ClientType, ProcessType, SkillTableType, SkillType } from 'types/employee/skill-table';
-import { ParameterType } from 'types/parameter/parameter';
+import { ClientType, SkillTableType } from 'types/employee/skill-table';
+import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
 
 // ==============================|| REACT TABLE - EDITABLE ROW ||============================== //
 
@@ -50,6 +50,7 @@ interface Props {
 }
 
 function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps }: Props) {
+  console.log('ReactTable',data)
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -99,7 +100,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
         `description`,
         `project_position`,
         `employee_project_skills`,
-        `employee_project_process`
+        `employee_project_processes`
       ]);
     } else {
       setHiddenColumns([
@@ -109,7 +110,7 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
         `description`,
         `project_position`,
         `employee_project_skills`,
-        `employee_project_process`
+        `employee_project_processes`
       ]);
     }
     // eslint-disable-next-line
@@ -202,9 +203,9 @@ const SkillTable = ({
   candidate_client
 }: {
   data: SkillTableType[];
-  candidate_skills: SkillType[];
+  candidate_skills: SkillParameterType[];
   candidate_technics: ParameterType[];
-  candidate_processes: ProcessType[];
+  candidate_processes: ParameterType[];
   candidate_roles: ParameterType[];
   candidate_client: ClientType[];
 }) => {
@@ -287,7 +288,8 @@ const SkillTable = ({
       },
       {
         Header: '企業名',
-        accessor: 'client_name'
+        accessor: 'client',
+        Cell: ({ value }: CellProps<any>) => value?.name ?? null
       },
       {
         Header: '人数',
@@ -296,18 +298,18 @@ const SkillTable = ({
       {
         Header: '役割',
         accessor: `project_position`,
-        Cell: ({ value }: CellProps<any>) => value.map((position: ParameterType) => position.name)
+        Cell: ({ value }: CellProps<any>) => value?.name ?? null
       },
       {
         Header: 'スキル',
         accessor: 'employee_project_skills',
         className: 'cell-right',
-        Cell: ({ value }: CellProps<any>) => value.map((skill: SkillType) => skill.skill.name).join(', ')
+        Cell: ({ value }: CellProps<any>) => value.map((skill: SkillParameterType) => skill.name).join(', ')
       },
       {
         Header: '担当工程',
-        accessor: 'employee_project_process',
-        Cell: ({ value }: CellProps<any>) => value.map((process: ProcessType) => process.process.name).join(', ')
+        accessor: 'employee_project_processes',
+        Cell: ({ value }: CellProps<any>) => value.map((process: ParameterType) => process.name).join(', ')
       },
 
       {

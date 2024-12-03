@@ -49,8 +49,8 @@ import SkillAddCustomer from 'sections/apps/parameter/skill/AddCustomer';
 import { createFilterOptions, Autocomplete, Chip } from '@mui/material';
 
 // assets
-import { ClientType, ProcessType, SkillTableType, SkillType } from 'types/employee/skill-table';
-import { ParameterType } from 'types/parameter/parameter';
+import { ClientType, SkillTableType } from 'types/employee/skill-table';
+import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
 
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
@@ -59,12 +59,12 @@ const getInitialValues = (customer: FormikValues | null) => {
     start_date: null as Date | null,
     end_date: null as Date | null,
     project_title: '',
-    client_name: ``,
+    client: null,
     description: '',
     people_number: '',
-    skills: [],
-    process: [],
-    project_position_name: ''
+    employee_project_skills: [],
+    employee_project_processes: [],
+    project_position: null
   };
 
   if (customer) {
@@ -72,29 +72,29 @@ const getInitialValues = (customer: FormikValues | null) => {
     newCustomer.start_date = customer.start_date;
     newCustomer.end_date = customer.end_date;
     newCustomer.project_title = customer.project_title;
-    newCustomer.client_name = customer.client_name;
+    newCustomer.client = customer.client;
     newCustomer.description = customer.description;
     newCustomer.people_number = customer.people_number;
-    newCustomer.skills = customer.skills || [];
-    newCustomer.process = customer.process || [];
-    newCustomer.project_position_name = customer.project_position_name;
+    newCustomer.employee_project_skills = customer.employee_project_skills;
+    newCustomer.employee_project_processes = customer.employee_project_processes;
+    newCustomer.project_position = customer.project_position;
     return _.merge({}, newCustomer, customer);
   }
 
   return newCustomer;
 };
 
-const filterprocess = createFilterOptions<string>();
-const filterSkills = createFilterOptions<string>();
+const filterProcess = createFilterOptions<ParameterType>();
+const filterSkills = createFilterOptions<SkillParameterType>();
 
 // ==============================|| 顧客の追加/編集 ||============================== //
 export interface Props {
   customer?: any;
   onCancel: (status: boolean) => void;
   reloadDataAfterAdd: (data: SkillTableType[]) => void;
-  candidate_skills: SkillType[];
+  candidate_skills: SkillParameterType[];
   candidate_technics: ParameterType[];
-  candidate_processes: ProcessType[];
+  candidate_processes: ParameterType[];
   candidate_roles: ParameterType[];
   candidate_client: ClientType[];
 }
@@ -114,13 +114,7 @@ const AddCustomer = ({
   const id = router.query.id as string;
 
   // candidate_flagがtrueのものだけ抽出
-  const skills = candidate_skills.map((skill) => String(skill.skill?.name));
-  const CandidateSkillList = candidate_skills.filter((skill) => skill.skill?.candidate_flag).map((skill) => skill.skill?.name);
-
-  const process = candidate_processes.map((process) => String(process.process?.name));
-  const role = candidate_roles.map((role) => String(role?.name));
-  const client = candidate_client.map((client) => String(client?.name));
-
+  const CandidateSkillList = candidate_skills.filter((skill) => skill?.candidate_flag);
   const CustomerSchema = Yup.object().shape({
     project_title: Yup.string().max(255).required('プロジェクト名は必須です')
   });
@@ -164,7 +158,7 @@ const AddCustomer = ({
             })
             .then((data) => {
               alertSnackBar('正常に更新されました。', 'success');
-              reloadDataAfterAdd(data.data.rows);
+              reloadDataAfterAdd(data.data);
               setIsEditing(false);
             })
             .catch((error) => {
@@ -191,7 +185,7 @@ const AddCustomer = ({
             })
             .then((data) => {
               alertSnackBar('正常に追加されました。', 'success');
-              reloadDataAfterAdd(data.data.rows);
+              reloadDataAfterAdd(data.data);
               setIsEditing(false);
             })
             .catch((error) => {
@@ -231,19 +225,6 @@ const AddCustomer = ({
 
   const { errors, touched, handleSubmit, getFieldProps, setFieldValue } = formik;
   let TagsError: boolean | string | undefined = false;
-  if (formik.touched.skills && typeof formik.errors.skills) {
-    if (formik.touched.skills && typeof formik.errors.skills === 'string') {
-      TagsError = formik.errors.skills;
-    } else {
-      formik.errors.skills &&
-        typeof formik.errors.skills !== 'string' &&
-        formik.errors.skills.map((item) => {
-          // @ts-ignore
-          if (typeof item === 'object') TagsError = item.label;
-          return item;
-        });
-    }
-  }
 
   const message = `
   ■フロントエンド開発
@@ -311,27 +292,27 @@ const AddCustomer = ({
                           <Select
                             id="column-hiding"
                             displayEmpty
-                            {...getFieldProps('client_name')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('client_name', event.target.value as string)}
+                            {...getFieldProps('client')}
+                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('client', JSON.parse(event.target.value))}
                             input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
                             renderValue={(selected) => {
                               if (!selected) {
                                 return <Typography variant="subtitle1">企業を選択</Typography>;
                               }
 
-                              return <Typography variant="subtitle2">{selected}</Typography>;
+                              return <Typography variant="subtitle2">{JSON.parse(JSON.stringify(selected)).name}</Typography>;
                             }}
                           >
-                            {client.map((column: any) => (
-                              <MenuItem key={column} value={column}>
-                                <ListItemText primary={column} />
+                            {candidate_client.map((client: ClientType) => (
+                              <MenuItem key={client.name} value={JSON.stringify(client)}>
+                                <ListItemText primary={client.name} />
                               </MenuItem>
                             ))}
                           </Select>
                         </FormControl>
-                        {touched.client_name && errors.client_name && (
+                        {touched.client && errors.client && (
                           <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.client_name}
+                            {errors.client}
                           </FormHelperText>
                         )}
                       </Stack>
@@ -372,9 +353,9 @@ const AddCustomer = ({
                           <Select
                             id="column-hiding"
                             displayEmpty
-                            {...getFieldProps('project_position_name')}
+                            {...getFieldProps('project_position')}
                             onChange={(event: SelectChangeEvent<string>) =>
-                              setFieldValue('project_position_name', event.target.value as string)
+                              setFieldValue('project_position', JSON.parse(event.target.value))
                             }
                             input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
                             renderValue={(selected) => {
@@ -382,19 +363,19 @@ const AddCustomer = ({
                                 return <Typography variant="subtitle1">役割を選択</Typography>;
                               }
 
-                              return <Typography variant="subtitle2">{selected}</Typography>;
+                              return <Typography variant="subtitle2">{JSON.parse(JSON.stringify(selected)).name}</Typography>;
                             }}
                           >
-                            {role.map((column: any) => (
-                              <MenuItem key={column} value={column}>
-                                <ListItemText primary={column} />
+                            {candidate_roles.map((project_position: ParameterType) => (
+                              <MenuItem key={project_position.name} value={JSON.stringify(project_position)}>
+                                <ListItemText primary={project_position.name} />
                               </MenuItem>
                             ))}
                           </Select>
                         </FormControl>
-                        {touched.project_position_name && errors.project_position_name && (
+                        {touched.project_position && errors.project_position && (
                           <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.project_position_name}
+                            {errors.project_position}
                           </FormHelperText>
                         )}
                       </Stack>
@@ -404,28 +385,31 @@ const AddCustomer = ({
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-orderStatus">スキル</InputLabel>
                         <Autocomplete
-                          id="skills"
+                          id="employee_project_skills"
                           multiple
                           fullWidth
                           autoHighlight
-                          freeSolo
                           disableCloseOnSelect
-                          options={skills}
-                          value={formik.values.skills}
+                          options={candidate_skills as SkillParameterType[]}
+                          value={formik.values.employee_project_skills}
                           onBlur={formik.handleBlur}
-                          getOptionLabel={(option) => option}
+                          getOptionLabel={(option) => option.name}
                           onChange={(event, newValue) => {
-                            const exist = skills.includes(newValue[newValue.length - 1]);
-                            if (exist) {
-                              setFieldValue('skills', newValue);
-                            }
+                            const newData = newValue.filter((item: SkillParameterType) => {
+                              const exist = candidate_skills.some((v) => v.id === item.id);
+                              if (exist) {
+                                return item;
+                              }
+                              return false;
+                            });
+                            setFieldValue('employee_project_skills', newData);
                           }}
                           filterOptions={(options, params) => {
                             const filtered = filterSkills(options, params);
                             const { inputValue } = params;
-                            const isExisting = options.some((option) => inputValue === option);
+                            const isExisting = options.some((option) => inputValue === option.name);
                             if (inputValue !== '' && !isExisting) {
-                              filtered.push(inputValue);
+                              filtered.push({ id: -1, name: `絞り込み:「${inputValue}」` } as SkillParameterType);
                             }
 
                             return filtered;
@@ -433,7 +417,7 @@ const AddCustomer = ({
                           renderOption={(props, option) => {
                             return (
                               <Box component="li" {...props}>
-                                {!skills.some((v) => option.includes(v)) ? `絞り込み:「${option}」` : option}
+                                {option.name}
                               </Box>
                             );
                           }}
@@ -441,7 +425,7 @@ const AddCustomer = ({
                             <TextField
                               {...params}
                               placeholder="使用したスキルを入力してください"
-                              error={formik.touched.skills && Boolean(formik.errors.skills)}
+                              error={formik.touched.employee_project_skills && Boolean(formik.errors.employee_project_skills)}
                               helperText={TagsError} // エラーメッセージ
                             />
                           )}
@@ -453,22 +437,25 @@ const AddCustomer = ({
                           sx={{
                             mt: 1.5,
                             flexWrap: { xs: 'wrap', sm: 'inherit' },
-                            gap: { xs: 1, sm: 0 },
+                            gap: { xs: 1, sm: 0 }
                           }}
                         >
                           <Typography variant="caption">候補:</Typography>
-                          {CandidateSkillList.map((option, index) => (
-                            <Chip
-                              key={index}
-                              variant="outlined"
-                              onClick={() => {
-                                // 候補スキルを選択すると、フォームに追加
-                                formik.setFieldValue('skills', [...formik.values.skills, option]);
-                              }}
-                              label={<Typography variant="caption">{option}</Typography>}
-                              size="small"
-                            />
-                          ))}
+                          {CandidateSkillList.filter(
+                            (skills: SkillParameterType) =>
+                              formik.values.employee_project_skills &&
+                              !formik.values.employee_project_skills.map((item) => item).includes(skills as never)
+                          )
+                            .slice(0, 5)
+                            .map((option, index) => (
+                              <Chip
+                                key={index}
+                                variant="outlined"
+                                onClick={() => setFieldValue('employee_project_skills', [...formik.values.employee_project_skills, option])}
+                                label={<Typography variant="caption">{option.name}</Typography>}
+                                size="small"
+                              />
+                            ))}
                         </Stack>
                       </Stack>
                       <Tooltip title="スキルを追加">
@@ -482,28 +469,31 @@ const AddCustomer = ({
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="customer-orderStatus">担当工程</InputLabel>
                         <Autocomplete
-                          id="process"
+                          id="employee_project_processes"
                           multiple
                           fullWidth
                           autoHighlight
-                          freeSolo
                           disableCloseOnSelect
-                          options={process}
-                          value={formik.values.process}
+                          options={candidate_processes}
+                          value={formik.values.employee_project_processes}
                           onBlur={formik.handleBlur}
-                          getOptionLabel={(option) => option}
+                          getOptionLabel={(option) => option.name}
                           onChange={(event, newValue) => {
-                            const exist = process.includes(newValue[newValue.length - 1]);
-                            if (exist) {
-                              setFieldValue('process', newValue);
-                            }
+                            const newData = newValue.filter((item: ParameterType) => {
+                              const exist = candidate_processes.some((v) => v.id === item.id);
+                              if (exist) {
+                                return item;
+                              }
+                              return false;
+                            });
+                            setFieldValue('employee_project_processes', newData);
                           }}
                           filterOptions={(options, params) => {
-                            const filtered = filterprocess(options, params);
+                            const filtered = filterProcess(options, params);
                             const { inputValue } = params;
-                            const isExisting = options.some((option) => inputValue === option);
+                            const isExisting = options.some((option) => inputValue === option.name);
                             if (inputValue !== '' && !isExisting) {
-                              filtered.push(inputValue);
+                              filtered.push({ id: -1, name: `絞り込み:「${inputValue}」` } as ParameterType);
                             }
 
                             return filtered;
@@ -511,7 +501,7 @@ const AddCustomer = ({
                           renderOption={(props, option) => {
                             return (
                               <Box component="li" {...props}>
-                                {!process.some((v) => option.includes(v)) ? `絞り込み:「${option}」` : option}
+                                {option.name}
                               </Box>
                             );
                           }}
@@ -519,7 +509,7 @@ const AddCustomer = ({
                             <TextField
                               {...params}
                               placeholder="担当した工程を入力してください"
-                              error={formik.touched.process && Boolean(formik.errors.process)}
+                              error={formik.touched.employee_project_processes && Boolean(formik.errors.employee_project_processes)}
                               helperText={TagsError}
                             />
                           )}
@@ -528,21 +518,28 @@ const AddCustomer = ({
                           direction="row"
                           spacing={1}
                           alignItems="center"
-                          sx={{ mt: 1.5, flexWrap: { xs: 'wrap', sm: 'inherit' }, gap: { xs: 1, sm: 0 } }}
+                          sx={{
+                            mt: 1.5,
+                            flexWrap: { xs: 'wrap', sm: 'inherit' },
+                            gap: { xs: 1, sm: 0 }
+                          }}
                         >
                           <Typography variant="caption">候補:</Typography>
-                          {process
+                          {candidate_processes
                             .filter(
-                              (process: string) =>
-                                formik.values.process && !formik.values.process.map((item) => item).includes(process as never)
+                              (process: ParameterType) =>
+                                formik.values.employee_project_processes &&
+                                !formik.values.employee_project_processes.map((item) => item).includes(process as never)
                             )
                             .slice(0, 5)
                             .map((option, index) => (
                               <Chip
                                 key={index}
                                 variant="outlined"
-                                onClick={() => setFieldValue('process', [...formik.values.process, option])}
-                                label={<Typography variant="caption">{option}</Typography>}
+                                onClick={() =>
+                                  setFieldValue('employee_project_processes', [...formik.values.employee_project_processes, option])
+                                }
+                                label={<Typography variant="caption">{option.name}</Typography>}
                                 size="small"
                               />
                             ))}

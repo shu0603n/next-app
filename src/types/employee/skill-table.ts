@@ -11,16 +11,8 @@ export type SkillTableType = {
   client?: ClientType;
   client_name: string;
   project_position?: ParameterType;
-  employee_project_skills?: Array<SkillType>;
-  employee_project_processes?: Array<ProcessType>;
-};
-
-export type SkillType = {
-  skill: SkillParameterType;
-};
-
-export type ProcessType = {
-  process: ParameterType;
+  employee_project_skills?: Array<SkillParameterType>;
+  employee_project_processes?: Array<ParameterType>;
 };
 
 export type ClientType = {

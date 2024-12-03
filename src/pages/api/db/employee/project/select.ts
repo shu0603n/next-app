@@ -1,6 +1,70 @@
 import { NextApiResponse, NextApiRequest } from 'next';
 import { prisma } from '../../prisma';
 
+export const selectEmployeePrijects = async (employeeId: string) => {
+  const employeeProjectData = await prisma.employee_project.findMany({
+    where: {
+      employee_id: parseInt(employeeId, 10)
+    },
+    select: {
+      id: true,
+      start_date: true,
+      end_date: true,
+      project_title: true,
+      description: true,
+      people_number: true,
+      client: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
+      project_position: {
+        select: {
+          id: true,
+          name: true,
+          description: true
+        }
+      },
+      employee_project_processes: {
+        select: {
+          process: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        }
+      },
+      employee_project_skills: {
+        select: {
+          skill: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        }
+      }
+    },
+    orderBy: {
+      start_date: 'desc'
+    }
+  });
+  // データ整形
+  const formattedData = employeeProjectData.map((project) => {
+    const skills = project.employee_project_skills.map((item) => item.skill);
+    const processes = project.employee_project_processes.map((item) => item.process);
+    return {
+      ...project,
+      employee_project_skills: skills,
+      employee_project_processes: processes
+    };
+  });
+
+  return formattedData;
+};
+
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
     const employeeId = request.query.id as string;
@@ -42,51 +106,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
       }
     });
 
-    const employeeProjectData = await prisma.employee_project.findMany({
-      where: {
-        employee_id: parseInt(employeeId, 10)
-      },
-      select: {
-        id: true,
-        start_date: true,
-        end_date: true,
-        project_title: true,
-        description: true,
-        people_number: true,
-        client: {
-          select: {
-            name: true
-          }
-        },
-        project_position: {
-          select: {
-            name: true,
-            description: true
-          }
-        },
-        employee_project_processes: {
-          select: {
-            process: {
-              select: {
-                name: true
-              }
-            }
-          }
-        },
-        employee_project_skills: {
-          select: {
-            skill: {
-              select: {
-                name: true
-              }
-            }
-          }
-        }
-      },
-      orderBy: {
-        start_date: 'desc'
-      }
-    });
+    const employeeProjectData = await selectEmployeePrijects(employeeId);
 
     // 同時に実行して待つ
     const [skill, technic, process, projectPosition, client] = await Promise.all([
@@ -96,17 +116,6 @@ export default async function handler(request: NextApiRequest, response: NextApi
       project_positionPromise,
       clientPromise
     ]);
-
-    // const formattedData = employeeProjectData.map((project) => ({
-    //   ...project,
-    //   client: project.client,
-    //   project_position: project.
-    //   start_date: project.start_date,
-    //   end_date: project.end_date
-    //   skills: project.employee_project_skills.map((skill) => skill.skill?.name),
-    //   processes: project.employee_project_processes.map((process) => process.process?.name),
-    //   client_name: project.client?.name,
-    // }));
 
     return response.status(200).json({
       data: employeeProjectData,

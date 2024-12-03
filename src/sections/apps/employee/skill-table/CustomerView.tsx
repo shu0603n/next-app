@@ -7,7 +7,8 @@ import MainCard from 'components/MainCard';
 import Transitions from 'components/@extended/Transitions';
 
 // アセット
-import { ProcessType, SkillTableType, SkillType } from 'types/employee/skill-table';
+import { SkillTableType } from 'types/employee/skill-table';
+import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
 
 // ==============================|| 顧客 - 表示 ||============================== //
 interface Props {
@@ -98,9 +99,9 @@ const CustomerView = ({ data }: Props) => {
                               }}
                               component="ul"
                             >
-                              {data.employee_project_skills.map((skills: SkillType, index: number) => (
+                              {data.employee_project_skills.map((skills: SkillParameterType, index: number) => (
                                 <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                                  <Chip variant="outlined" size="small" label={skills.skill.name} />
+                                  <Chip variant="outlined" size="small" label={skills.name} />
                                 </ListItem>
                               ))}
                             </Box>
@@ -121,9 +122,9 @@ const CustomerView = ({ data }: Props) => {
                               }}
                               component="ul"
                             >
-                              {data.employee_project_processes.map((process: ProcessType, index: number) => (
+                              {data.employee_project_processes.map((process: ParameterType, index: number) => (
                                 <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                                  <Chip variant="outlined" size="small" label={process.process.name} />
+                                  <Chip variant="outlined" size="small" label={process.name} />
                                 </ListItem>
                               ))}
                             </Box>
