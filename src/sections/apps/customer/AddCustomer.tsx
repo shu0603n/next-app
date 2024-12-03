@@ -29,6 +29,7 @@ import {
 import { LocalizationProvider } from '@mui/x-date-pickers';
 
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 
 // third-party
 import _ from 'lodash';
@@ -158,7 +159,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
   return (
     <>
       <FormikProvider value={formik}>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <DialogTitle>{customer ? 'Edit Customer' : 'New Customer'}</DialogTitle>
             <Divider />

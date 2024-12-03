@@ -82,6 +82,9 @@ db から prisma ファイルを生成
 prisma ファイルを元にローカル prisma を更新
 `yarn prisma generate`
 
+## ビルドエラーの確認
+`yarn next build`
+
 # よくあるトラブル
 
 ### vsCode で yarn が使えない場合

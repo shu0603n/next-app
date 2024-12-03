@@ -29,6 +29,7 @@ import {
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 
 // third-party
 import { v4 as UIDV4 } from 'uuid';
@@ -246,7 +247,7 @@ const Create = () => {
                     <Stack spacing={1}>
                       <InputLabel>Date</InputLabel>
                       <FormControl sx={{ width: '100%' }} error={Boolean(touched.date && errors.date)}>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
                           <DatePicker format="dd/MM/yyyy" value={values.date} onChange={(newValue) => setFieldValue('date', newValue)} />
                         </LocalizationProvider>
                       </FormControl>
@@ -257,7 +258,7 @@ const Create = () => {
                     <Stack spacing={1}>
                       <InputLabel>Due Date</InputLabel>
                       <FormControl sx={{ width: '100%' }} error={Boolean(touched.due_date && errors.due_date)}>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
                           <DatePicker
                             format="dd/MM/yyyy"
                             value={values.due_date}

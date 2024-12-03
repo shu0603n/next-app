@@ -24,6 +24,7 @@ import {
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 import _ from 'lodash';
 import * as Yup from 'yup';
 import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
@@ -33,7 +34,7 @@ import { DeleteFilled } from '@ant-design/icons';
 import { createFilterOptions, Autocomplete, Chip, CircularProgress } from '@mui/material';
 import { CloseOutlined } from '@ant-design/icons';
 import { ProjectType } from 'types/project/project';
-import { ParameterType, SkillParameterType, SkillArrayType, ProcessArrayType, EmployeeParameterType } from 'types/parameter/parameter';
+import { ParameterType, SkillParameterType, EmployeeParameterType } from 'types/parameter/parameter';
 import Loader from 'components/Loader';
 import { alertSnackBar } from 'function/alert/alertSnackBar';
 
@@ -205,12 +206,10 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
     // ページがロードされたときにデータを取得
     fetchAllData(customer?.id)
       .then((data) => {
-        const skills = data.project_skills?.map((item: SkillArrayType) => item.skill);
-        const process = data.project_process?.map((item: ProcessArrayType) => item.process);
-        setProjectSkills(skills);
-        setProjectProcess(process);
-        setFieldValue('skills', skills);
-        setFieldValue('process', process);
+        setProjectSkills(data.project_skills);
+        setProjectProcess(data.project_process);
+        setFieldValue('skills', data.project_skills);
+        setFieldValue('process', data.project_process);
         setLoading(false);
       })
       .catch((error) => {
@@ -320,7 +319,7 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
   return (
     <>
       <FormikProvider value={formik}>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <DialogTitle>{customer ? '編集' : '新規追加'}</DialogTitle>
             <Divider />

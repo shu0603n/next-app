@@ -29,7 +29,6 @@ const HeaderContent = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const localization = useMemo(() => <Localization />, [i18n]);
 
-
   return (
     <>
       {menuOrientation === MenuOrientation.HORIZONTAL && !downLG && <DrawerHeader open={true} />}
