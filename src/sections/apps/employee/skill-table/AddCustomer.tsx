@@ -221,6 +221,7 @@ const AddCustomer = ({
       // 編集時はcustomerが変更された場合のみフォームの値を更新
       formik.setValues(getInitialValues(customer));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [customer, isCreating]);
 
   const { errors, touched, handleSubmit, getFieldProps, setFieldValue } = formik;

@@ -50,7 +50,6 @@ interface Props {
 }
 
 function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeaderProps }: Props) {
-  console.log('ReactTable',data)
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 

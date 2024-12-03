@@ -34,7 +34,7 @@ import { DeleteFilled } from '@ant-design/icons';
 import { createFilterOptions, Autocomplete, Chip, CircularProgress } from '@mui/material';
 import { CloseOutlined } from '@ant-design/icons';
 import { ProjectType } from 'types/project/project';
-import { ParameterType, SkillParameterType, SkillArrayType, ProcessArrayType, EmployeeParameterType } from 'types/parameter/parameter';
+import { ParameterType, SkillParameterType, EmployeeParameterType } from 'types/parameter/parameter';
 import Loader from 'components/Loader';
 import { alertSnackBar } from 'function/alert/alertSnackBar';
 
@@ -206,12 +206,10 @@ const AddCustomer = ({ customer, skillAll, contractAll, clientAll, processAll, e
     // ページがロードされたときにデータを取得
     fetchAllData(customer?.id)
       .then((data) => {
-        const skills = data.project_skills?.map((item: SkillArrayType) => item.skill);
-        const process = data.project_process?.map((item: ProcessArrayType) => item.process);
-        setProjectSkills(skills);
-        setProjectProcess(process);
-        setFieldValue('skills', skills);
-        setFieldValue('process', process);
+        setProjectSkills(data.project_skills);
+        setProjectProcess(data.project_process);
+        setFieldValue('skills', data.project_skills);
+        setFieldValue('process', data.project_process);
         setLoading(false);
       })
       .catch((error) => {

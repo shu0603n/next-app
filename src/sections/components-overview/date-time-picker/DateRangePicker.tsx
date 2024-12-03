@@ -3,7 +3,6 @@ import { useState } from 'react';
 // material-ui
 import { Stack } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import ja from 'date-fns/locale/ja';
 import { MobileDateRangePicker } from '@mui/x-date-pickers-pro/MobileDateRangePicker';
 import { DesktopDateRangePicker } from '@mui/x-date-pickers-pro/DesktopDateRangePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';

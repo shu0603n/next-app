@@ -34,6 +34,6 @@ export default async function handler(request: NextApiRequest, response: NextApi
     console.error('エラーが発生しました:', error);
     return response.status(500).json({ error: 'データを取得できませんでした。' });
   } finally {
-    await prisma.$disconnect();  // Prisma接続の切断
+    await prisma.$disconnect();
   }
 }

@@ -263,6 +263,7 @@ const Top = () => {
         // エラーハンドリング
         console.error('Error:', error);
       });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 空の依存リストを指定することで、一度だけ実行される
 
   const [startTime, setStartTime] = useState<string>();
