@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { FormControl, MenuItem, OutlinedInput, OutlinedInputProps, Select, Slider, Stack, TextField, Tooltip } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 
 // third-party
 import { useAsyncDebounce, Row, TableState, MetaBase } from 'react-table';
@@ -61,7 +62,7 @@ export function DefaultColumnFilter({ column: { filterValue, Header, setFilter }
 export function DateColumnFilter({ column: { filterValue, Header, setFilter } }: any) {
   return (
     <FormControl fullWidth>
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
         <DatePicker
           format="dd/MM/yyyy"
           value={filterValue && new Date(filterValue)}

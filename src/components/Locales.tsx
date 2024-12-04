@@ -19,9 +19,9 @@ const loadLocaleData = (locale: I18n) => {
       return import('utils/locales/zh.json');
     case 'en':
       return import('utils/locales/en.json');
-    case 'jp':
+    case 'ja':
     default:
-      return import('utils/locales/jp.json');
+      return import('utils/locales/ja.json');
   }
 };
 
@@ -45,7 +45,7 @@ const Locales = ({ children }: Props) => {
   return (
     <>
       {messages && (
-        <IntlProvider locale={i18n} defaultLocale="en" messages={messages}>
+        <IntlProvider locale={i18n} defaultLocale="ja" messages={messages}>
           {children as React.ReactElement}
         </IntlProvider>
       )}

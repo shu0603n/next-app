@@ -45,7 +45,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
       hr_requirements,
       gender_requirements,
       age_requirements,
-      recruitment_count,
+      recruitment_count
     } = request.body;
 
     const skillIds = skills?.map((skillItem: SkillParameterType) => skillItem?.id) ?? [];
@@ -95,29 +95,28 @@ export default async function handler(request: NextApiRequest, response: NextApi
           hr_requirements,
           gender_requirements,
           age_requirements,
-          recruitment_count,
-        },
+          recruitment_count
+        }
       });
 
       const deleteSkillsAndProcesses = Promise.all([
         prisma.project_skills.deleteMany({ where: { project_id: Number(id) } }),
-        prisma.project_process.deleteMany({ where: { project_id: Number(id) } }),
+        prisma.project_process.deleteMany({ where: { project_id: Number(id) } })
       ]);
 
       await Promise.all([updateProject, deleteSkillsAndProcesses]);
 
       if (skillIds.length > 0) {
         await prisma.project_skills.createMany({
-          data: skillIds.map((skillId: number) => ({ project_id: Number(id), skill_id: skillId })),
+          data: skillIds.map((skillId: number) => ({ project_id: Number(id), skill_id: skillId }))
         });
       }
 
       if (processIds.length > 0) {
         await prisma.project_process.createMany({
-          data: processIds.map((processId: number) => ({ project_id: Number(id), process_id: processId })),
+          data: processIds.map((processId: number) => ({ project_id: Number(id), process_id: processId }))
         });
       }
-
     } else {
       const newProject = await prisma.project.create({
         data: {
@@ -157,19 +156,19 @@ export default async function handler(request: NextApiRequest, response: NextApi
           hr_requirements,
           gender_requirements,
           age_requirements,
-          recruitment_count,
-        },
+          recruitment_count
+        }
       });
 
       if (skillIds.length > 0) {
         await prisma.project_skills.createMany({
-          data: skillIds.map((skillId: number) => ({ project_id: newProject.id, skill_id: skillId })),
+          data: skillIds.map((skillId: number) => ({ project_id: newProject.id, skill_id: skillId }))
         });
       }
 
       if (processIds.length > 0) {
         await prisma.project_process.createMany({
-          data: processIds.map((processId: number) => ({ project_id: newProject.id, process_id: processId })),
+          data: processIds.map((processId: number) => ({ project_id: newProject.id, process_id: processId }))
         });
       }
     }

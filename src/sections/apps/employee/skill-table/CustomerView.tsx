@@ -8,6 +8,7 @@ import Transitions from 'components/@extended/Transitions';
 
 // アセット
 import { SkillTableType } from 'types/employee/skill-table';
+import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
 
 // ==============================|| 顧客 - 表示 ||============================== //
 interface Props {
@@ -86,7 +87,8 @@ const CustomerView = ({ data }: Props) => {
                       <Grid item xs={12} md={8} sx={{ ml: 6 }}>
                         <Stack spacing={2.5}>
                           <Typography color="secondary">使用スキル</Typography>
-                          {data.skills && data.skills.filter((skill) => skill !== null && skill !== undefined).length > 0 ? (
+                          {data.employee_project_skills &&
+                          data.employee_project_skills.filter((skill) => skill !== null && skill !== undefined).length > 0 ? (
                             <Box
                               sx={{
                                 display: 'flex',
@@ -97,9 +99,9 @@ const CustomerView = ({ data }: Props) => {
                               }}
                               component="ul"
                             >
-                              {data.skills.map((skills: any, index: number) => (
+                              {data.employee_project_skills.map((skills: SkillParameterType, index: number) => (
                                 <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                                  <Chip variant="outlined" size="small" label={skills} />
+                                  <Chip variant="outlined" size="small" label={skills.name} />
                                 </ListItem>
                               ))}
                             </Box>
@@ -108,7 +110,8 @@ const CustomerView = ({ data }: Props) => {
                           )}
 
                           <Typography color="secondary">担当工程</Typography>
-                          {data.process && data.process.filter((process) => process !== null && process !== undefined).length > 0 ? (
+                          {data.employee_project_processes &&
+                          data.employee_project_processes.filter((process) => process !== null && process !== undefined).length > 0 ? (
                             <Box
                               sx={{
                                 display: 'flex',
@@ -119,9 +122,9 @@ const CustomerView = ({ data }: Props) => {
                               }}
                               component="ul"
                             >
-                              {data.process.map((process: any, index: number) => (
+                              {data.employee_project_processes.map((process: ParameterType, index: number) => (
                                 <ListItem disablePadding key={index} sx={{ width: 'auto', pr: 0.75, pb: 0.75 }}>
-                                  <Chip variant="outlined" size="small" label={process} />
+                                  <Chip variant="outlined" size="small" label={process.name} />
                                 </ListItem>
                               ))}
                             </Box>
@@ -144,7 +147,7 @@ const CustomerView = ({ data }: Props) => {
                         <Divider orientation="vertical" flexItem />
                         <Stack spacing={0.5} alignItems="center">
                           <Typography color="secondary">役割</Typography>
-                          <Typography variant="h5">{data.project_position_description}</Typography>
+                          <Typography variant="h5">{data.project_position?.description}</Typography>
                         </Stack>
                         <Divider orientation="vertical" flexItem />
                         <Stack spacing={0.5} alignItems="center">

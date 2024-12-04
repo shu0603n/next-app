@@ -3,6 +3,7 @@ import { useState } from 'react';
 // material-ui
 import { Stack } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 
@@ -17,7 +18,7 @@ export default function ComponentStaticDatePicker() {
   return (
     <MainCard title="Static Mode">
       <Stack spacing={3}>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
           <StaticDatePicker
             displayStaticWrapperAs="desktop"
             openTo="year"
@@ -27,7 +28,7 @@ export default function ComponentStaticDatePicker() {
             }}
           />
         </LocalizationProvider>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
           <StaticDatePicker
             displayStaticWrapperAs="desktop"
             openTo="day"

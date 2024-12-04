@@ -23,6 +23,7 @@ import ExportPDFView from 'sections/apps/employee/skill-sheet/export-pdf';
 
 // assets
 import { DownloadOutlined, EditOutlined, PrinterFilled } from '@ant-design/icons';
+import { BasicCardType, ProjectCardType, SkillSheetType } from 'types/skillSheet';
 
 // ==============================|| INVOICE - DETAILS ||============================== //
 
@@ -30,9 +31,9 @@ const SkillSheet = () => {
   const theme = useTheme();
   const router = useRouter();
   const { id } = router.query;
-  const [projects, setProjects] = useState<Array<ProjectCard>>([]);
-  const [basics, setBasics] = useState<BasicCard>();
-  const [list, setList] = useState<SkillSheet>();
+  const [projects, setProjects] = useState<Array<ProjectCardType>>([]);
+  const [basics, setBasics] = useState<BasicCardType>();
+  const [list, setList] = useState<SkillSheetType>();
 
   const today = new Date().toLocaleDateString('ja-JP', {
     year: 'numeric',
@@ -41,36 +42,6 @@ const SkillSheet = () => {
   });
 
   const componentRef: React.Ref<HTMLDivElement> = useRef(null);
-
-  type SkillSheet = {
-    id?: number;
-    sei?: string;
-    mei?: string;
-    birthday?: number;
-    address?: string;
-    project?: Array<ProjectCard>;
-  };
-
-  type ProjectCard = {
-    id: number;
-    start_date: string;
-    end_date: string;
-    people: number;
-    client: string;
-    project_title: string;
-    description: string;
-    skills: string[];
-    process: string[];
-    time: string;
-  };
-
-  type BasicCard = {
-    id: number;
-    sei: string;
-    mei: string;
-    birthday: number;
-    address: string;
-  };
 
   async function fetchTableData(id: string) {
     try {
@@ -102,7 +73,7 @@ const SkillSheet = () => {
 
   const [sortBy] = useState('Default');
   const [globalFilter] = useState('');
-  const [userCard, setUserCard] = useState<Array<ProjectCard>>([]);
+  const [userCard, setUserCard] = useState<Array<ProjectCardType>>([]);
   const PER_PAGE = 20;
 
   const _DATA = usePagination(userCard, PER_PAGE);
@@ -111,8 +82,8 @@ const SkillSheet = () => {
     if (typeof id === 'string') {
       Promise.all([fetchTableData(id), fetchBasicData(id)])
         .then(([tableData, basicData]) => {
-          setProjects(tableData.data.rows);
-          setBasics(basicData.data.rows[0]);
+          setProjects(tableData.data);
+          setBasics(basicData.data);
         })
         .catch((error) => {
           console.error('Error fetching data:', error);
@@ -239,7 +210,7 @@ const SkillSheet = () => {
                         if (sortBy === 'Status') return a.status.localeCompare(b.status);
                         return a;
                       })
-                      .map((user: ProjectCard, index: number) => (
+                      .map((user: ProjectCardType, index: number) => (
                         <Slide key={index} direction="up" in={true} timeout={50}>
                           <Grid item xs={12}>
                             <CustomerCard customer={user} />

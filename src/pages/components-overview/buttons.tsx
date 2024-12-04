@@ -439,7 +439,7 @@ const Buttons = () => {
                       <Grid item>
                         <Tooltip title="Home">
                           <IconButton shape="rounded" variant="contained">
-                            <HomeFilled />
+                            <PlusCircleOutlined />
                           </IconButton>
                         </Tooltip>
                       </Grid>

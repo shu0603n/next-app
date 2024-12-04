@@ -25,6 +25,7 @@ import {
   Tooltip
 } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
@@ -197,7 +198,7 @@ const EditStory = ({ story, open, handleDrawerOpen }: Props) => {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <form onSubmit={formik.handleSubmit}>
-                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
                     <Grid container spacing={2.5}>
                       <Grid item xs={12}>
                         <Stack spacing={1}>

@@ -16,7 +16,8 @@ import {
   Column,
   HeaderGroup,
   Row,
-  Cell
+  Cell,
+  CellProps
 } from 'react-table';
 
 // project import
@@ -35,7 +36,8 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 
 // assets
 import { CloseOutlined, PlusOutlined, EyeTwoTone, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
-import { SkillTableType, skill, processType, projectPositionType, clientType } from 'types/employee/skill-table';
+import { ClientType, SkillTableType } from 'types/employee/skill-table';
+import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
 
 // ==============================|| REACT TABLE - EDITABLE ROW ||============================== //
 
@@ -95,10 +97,9 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
         'people_number',
         `end_date`,
         `description`,
-        `project_position_id`,
-        'project_position_name',
-        `skills`,
-        `process`
+        `project_position`,
+        `employee_project_skills`,
+        `employee_project_processes`
       ]);
     } else {
       setHiddenColumns([
@@ -106,10 +107,9 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
         'client_name',
         'people_number',
         `description`,
-        `project_position_id`,
-        'project_position_name',
-        `skills`,
-        `process`
+        `project_position`,
+        `employee_project_skills`,
+        `employee_project_processes`
       ]);
     }
     // eslint-disable-next-line
@@ -196,15 +196,17 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
 const SkillTable = ({
   data,
   candidate_skills,
+  candidate_technics,
   candidate_processes,
   candidate_roles,
   candidate_client
 }: {
   data: SkillTableType[];
-  candidate_skills: skill[];
-  candidate_processes: processType[];
-  candidate_roles: projectPositionType[];
-  candidate_client: clientType[];
+  candidate_skills: SkillParameterType[];
+  candidate_technics: ParameterType[];
+  candidate_processes: ParameterType[];
+  candidate_roles: ParameterType[];
+  candidate_client: ClientType[];
 }) => {
   const theme = useTheme();
 
@@ -285,28 +287,28 @@ const SkillTable = ({
       },
       {
         Header: '企業名',
-        accessor: 'client_name'
+        accessor: 'client',
+        Cell: ({ value }: CellProps<any>) => value?.name ?? null
       },
       {
         Header: '人数',
         accessor: 'people_number'
       },
       {
-        Header: '役割ID',
-        accessor: `project_position_id`
-      },
-      {
         Header: '役割',
-        accessor: 'project_position_name'
+        accessor: `project_position`,
+        Cell: ({ value }: CellProps<any>) => value?.name ?? null
       },
       {
         Header: 'スキル',
-        accessor: 'skills',
-        className: 'cell-right'
+        accessor: 'employee_project_skills',
+        className: 'cell-right',
+        Cell: ({ value }: CellProps<any>) => value.map((skill: SkillParameterType) => skill.name).join(', ')
       },
       {
         Header: '担当工程',
-        accessor: 'process'
+        accessor: 'employee_project_processes',
+        Cell: ({ value }: CellProps<any>) => value.map((process: ParameterType) => process.name).join(', ')
       },
 
       {
@@ -394,6 +396,7 @@ const SkillTable = ({
           onCancel={handleAdd}
           reloadDataAfterAdd={handleReloadData}
           candidate_skills={candidate_skills}
+          candidate_technics={candidate_technics}
           candidate_processes={candidate_processes}
           candidate_roles={candidate_roles}
           candidate_client={candidate_client}

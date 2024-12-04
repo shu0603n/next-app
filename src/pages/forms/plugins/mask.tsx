@@ -3,6 +3,7 @@ import { useState, ReactElement } from 'react';
 // material-ui
 import { Grid, InputLabel, Stack, TextField } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
@@ -27,7 +28,7 @@ const MaskPage = () => {
 
   return (
     <Page title="Input Mask">
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
             <MainCard title="Date">

@@ -25,8 +25,10 @@ import {
   Typography
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import 'dayjs/locale/ja';
 
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 
 // third-party
 import _ from 'lodash';
@@ -250,7 +252,7 @@ const AddCustomer = ({ customer, onCancel }: Props) => {
   return (
     <>
       <FormikProvider value={formik}>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <DialogTitle>{customer ? 'スキル情報の編集' : '新しいスキルの追加'}</DialogTitle>
             <Divider />

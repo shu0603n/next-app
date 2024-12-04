@@ -1,3 +1,5 @@
+import { ParameterType } from 'types/parameter/parameter';
+
 export type EmployeeType = {
   id: number;
   sei: string;
@@ -13,12 +15,10 @@ export type EmployeeType = {
   retirement_date: string;
   client_id: number;
   employee_project_id: number;
-  employment_id: number;
-  employment_name: string;
+  employment: ParameterType;
   job_category_id: number;
   job_category_name: string;
-  position_id: number;
-  position_name: string;
+  position: ParameterType;
   postal_code: string;
   project_id: number;
   remarks: string;

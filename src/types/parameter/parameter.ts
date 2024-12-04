@@ -23,11 +23,3 @@ export type SkillParameterType = {
   technic: ParameterType;
   candidate_flag: boolean;
 };
-
-export type SkillArrayType = {
-  skill: SkillParameterType;
-};
-
-export type ProcessArrayType = {
-  process: ParameterType;
-};

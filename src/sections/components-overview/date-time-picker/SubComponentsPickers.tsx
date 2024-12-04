@@ -3,6 +3,7 @@ import { useState } from 'react';
 // material-ui
 import { Box, Stack } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ja from 'date-fns/locale/ja';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { MonthCalendar } from '@mui/x-date-pickers/MonthCalendar';
@@ -21,7 +22,7 @@ export default function SubComponentsPickers() {
 
   return (
     <MainCard title="Sub Component">
-      <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
         <Stack spacing={3} justifyContent="center" alignItems="center">
           <Box sx={{ maxWidth: 320 }}>
             <YearCalendar
