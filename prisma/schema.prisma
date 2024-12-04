@@ -29,6 +29,7 @@ model client {
   email            String?            @db.VarChar(255)
   postal_code      String?            @db.VarChar(255)
   remarks          String?            @db.VarChar(255)
+  client_history   client_history[]
   employee_project employee_project[]
   invoice          invoice[]
   project          project[]
@@ -63,6 +64,7 @@ model employee {
   password         String?            @db.VarChar(255)
   avatar           String?
   attendance       attendance[]
+  client_history   client_history[]
   employment       employment?        @relation(fields: [employment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   job_category     job_category?      @relation(fields: [job_category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   position         position?          @relation(fields: [position_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -309,4 +311,25 @@ model project_position {
   name             String             @db.VarChar(30)
   description      String?            @db.VarChar(255)
   employee_project employee_project[]
+}
+
+model client_history {
+  id                 Int              @id(map: "support_histories_pkey") @default(autoincrement())
+  client_id          Int
+  time               DateTime         @default(now()) @db.Timestamptz(6)
+  name               String           @db.VarChar(100)
+  gender             String?          @db.Char(1)
+  remarks            String?
+  client_position_id Int?
+  age                String?          @db.VarChar(20)
+  employee_id        Int?
+  client             client           @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_client")
+  client_position    client_position? @relation(fields: [client_position_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_client_position")
+  employee           employee?        @relation(fields: [employee_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_employee")
+}
+
+model client_position {
+  id             Int              @id(map: "client_positions_pkey") @default(autoincrement())
+  name           String           @db.VarChar(30)
+  client_history client_history[]
 }
