@@ -52,6 +52,7 @@ import { ProjectTableType, ClientType, EmployeeType, ContractType, SkillType, Pr
 const getInitialValues = (customer: FormikValues | null) => {
   const newCustomer = {
     id: null as number | null,
+    hp_posting_flag: false,
     client_name: ``,
     start_date: null as Date | null,
     end_date: null as Date | null,
@@ -96,6 +97,7 @@ const getInitialValues = (customer: FormikValues | null) => {
 
   if (customer) {
     newCustomer.id = customer.id;
+    newCustomer.hp_posting_flag = customer.id;
     newCustomer.client_name = customer.client_name;
     newCustomer.start_date = customer.start_date;
     newCustomer.end_date = customer.end_date;
@@ -234,7 +236,7 @@ const AddCustomer = ({
       try {
         if (customer) {
           alertSnackBar('処理中…', 'secondary');
-          fetch(`/api/db/employee/project/update?id=${id}`, {
+          fetch(`/api/db/client/update?id=${id}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -261,7 +263,7 @@ const AddCustomer = ({
             });
         } else {
           alertSnackBar('処理中…', 'secondary');
-          fetch(`/api/db/employee/project/insert?id=${id}`, {
+          fetch(`/api/db/project/insert?id=${id}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -346,7 +348,7 @@ const AddCustomer = ({
                   <Grid container spacing={3}>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-name">開始日</InputLabel>
+                        <InputLabel htmlFor="start_date">開始日</InputLabel>
                         <DatePicker
                           format="yyyy/MM/dd"
                           value={getFieldProps('start_date').value ? new Date(getFieldProps('start_date').value) : null}
@@ -356,7 +358,7 @@ const AddCustomer = ({
                     </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-name">終了日</InputLabel>
+                        <InputLabel htmlFor="end_date">終了日</InputLabel>
                         <DatePicker
                           format="yyyy/MM/dd"
                           value={getFieldProps('end_date').value ? new Date(getFieldProps('end_date').value) : null}
@@ -404,10 +406,10 @@ const AddCustomer = ({
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-project_title">プロジェクト名</InputLabel>
+                        <InputLabel htmlFor="project_title">プロジェクト名</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-project_title"
+                          id="project_title"
                           placeholder="プロジェクト名を入力"
                           {...getFieldProps('project_title')}
                           error={Boolean(touched.project_title && errors.project_title)}
@@ -417,10 +419,10 @@ const AddCustomer = ({
                     </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-client">企業名</InputLabel>
+                        <InputLabel htmlFor="client_name">企業名</InputLabel>
                         <FormControl fullWidth>
                           <Select
-                            id="column-hiding"
+                            id="client_name"
                             displayEmpty
                             {...getFieldProps('client_name')}
                             onChange={(event: SelectChangeEvent<string>) => setFieldValue('client_name', event.target.value as string)}
@@ -449,10 +451,10 @@ const AddCustomer = ({
                     </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-employee">担当者</InputLabel>
+                        <InputLabel htmlFor="sei">担当者</InputLabel>
                         <FormControl fullWidth>
                           <Select
-                            id="column-hiding"
+                            id="sei"
                             displayEmpty
                             {...getFieldProps('sei')}
                             onChange={(event: SelectChangeEvent<string>) => setFieldValue('sei', event.target.value as string)}
@@ -493,10 +495,10 @@ const AddCustomer = ({
                     </Grid>
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-contract">契約区分</InputLabel>
+                        <InputLabel htmlFor="contract_name">契約区分</InputLabel>
                         <FormControl fullWidth>
                           <Select
-                            id="column-hiding"
+                            id="contract_name"
                             displayEmpty
                             {...getFieldProps('contract_name')}
                             onChange={(event: SelectChangeEvent<string>) => setFieldValue('contract_name', event.target.value as string)}
@@ -564,7 +566,7 @@ const AddCustomer = ({
                         <InputLabel>休日</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-holiday"
+                          id="holiday"
                           {...getFieldProps('holiday')}
                           error={Boolean(touched.holiday && errors.holiday)}
                           helperText={touched.holiday && errors.holiday}
@@ -573,10 +575,10 @@ const AddCustomer = ({
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-description">業務内容</InputLabel>
+                        <InputLabel htmlFor="description">業務内容</InputLabel>
                         <TextField
                           fullWidth
-                          id="customer-description"
+                          id="description"
                           multiline
                           rows={20}
                           placeholder={message}
@@ -685,32 +687,35 @@ const AddCustomer = ({
 
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-price_type">計算方法</InputLabel>
+                        <InputLabel htmlFor="price_type">計算方法</InputLabel>
                         <FormControl fullWidth>
                           <Select
-                            id="column-hiding"
+                            id="price_type"
                             displayEmpty
                             {...getFieldProps('price_type')}
                             onChange={(event: SelectChangeEvent<string>) => setFieldValue('price_type', event.target.value as string)}
-                            input={<OutlinedInput id="select-column-hiding" placeholder="ソート" />}
+                            input={<OutlinedInput id="price_type" placeholder="ソート" />}
                             renderValue={(selected) => {
-                              if (!selected) {
+                              const selectedPriceType = candidate_price.find((item) => item.id === parseInt(selected as string))?.name;
+
+                              if (!selectedPriceType) {
                                 return <Typography variant="subtitle1">計算方法を選択</Typography>;
                               }
 
-                              return <Typography variant="subtitle2">{selected}</Typography>;
+                              return <Typography variant="subtitle2">{selectedPriceType}</Typography>;
                             }}
                           >
                             {candidate_price.map((column: any) => (
-                              <MenuItem key={column.id} value={column.name}>
+                              <MenuItem key={column.id} value={column.id.toString()}>
+                                {' '}
                                 <ListItemText primary={column.name} />
                               </MenuItem>
                             ))}
                           </Select>
                         </FormControl>
-                        {touched.client_name && errors.client_name && (
+                        {touched.price_type && errors.price_type && (
                           <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.client_name}
+                            {errors.price_type}
                           </FormHelperText>
                         )}
                       </Stack>
@@ -877,7 +882,7 @@ const AddCustomer = ({
 
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-orderStatus">スキル</InputLabel>
+                        <InputLabel htmlFor="skills">スキル</InputLabel>
                         <Autocomplete
                           id="skills"
                           multiple
@@ -1018,7 +1023,19 @@ const AddCustomer = ({
                         <Stack spacing={0.5}>
                           <Typography variant="subtitle1">スキルシートに掲載する</Typography>
                         </Stack>
-                        <FormControlLabel control={<Switch defaultChecked sx={{ mt: 0 }} />} label="" labelPlacement="start" />
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              defaultChecked={getFieldProps('hp_posting_flag').value}
+                              onChange={() => {
+                                setFieldValue('hp_posting_flag', !getFieldProps('hp_posting_flag').value);
+                              }}
+                              sx={{ mt: 0 }}
+                            />
+                          }
+                          label=""
+                          labelPlacement="start"
+                        />
                       </Stack>
                       <Divider sx={{ my: 2 }} />
                     </Grid>

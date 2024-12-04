@@ -7,14 +7,14 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
-import { SkillTableType } from 'types/employee/skill-table';
+import { ProjectTableType } from 'types/client/project-table';
 
 // types
 interface Props {
   title: string;
   open: boolean;
   handleClose: (status: boolean) => void;
-  reloadDataAfterDelete: (data: SkillTableType[]) => void;
+  reloadDataAfterDelete: (data: ProjectTableType[]) => void;
 }
 
 // ==============================|| 顧客 - 削除 ||============================== //
@@ -22,7 +22,7 @@ interface Props {
 export default function AlertCustomerDelete({ title, open, handleClose, reloadDataAfterDelete }: Props) {
   const handleDelete = async (title: string) => {
     try {
-      const response = await fetch(`/api/db/employee/project/delete?id=${title}`, {
+      const response = await fetch(`/api/db/client/delete?id=${title}`, {
         method: 'DELETE'
       });
 

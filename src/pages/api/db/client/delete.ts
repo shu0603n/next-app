@@ -1,27 +1,38 @@
 import { NextApiResponse, NextApiRequest } from 'next';
 import { prisma } from '../prisma';
-import { getClients } from './select';
 
-export default async function handler(request: NextApiRequest, response: NextApiResponse) {
+export default async function deleteProject(request: NextApiRequest, response: NextApiResponse) {
   try {
-    const id = request.query.id;
+    const id = request.query.id as string;
     if (!id) throw new Error('パラメーターが不足しています');
 
-    // Prismaを使用してデータを削除
-    await prisma.client.deleteMany({
+    await prisma.project_skills.deleteMany({
+      where: {
+        project_id: Number(id)
+      }
+    });
+
+    await prisma.project_process.deleteMany({
+      where: {
+        project_id: Number(id)
+      }
+    });
+
+    // employee_projectと関連するデータを削除
+    const deletEmployeeProject = await prisma.project.deleteMany({
       where: {
         id: Number(id)
       }
     });
 
-    // データを再取得
-    const data = await getClients();
-    return response.status(200).json({ data });
+    // 削除された件数をチェック
+    if (deletEmployeeProject.count === 0) {
+      return response.status(404).json({ error: '削除対象が見つかりませんでした。' });
+    }
+
+    return response.status(200).json({ message: '削除が成功しました。' });
   } catch (error) {
     console.error('エラーが発生しました:', error);
-    return response.status(500).json({ error: 'データを取得できませんでした。' });
-  } finally {
-    // モジュールの終了時に PrismaClient を切断
-    await prisma.$disconnect();
+    return response.status(500).json({ error: 'データを削除できませんでした。' });
   }
 }

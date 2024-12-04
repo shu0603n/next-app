@@ -126,7 +126,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
         `hr_requirements`,
         `gender_requirements`,
         `age_requirements`,
-        `recruitment_count`
+        `recruitment_count`,
+        `hp_posting_flag`
       ]);
     } else {
       setHiddenColumns([
@@ -165,7 +166,8 @@ function ReactTable({ columns, data, renderRowSubComponent, handleAdd, getHeader
         `hr_requirements`,
         `gender_requirements`,
         `age_requirements`,
-        `recruitment_count`
+        `recruitment_count`,
+        `hp_posting_flag`
       ]);
     }
     // eslint-disable-next-line
@@ -478,7 +480,10 @@ const ProjectTable = ({
         Header: '担当工程',
         accessor: 'processes'
       },
-
+      {
+        Header: 'スキルシート登録フラグ',
+        accessor: 'hp_posting_flag'
+      },
       {
         Header: 'アクション',
         className: 'cell-center',
@@ -538,7 +543,7 @@ const ProjectTable = ({
   const renderRowSubComponent = useCallback(({ row }: { row: Row<{}> }) => <CustomerView data={data[Number(row.id)]} />, [data]);
   return (
     <MainCard content={false}>
-      {JSON.stringify(data[1])}
+      {JSON.stringify(data)}
       <ScrollX>
         <ReactTable
           columns={columns}

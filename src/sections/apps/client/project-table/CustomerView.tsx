@@ -1,6 +1,6 @@
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { useMediaQuery, Grid, Divider, List, ListItem, Stack, TableCell, TableRow, Typography, Box } from '@mui/material';
+import { useMediaQuery, Grid, List, ListItem, Stack, TableCell, TableRow, Typography } from '@mui/material';
 
 // プロジェクトのインポート
 import MainCard from 'components/MainCard';
@@ -13,6 +13,7 @@ import { ProjectTableType } from 'types/client/project-table';
 interface Props {
   data: ProjectTableType;
 }
+
 const CustomerView = ({ data }: Props) => {
   const theme = useTheme();
   const matchDownMD = useMediaQuery(theme.breakpoints.down('md'));
@@ -26,108 +27,198 @@ const CustomerView = ({ data }: Props) => {
     });
   };
 
-  // 期間を月数で計算
-  const calculateMonthsBetween = (startDate: string, endDate: string): number => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    // 開始日と終了日の年月を取り出す
-    const startYear = start.getFullYear();
-    const startMonth = start.getMonth(); // 0-based index (0 = January)
-    const endYear = end.getFullYear();
-    const endMonth = end.getMonth();
-
-    // 月数の差を計算
-    const monthDifference = (endYear - startYear) * 12 + (endMonth - startMonth);
-
-    // 結果を返す
-    return monthDifference;
-  };
-
-  // 期間（月数）の計算
-  const monthsBetween = calculateMonthsBetween(formatDate(data.start_date), formatDate(data.end_date));
-
   return (
     <TableRow sx={{ '&:hover': { bgcolor: `transparent !important` }, overflow: 'hidden' }}>
       <TableCell colSpan={8} sx={{ p: 2.5, overflow: 'hidden' }}>
         <Transitions type="slide" direction="down" in={true}>
-          <Grid container spacing={2.5} sx={{ pl: { xs: 0, sm: 5, md: 6, lg: 10, xl: 12 } }}>
-            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-              <Stack spacing={2.5}>
-                <MainCard title="プロジェクト詳細">
-                  <List sx={{ py: 0 }}>
-                    <ListItem divider={!matchDownMD}>
-                      <Grid container spacing={3}>
-                        <Grid item xs={12} md={12}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">ID</Typography>
-                            <Typography>{data.id}</Typography>
-                          </Stack>
-                        </Grid>
-                        <Grid item xs={12} md={12}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">開始日 / 終了日</Typography>
-                            <Typography>{`${formatDate(data.start_date)} ~ ${formatDate(data.end_date)}`}</Typography>
-                          </Stack>
-                        </Grid>
-                        <Grid item xs={12} md={12}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">就業時間</Typography>
-                            <Typography>{`${data.working_start_time} ~ ${data.working_end_time}`}</Typography>
-                          </Stack>
-                        </Grid>
-                        <Grid item xs={12} md={12}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">就業場所</Typography>
-                            <Typography>{data.working_postal_code}</Typography>
-                            <Typography>{data.working_address}</Typography>
-                          </Stack>
-                        </Grid>
+          {/* {JSON.stringify(data)} */}
+          <Grid container spacing={2.5}>
+            <Grid item xs={12}>
+              <MainCard title="プロジェクト詳細">
+                <List sx={{ py: 0 }}>
+                  <ListItem divider={!matchDownMD}>
+                    <Grid container spacing={3}>
+                      {/* 左側カラム */}
+                      <Grid item xs={12} md={5.5} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            ID
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.id}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            開始日 / 終了日
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>
+                            {`${formatDate(data.start_date)} ~ ${formatDate(data.end_date)}`}
+                          </Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            就業時間
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{`${data.working_start_time} ~ ${data.working_end_time}`}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            郵便番号
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{`〒 ${data.working_postal_code}`}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            住所
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.working_address}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            休日
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.holiday}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            最寄駅
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.fertilizer_type}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            担当者
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.sei}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            派遣元
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.dispatch_source}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            就業期間
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.contract_period}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            計算方法
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>
+                            {
+                              <Typography>
+                                {data.price_type === 1 ? '時給' : data.price_type === 2 ? '単価' : '計算方法を入力してください'}
+                              </Typography>
+                            }
+                          </Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            環境備考
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.environmental_notes}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            特記事項
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.special_notes}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            人材要件
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.hr_requirements}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            男女
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.gender_requirements}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            年齢
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.age_requirements}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            募集人数
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.recruitment_count}</Typography>
+                        </Stack>
                       </Grid>
-                      <Grid item xs={12} md={24} sx={{ ml: 6 }}>
-                        <Stack spacing={0.5}>
-                          <Typography color="secondary">会社名</Typography>
-                          <Typography>{data.name}</Typography>
+
+                      {/* 右側カラム */}
+                      <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            会社名
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.client_name}</Typography>
                         </Stack>
-                        <Box sx={{ marginTop: 2.5 }}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">プロジェクト名</Typography>
-                            <Typography>{data.project_title}</Typography>
-                          </Stack>
-                        </Box>
-                        <Box sx={{ marginTop: 2.5 }}>
-                          <Stack spacing={0.5}>
-                            <Typography color="secondary">業務内容</Typography>
-                            <Typography>{data.description}</Typography>
-                          </Stack>
-                        </Box>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            プロジェクト名
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.project_title}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            業務内容
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.description}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            勤務日数
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.working_days_count}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            勤務曜日
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.working_days_list}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            勤務時間
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.description}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            勤務備考
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.work_notes}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            試用期間
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.trial_period_duration}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            研修日程
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.training_schedule}</Typography>
+                        </Stack>
+                        <Stack sx={{ mb: 2 }}>
+                          <Typography color="secondary" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+                            研修備考
+                          </Typography>
+                          <Typography sx={{ marginBottom: 2 }}>{data.training_memo}</Typography>
+                        </Stack>
                       </Grid>
-                    </ListItem>
-                  </List>
-                </MainCard>
-                <MainCard>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <Stack direction="row" justifyContent="space-around" alignItems="center">
-                        <Stack spacing={0.5} alignItems="center">
-                          <Typography color="secondary">期間</Typography>
-                          <Typography variant="h5">{monthsBetween}ヵ月</Typography>
-                        </Stack>
-                        <Divider orientation="vertical" flexItem />
-                        <Stack spacing={0.5} alignItems="center">
-                          <Typography color="secondary">就業時間</Typography>
-                          <Typography>{`${data.working_start_time} ~ ${data.working_end_time}`}</Typography>
-                        </Stack>
-                        <Divider orientation="vertical" flexItem />
-                        <Stack spacing={0.5} alignItems="center">
-                          <Typography color="secondary">休日</Typography>
-                          <Typography variant="h5">{data.holiday}</Typography>
-                        </Stack>
-                      </Stack>
                     </Grid>
-                  </Grid>
-                </MainCard>
-              </Stack>
+                  </ListItem>
+                </List>
+              </MainCard>
             </Grid>
           </Grid>
         </Transitions>
