@@ -21,7 +21,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { alertSnackBar } from 'function/alert/alertSnackBar';
@@ -43,10 +43,10 @@ import { ParameterType } from 'types/parameter/parameter';
 import { ClientHistoryType } from 'types/client/history';
 import { useRouter } from 'next/router';
 import useUser from 'hooks/useUser';
+import ja from 'date-fns/locale/ja';
 
 // constant
 const getInitialValues = (customer: FormikValues | null, client_id: string, user_id?: string) => {
-  console.log('getInitialValues', customer,client_id,user_id)
   const newCustomer = {
     id: null,
     client_id: client_id,
@@ -211,7 +211,7 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd, candidate_client_
   return (
     <>
       <FormikProvider value={formik}>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ja}>
           <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
             <DialogTitle>{customer ? '対応履歴の編集' : '新しい対応履歴の追加'}</DialogTitle>
             <Divider />
@@ -222,10 +222,9 @@ const AddCustomer = ({ customer, onCancel, reloadDataAfterAdd, candidate_client_
                     <Grid item xs={6}>
                       <Stack spacing={1.25}>
                         <InputLabel htmlFor="time">対応日時</InputLabel>
-                        <DatePicker
-                          format="yyyy/MM/dd"
+                        <DateTimePicker
                           value={getFieldProps('time').value ? new Date(getFieldProps('time').value) : new Date()}
-                          onChange={(newValue) => setFieldValue('time', newValue)}
+                          onChange={(newValue: any) => setFieldValue('time', newValue)}
                         />
                       </Stack>
                     </Grid>

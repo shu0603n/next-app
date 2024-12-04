@@ -321,7 +321,10 @@ const HistoryTable = ({ data, candidate_client_position }: { data: ClientHistory
     [theme]
   );
 
-  const renderRowSubComponent = useCallback(({ row }: { row: Row<{}> }) => <CustomerView data={data[Number(row.id)]} />, [data]);
+  const renderRowSubComponent = useCallback(
+    ({ row }: { row: Row<{}> }) => <CustomerView data={updatedData[Number(row.id)]} />,
+    [updatedData]
+  );
   return (
     <MainCard content={false}>
       <ScrollX>
