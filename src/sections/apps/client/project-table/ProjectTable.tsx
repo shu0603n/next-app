@@ -543,7 +543,6 @@ const ProjectTable = ({
   const renderRowSubComponent = useCallback(({ row }: { row: Row<{}> }) => <CustomerView data={data[Number(row.id)]} />, [data]);
   return (
     <MainCard content={false}>
-      {JSON.stringify(data)}
       <ScrollX>
         <ReactTable
           columns={columns}

@@ -56,21 +56,38 @@ export default async function handler(request: NextApiRequest, response: NextApi
       throw new Error('パラメーターが不足しています');
     }
 
+    // 企業名からclient_idを取得
     let client_id = null;
     if (client_name) {
       const clientResult = await sql`
         SELECT id FROM client WHERE name = ${client_name};
       `;
 
-      if (clientResult.rowCount > 0) {
-        client_id = clientResult.rows[0].id; // 該当するIDを取得
-      } else {
-        throw new Error('指定された企業名が見つかりません');
-      }
+      client_id = clientResult.rows[0].id;
+    }
+
+    // 契約区分からclient_idを取得
+    let contract_id = null;
+    if (contract_name) {
+      const contractResult = await sql`
+        SELECT id FROM contract WHERE name = ${contract_name};
+      `;
+
+      contract_id = contractResult.rows[0].id;
+    }
+
+    // 担当者からemployee_idを取得
+    let employee_id = null;
+    if (sei) {
+      const employeeResult = await sql`
+        SELECT id FROM employee WHERE sei = ${sei};
+      `;
+
+      employee_id = employeeResult.rows[0].id;
     }
 
     // 更新クエリ
-    const result = await sql`
+    const updatedProject = await sql`
     UPDATE project
     SET 
       id = ${toNull(id)},
@@ -112,70 +129,15 @@ export default async function handler(request: NextApiRequest, response: NextApi
       recruitment_count = ${toNull(recruitment_count)},
       skills = ${toNull(skills)},
       processes = ${toNull(processes)},
-      hp_posting_flag = ${toNull(hp_posting_flag)}
+      hp_posting_flag = ${toNull(hp_posting_flag)},
+      client_id = ${toNull(client_id)},
+      contract_id = ${toNull(contract_id)}
+      employee_id = ${toNull(employee_id)}
     `;
 
     // 更新された行数の確認
-    if (result.rowCount === 0) {
+    if (updatedProject.rowCount === 0) {
       throw new Error('データを更新できませんでした');
-    }
-
-    // employee_project_idを取得するためにSELECTを実行
-    const employeeProjectIdResult = await sql`
-    SELECT id FROM employee_project WHERE id = ${id};
-    `;
-
-    if (employeeProjectIdResult.rowCount === 0) {
-      throw new Error('指定されたプロジェクトIDが存在しません');
-    }
-
-    const employeeProjectId = employeeProjectIdResult.rows[0].id;
-
-    // 既存のスキルデータを削除
-    await sql`
-    DELETE FROM employee_project_skills
-    WHERE employee_project_id = ${employeeProjectId};
-    `;
-
-    await sql`
-    DELETE FROM employee_project_processes
-    WHERE employee_project_id = ${employeeProjectId};
-    `;
-
-    // employee_project_skillsテーブルにスキルを追加
-    if (skills && skills.length > 0) {
-      for (const skillName of skills) {
-        const skillResult = await sql`
-        SELECT id FROM skill WHERE name = ${skillName};
-      `;
-
-        if (skillResult.rowCount > 0) {
-          const skillId = skillResult.rows[0].id;
-
-          await sql`
-          INSERT INTO employee_project_skills (employee_project_id, skill_id)
-          VALUES (${employeeProjectId}, ${skillId})
-          `;
-        }
-      }
-    }
-
-    // employee_project_processesテーブルにスキルを追加
-    if (process && process.length > 0) {
-      for (const processName of process) {
-        const processResult = await sql`
-        SELECT id FROM process WHERE name = ${processName};
-      `;
-
-        if (processResult.rowCount > 0) {
-          const processId = processResult.rows[0].id;
-
-          await sql`
-          INSERT INTO employee_project_processes (employee_project_id, process_id)
-          VALUES (${employeeProjectId}, ${processId})
-          `;
-        }
-      }
     }
 
     // 更新後のデータを取得
