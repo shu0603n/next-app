@@ -1,9 +1,10 @@
 import { sql } from '@vercel/postgres';
 import { NextApiResponse, NextApiRequest } from 'next';
+import { prisma } from '../prisma';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    const employeeId = request.query.id as string;
+    const projectId = request.query.id as string;
     const toNull = (str: string) => {
       return str === null || str === '' ? null : str;
     };
@@ -56,6 +57,18 @@ export default async function handler(request: NextApiRequest, response: NextApi
       throw new Error('パラメーターが不足しています');
     }
 
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString);
+      return !isNaN(date.getTime()) ? date.toISOString() : null; // returns null if invalid
+    };
+
+    const formattedStartDate = formatDate(start_date);
+    const formattedEndDate = formatDate(end_date);
+
+    if (!formattedStartDate || !formattedEndDate) {
+      return response.status(400).json({ error: 'Invalid date format. Please use YYYY-MM-DD.' });
+    }
+
     // 企業名からclient_idを取得
     let client_id = null;
     if (client_name) {
@@ -90,16 +103,12 @@ export default async function handler(request: NextApiRequest, response: NextApi
     const updatedProject = await sql`
     UPDATE project
     SET 
-      id = ${toNull(id)},
-      start_date = ${toNull(start_date)},
-      end_date = ${toNull(end_date)},
+      start_date = ${toNull(formattedStartDate)},
+      end_date = ${toNull(formattedEndDate)},
       working_start_time = ${toNull(working_start_time)},
       working_end_time = ${toNull(working_end_time)},
       project_title = ${toNull(project_title)},
-      client_name = ${toNull(client_name)},
-      sei = ${toNull(sei)},
       dispatch_source = ${toNull(dispatch_source)},
-      contract_name = ${toNull(contract_name)},
       working_postal_code = ${toNull(working_postal_code)},
       fertilizer_type = ${toNull(fertilizer_type)},
       working_address = ${toNull(working_address)},
@@ -127,47 +136,97 @@ export default async function handler(request: NextApiRequest, response: NextApi
       gender_requirements = ${toNull(gender_requirements)},
       age_requirements = ${toNull(age_requirements)},
       recruitment_count = ${toNull(recruitment_count)},
-      skills = ${toNull(skills)},
-      processes = ${toNull(processes)},
       hp_posting_flag = ${toNull(hp_posting_flag)},
       client_id = ${toNull(client_id)},
-      contract_id = ${toNull(contract_id)}
+      contract_id = ${toNull(contract_id)},
       employee_id = ${toNull(employee_id)}
-    `;
+    WHERE id = ${projectId};
+  `;
 
     // 更新された行数の確認
     if (updatedProject.rowCount === 0) {
       throw new Error('データを更新できませんでした');
     }
 
+    // 既存のスキルデータを削除
+    if (updatedProject) {
+      await prisma.project_skills.deleteMany({
+        where: { project_id: id }
+      });
+
+      await prisma.project_process.deleteMany({
+        where: { project_id: id }
+      });
+
+      // 並列でスキルとプロセスを追加
+      const createSkillsPromises =
+        skills && Array.isArray(skills) && skills.length > 0
+          ? skills
+              .map((skill) => {
+                if (skill) {
+                  return prisma.project_skills.create({
+                    data: {
+                      project_id: id,
+                      skill_id: skill.id
+                    }
+                  });
+                }
+              })
+              .filter(Boolean) // 空でないPromiseだけをフィルタリング
+          : [];
+
+      const createProcessesPromises =
+        processes && Array.isArray(processes) && processes.length > 0
+          ? processes
+              .map((process) => {
+                if (process) {
+                  return prisma.project_process.create({
+                    data: {
+                      project_id: id,
+                      process_id: process.id
+                    }
+                  });
+                }
+              })
+              .filter(Boolean) // 空でないPromiseだけをフィルタリング
+          : [];
+
+      // 並列でスキルとプロセスを追加
+      await Promise.all([...createSkillsPromises, ...createProcessesPromises]);
+    }
+
     // 更新後のデータを取得
     const data = await sql`
     SELECT 
-      employee_project.*,
+      client.id,
       client.name AS client_name,
-      pp.name AS project_position_name,
-      pp.description AS project_position_description,
-      array_agg(DISTINCT s.name) AS skills,
-      array_agg(DISTINCT p.name) AS process
+      project.*,
+      employee.sei,
+      contract.name AS contract_name,
+      array_agg(DISTINCT skill.name) AS skills,
+      array_agg(DISTINCT process.name) AS processes
     FROM 
-      employee_project
+      client
     LEFT JOIN 
-      client ON employee_project.client_id = client.id
+      project ON client.id = project.client_id
     LEFT JOIN 
-      employee_project_skills eps ON employee_project.id = eps.employee_project_id
+      employee ON project.employee_id = employee.id
     LEFT JOIN 
-      skill s ON eps.skill_id = s.id
-    LEFT JOIN
-      employee_project_processes epp ON employee_project.id = epp.employee_project_id
+      contract ON project.contract_id = contract.id
     LEFT JOIN 
-      process p ON epp.process_id = p.id
-    LEFT JOIN
-      project_position pp ON employee_project.project_position_id = pp.id
+      project_skills ON project.id = project_skills.project_id
+    LEFT JOIN 
+      skill ON project_skills.skill_id = skill.id
+    LEFT JOIN 
+      project_process ON project.id = project_process.project_id
+    LEFT JOIN 
+      process ON project_process.process_id = process.id
     WHERE 
-      employee_project.employee_id = ${employeeId}
-    GROUP BY 
-      employee_project.id, client.name, pp.name, pp.description
-    ORDER BY employee_project.start_date DESC;
+      client.id = ${projectId}
+    GROUP BY
+      client.id, project.id, employee.id, contract.id
+    ORDER BY 
+      project.start_date DESC;
     `;
 
     return response.status(200).json({ data });

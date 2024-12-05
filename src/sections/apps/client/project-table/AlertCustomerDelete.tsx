@@ -22,7 +22,7 @@ interface Props {
 export default function AlertCustomerDelete({ title, open, handleClose, reloadDataAfterDelete }: Props) {
   const handleDelete = async (title: string) => {
     try {
-      const response = await fetch(`/api/db/client/delete?id=${title}`, {
+      const response = await fetch(`/api/db/client/project/delete?id=${title}`, {
         method: 'DELETE'
       });
 

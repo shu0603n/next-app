@@ -16,8 +16,28 @@ interface Props {
 
 // ==============================|| 顧客 - 削除 ||============================== //
 
+// export default function AlertCustomerDelete({ deleteId, deleteName, open, handleClose, onReload }: Props) {
+//   const handleDelete = async (deleteId: string) => {
+//     try {
+//       const response = await fetch(`/api/db/client/delete?id=${deleteId}`, {
+//         method: 'DELETE'
+//       });
+
+//       if (!response.ok) {
+//         throw new Error('削除に失敗しました');
+//       }
+
+//       const data = await response.json();
+//       console.log('削除成功:', data);
+//       onReload(data.projects);
+//       handleClose(false);
+//     } catch (error) {
+//       console.error('エラー:', error);
+//     }
+//   };
+
 export default function AlertCustomerDelete({ deleteId, deleteName, open, handleClose, onReload }: Props) {
-  const handleClick = (isDelete: boolean) => {
+  const handleDelete = (isDelete: boolean) => {
     if (isDelete) {
       alertSnackBar('処理中…', 'secondary');
       fetch(`/api/db/client/delete?id=${deleteId}`)
@@ -28,8 +48,9 @@ export default function AlertCustomerDelete({ deleteId, deleteName, open, handle
           return response.json();
         })
         .then((data) => {
+          console.log(data.data);
           onReload(data.data);
-          alertSnackBar('データが正常に削除されました。', 'success');
+          alertSnackBar('正常に削除されました。', 'success');
         })
         .catch((error) => {
           console.error('エラー:', error);
@@ -63,17 +84,18 @@ export default function AlertCustomerDelete({ deleteId, deleteName, open, handle
             <Typography align="center">
               「
               <Typography variant="subtitle1" component="span">
-                {deleteName}
+                {' '}
+                {deleteName}{' '}
               </Typography>
-              」ユーザーを削除すると、そのユーザーに割り当てられたすべてのタスクも削除されます。
+              」を削除すると、そのプロジェクトに割り当てられたすべてのタスクも削除されます。
             </Typography>
           </Stack>
 
           <Stack direction="row" spacing={2} sx={{ width: 1 }}>
-            <Button fullWidth onClick={() => handleClick(false)} color="secondary" variant="outlined">
+            <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
               キャンセル
             </Button>
-            <Button fullWidth color="error" variant="contained" onClick={() => handleClick(true)} autoFocus>
+            <Button fullWidth color="error" variant="contained" onClick={() => handleDelete(true)} autoFocus>
               削除
             </Button>
           </Stack>
