@@ -71,6 +71,7 @@ model employee {
   employee_project employee_project[]
   invoice          invoice[]
   project          project[]
+  roles            roles[]
 }
 
 model employee_project {
@@ -332,4 +333,18 @@ model client_position {
   id             Int              @id(map: "client_positions_pkey") @default(autoincrement())
   name           String           @db.VarChar(30)
   client_history client_history[]
+}
+
+model roles {
+  id            Int      @id @default(autoincrement())
+  employee_id   Int
+  super_role    Boolean? @default(false)
+  system_role   Boolean? @default(false)
+  employee_view Boolean? @default(false)
+  client_view   Boolean? @default(false)
+  project_view  Boolean? @default(false)
+  employee_edit Boolean? @default(false)
+  client_edit   Boolean? @default(false)
+  project_edit  Boolean? @default(false)
+  employee      employee @relation(fields: [employee_id], references: [id], onDelete: Cascade, map: "fk_employee")
 }

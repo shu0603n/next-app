@@ -16,6 +16,8 @@ import { HORIZONTAL_MAX_ITEM } from 'config';
 // types
 import { NavItemType } from 'types/menu';
 import { MenuOrientation } from 'types/config';
+import useUser from 'hooks/useUser';
+import roleLevel from 'utils/roleLevel.json';
 
 // ==============================|| DRAWER CONTENT - NAVIGATION ||============================== //
 
@@ -29,6 +31,70 @@ const Navigation = () => {
   const [selectedItems, setSelectedItems] = useState<string | undefined>('');
   const [selectedLevel, setSelectedLevel] = useState<number>(0);
   const [menuItems, setMenuItems] = useState<{ items: NavItemType[] }>({ items: [] });
+
+  const user = useUser();
+
+  const updates = roleLevel.map((item) => {
+    const data = { id: item.id, disabled: false };
+
+    // roleLevel が 1 の場合の条件
+    if (item.roleLevel === 1) {
+      // superRole または systemRole が true の場合は常に disabled: false
+      if (user?.roles.superRole || user?.roles.systemRole) {
+        data.disabled = false;
+      } else {
+        switch (item.id) {
+          case 'client':
+            data.disabled = !user?.roles.clientView;
+            break;
+          case 'employee':
+            data.disabled = !user?.roles.employeeView;
+            break;
+          case 'project':
+            data.disabled = !user?.roles.projectView;
+            break;
+          default:
+            data.disabled = true; // その他の id の場合はデフォルトで true
+        }
+      }
+    } else if (item.roleLevel === 2) {
+      // superRole が true の場合は常に disabled: false
+      if (user?.roles.superRole) {
+        data.disabled = false;
+      } else {
+        data.disabled = true;
+      }
+    } else {
+      // roleLevel が 1 以外の場合は必ず disabled: false
+      data.disabled = false;
+    }
+
+    return data;
+  });
+
+  const updateDisabledProperty = (data: { items: NavItemType[] }, updates: any[]) => {
+    const updateItemDisabled = (items: NavItemType[], update: { id: string; disabled: boolean }) => {
+      items.forEach((item) => {
+        // id が一致する場合、disabled プロパティを更新
+        if (item.id === update.id) {
+          item.disabled = update.disabled;
+        }
+        // itemにchildrenがある場合、再帰的に処理
+        if (item.children) {
+          updateItemDisabled(item.children, update); // 再帰呼び出し
+        }
+      });
+    };
+    // updates の配列に基づいて、data 配列の各要素の disabled を更新
+    updates.forEach((update) => {
+      data.items.forEach((group) => {
+        updateItemDisabled([group], update); // グループに対しても処理を行う
+      });
+    });
+    return data;
+  };
+
+  updateDisabledProperty(menuItem, updates);
 
   useEffect(() => {
     handlerMenuItem();

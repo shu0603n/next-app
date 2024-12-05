@@ -10,12 +10,14 @@ declare module 'next-auth' {
     provider: any;
     token: any;
     jobCategories?: string;
+    roles: Roles;
     user: {
       id: string;
       name?: string | null;
       email?: string | null;
       image?: string | null;
       jobCategories?: string | null;
+      roles: Roles;
     };
   }
 
@@ -24,5 +26,17 @@ declare module 'next-auth' {
     name: string;
     email: string;
     jobCategories?: string | null;
+    roles: Roles;
+  }
+
+  interface Roles {
+    superRole: boolean;
+    systemRole: boolean;
+    employeeView: boolean;
+    clientView: boolean;
+    projectView: boolean;
+    employeeEdit: boolean;
+    clientEdit: boolean;
+    projectEdit: boolean;
   }
 }

@@ -39,7 +39,7 @@ const ComponentBreadcrumb = () => {
             <Grid item xs={12} lg={6}>
               <MainCard title="Basic">
                 <Breadcrumb
-                  navigation={navigation}
+                  navigation={navigation()}
                   sx={{
                     mb: '0px !important',
                     bgcolor: theme.palette.mode === ThemeMode.DARK ? 'dark.main' : 'grey.50'
@@ -50,7 +50,7 @@ const ComponentBreadcrumb = () => {
             <Grid item xs={12} lg={6}>
               <MainCard title="Custom Separator">
                 <Breadcrumb
-                  navigation={navigation}
+                  navigation={navigation()}
                   separator={RightOutlined}
                   sx={{
                     mb: '0px !important',
@@ -63,7 +63,7 @@ const ComponentBreadcrumb = () => {
               <MainCard title="With Title">
                 <Breadcrumb
                   title
-                  navigation={navigation}
+                  navigation={navigation()}
                   separator={RightOutlined}
                   sx={{
                     mb: '0px !important',
@@ -77,7 +77,7 @@ const ComponentBreadcrumb = () => {
                 <Breadcrumb
                   title
                   titleBottom
-                  navigation={navigation}
+                  navigation={navigation()}
                   separator={RightOutlined}
                   sx={{
                     mb: '0px !important',
@@ -91,7 +91,7 @@ const ComponentBreadcrumb = () => {
                 <Breadcrumb
                   title
                   icons
-                  navigation={navigation}
+                  navigation={navigation()}
                   separator={RightOutlined}
                   sx={{
                     mb: '0px !important',
@@ -105,7 +105,7 @@ const ComponentBreadcrumb = () => {
                 <Breadcrumb
                   title
                   icon
-                  navigation={navigation}
+                  navigation={navigation()}
                   separator={RightOutlined}
                   sx={{
                     mb: '0px !important',
@@ -119,7 +119,7 @@ const ComponentBreadcrumb = () => {
                 <Breadcrumb
                   title
                   maxItems={2}
-                  navigation={navigation}
+                  navigation={navigation()}
                   separator={RightOutlined}
                   sx={{
                     mb: '0px !important',
@@ -130,14 +130,14 @@ const ComponentBreadcrumb = () => {
             </Grid>
             <Grid item xs={12} md={6}>
               <MainCard title="No Card with Divider">
-                <Breadcrumb title navigation={navigation} separator={RightOutlined} card={false} sx={{ mb: '0px !important' }} />
+                <Breadcrumb title navigation={navigation()} separator={RightOutlined} card={false} sx={{ mb: '0px !important' }} />
               </MainCard>
             </Grid>
             <Grid item xs={12} md={6}>
               <MainCard title="No Card & No Divider">
                 <Breadcrumb
                   title
-                  navigation={navigation}
+                  navigation={navigation()}
                   separator={RightOutlined}
                   card={false}
                   divider={false}
