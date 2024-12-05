@@ -80,7 +80,7 @@ const TabSettings = () => {
         'project_view',
         'employee_edit',
         'client_edit',
-        'project_edit',
+        'project_edit'
       ];
 
       const values = initializePermissions(checked, Number(id));
@@ -142,6 +142,7 @@ const TabSettings = () => {
       <Grid item xs={12} sm={6}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
+            {JSON.stringify(checked)}
             <MainCard title="管理者設定">
               <Stack spacing={2.5}>
                 <Typography variant="subtitle1">管理者権限の設定</Typography>

@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export const selectData = async (id: string) => {
   const roles = await prisma.roles.findFirst({
     where: {
-      employee_id: Number(1) // 指定した employee_id
+      employee_id: Number(id) // 指定した employee_id
     }
   });
   if (roles) {
