@@ -233,7 +233,7 @@ const TabSettings = () => {
               <ListItem>
                 <ListItemText
                   id="switch-list-label-employee_edit"
-                  primary={<Typography color="secondary.light">社員情報の編集を許可</Typography>}
+                  primary={<Typography color="secondary">社員情報の編集を許可</Typography>}
                 />
                 <Switch
                   edge="end"
@@ -247,7 +247,7 @@ const TabSettings = () => {
               <ListItem>
                 <ListItemText
                   id="switch-list-label-client_edit"
-                  primary={<Typography color="secondary.light">顧客情報の編集を許可</Typography>}
+                  primary={<Typography color="secondary">顧客情報の編集を許可</Typography>}
                 />
                 <Switch
                   edge="end"
