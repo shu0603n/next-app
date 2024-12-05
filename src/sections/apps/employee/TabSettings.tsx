@@ -197,6 +197,7 @@ const TabSettings = () => {
                 <ListItemText id="switch-list-label-employee_view" primary={<Typography color="secondary">社員情報を表示</Typography>} />
                 <Switch
                   edge="end"
+                  disabled={!(user?.roles.superRole || user?.roles.systemRole)}
                   onChange={handleToggle('employee_view')}
                   checked={checked.indexOf('employee_view') !== -1}
                   inputProps={{
@@ -208,6 +209,7 @@ const TabSettings = () => {
                 <ListItemText id="switch-list-label-client_view" primary={<Typography color="secondary">企業情報を表示</Typography>} />
                 <Switch
                   edge="end"
+                  disabled={!(user?.roles.superRole || user?.roles.systemRole)}
                   onChange={handleToggle('client_view')}
                   checked={checked.indexOf('client_view') !== -1}
                   inputProps={{
@@ -219,6 +221,7 @@ const TabSettings = () => {
                 <ListItemText id="switch-list-label-project_view" primary={<Typography color="secondary">案件情報を表示</Typography>} />
                 <Switch
                   edge="end"
+                  disabled={!(user?.roles.superRole || user?.roles.systemRole)}
                   onChange={handleToggle('project_view')}
                   checked={checked.indexOf('project_view') !== -1}
                   inputProps={{
@@ -237,6 +240,7 @@ const TabSettings = () => {
                 />
                 <Switch
                   edge="end"
+                  disabled={!(user?.roles.superRole || user?.roles.systemRole)}
                   onChange={handleToggle('employee_edit')}
                   checked={checked.indexOf('employee_edit') !== -1}
                   inputProps={{
@@ -251,6 +255,7 @@ const TabSettings = () => {
                 />
                 <Switch
                   edge="end"
+                  disabled={!(user?.roles.superRole || user?.roles.systemRole)}
                   onChange={handleToggle('client_edit')}
                   checked={checked.indexOf('client_edit') !== -1}
                   inputProps={{
@@ -265,6 +270,7 @@ const TabSettings = () => {
                 />
                 <Switch
                   edge="end"
+                  disabled={!(user?.roles.superRole || user?.roles.systemRole)}
                   onChange={handleToggle('project_edit')}
                   checked={checked.indexOf('project_edit') !== -1}
                   inputProps={{
@@ -278,7 +284,7 @@ const TabSettings = () => {
       </Grid>
       <Grid item xs={12}>
         <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
-          <Button variant="contained" onClick={updateRoles}>
+          <Button variant="contained" onClick={updateRoles} disabled={!(user?.roles.superRole || user?.roles.systemRole)}>
             プロフィールを更新
           </Button>
         </Stack>
