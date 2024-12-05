@@ -58,6 +58,12 @@ const parameter: NavItemType = {
           url: '/parameter/position'
         },
         {
+          id: 'client_position',
+          title: <FormattedMessage id="client_position" />,
+          type: 'item',
+          url: '/parameter/client_position'
+        },
+        {
           id: 'contract',
           title: <FormattedMessage id="contract" />,
           type: 'item',

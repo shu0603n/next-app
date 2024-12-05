@@ -30,8 +30,6 @@ export default NextAuth({
             }
           }
         });
-        console.log('findFirst', user);
-
         if (user && user.password === credentials.password) {
           return {
             id: user.id,
@@ -47,7 +45,6 @@ export default NextAuth({
   ],
   callbacks: {
     jwt: async ({ token, user, account }) => {
-      console.log('jwt', token, user, account);
       if (user) {
         // @ts-ignore
         token.accessToken = user.accessToken;
@@ -58,7 +55,6 @@ export default NextAuth({
       return token;
     },
     session: ({ session, token }) => {
-      console.log('session', session, token);
       if (token) {
         session.id = token.id;
         session.provider = token.provider;

@@ -2,45 +2,24 @@ import { Button, Dialog, DialogContent, Stack, Typography } from '@mui/material'
 import Avatar from 'components/@extended/Avatar';
 import { PopupTransition } from 'components/@extended/Transitions';
 import { DeleteFilled } from '@ant-design/icons';
-import { ClientType } from 'types/client/client';
+import { ParameterType } from 'types/parameter/parameter';
 import { alertSnackBar } from 'function/alert/alertSnackBar';
 
 // types
 interface Props {
-  deleteId: string;
-  deleteName: string;
+  id: string;
   open: boolean;
   handleClose: (status: boolean) => void;
-  onReload: (data: Array<ClientType>) => void;
+  onReload: (data: Array<ParameterType>) => void;
 }
 
 // ==============================|| 顧客 - 削除 ||============================== //
 
-// export default function AlertCustomerDelete({ deleteId, deleteName, open, handleClose, onReload }: Props) {
-//   const handleDelete = async (deleteId: string) => {
-//     try {
-//       const response = await fetch(`/api/db/client/delete?id=${deleteId}`, {
-//         method: 'DELETE'
-//       });
-
-//       if (!response.ok) {
-//         throw new Error('削除に失敗しました');
-//       }
-
-//       const data = await response.json();
-//       console.log('削除成功:', data);
-//       onReload(data.projects);
-//       handleClose(false);
-//     } catch (error) {
-//       console.error('エラー:', error);
-//     }
-//   };
-
-export default function AlertCustomerDelete({ deleteId, deleteName, open, handleClose, onReload }: Props) {
-  const handleDelete = (isDelete: boolean) => {
+export default function AlertCustomerDelete({ id, open, handleClose, onReload }: Props) {
+  const handleClick = (isDelete: boolean) => {
     if (isDelete) {
       alertSnackBar('処理中…', 'secondary');
-      fetch(`/api/db/client/delete?id=${deleteId}`)
+      fetch(`/api/db/parameter/client_position/delete?id=${id}`)
         .then((response) => {
           if (!response.ok) {
             throw new Error('データの削除に失敗しました。');
@@ -48,9 +27,8 @@ export default function AlertCustomerDelete({ deleteId, deleteName, open, handle
           return response.json();
         })
         .then((data) => {
-          console.log(data.data);
           onReload(data.data);
-          alertSnackBar('正常に削除されました。', 'success');
+          alertSnackBar('パラメーターが正常に削除されました。', 'success');
         })
         .catch((error) => {
           console.error('エラー:', error);
@@ -82,12 +60,12 @@ export default function AlertCustomerDelete({ deleteId, deleteName, open, handle
               削除してもよろしいですか？
             </Typography>
             <Typography align="center">
-              「
+              {'ID:('}
               <Typography variant="subtitle1" component="span">
-                {' '}
-                {deleteName}{' '}
+                {id}
+                {') '}
               </Typography>
-              」を削除すると、そのプロジェクトに割り当てられたすべてのタスクも削除されます。
+              を削除すると、関連するデータも削除されます。
             </Typography>
           </Stack>
 
@@ -95,7 +73,7 @@ export default function AlertCustomerDelete({ deleteId, deleteName, open, handle
             <Button fullWidth onClick={() => handleClose(false)} color="secondary" variant="outlined">
               キャンセル
             </Button>
-            <Button fullWidth color="error" variant="contained" onClick={() => handleDelete(true)} autoFocus>
+            <Button fullWidth color="error" variant="contained" onClick={() => handleClick(true)} autoFocus>
               削除
             </Button>
           </Stack>

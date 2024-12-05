@@ -1,11 +1,6 @@
-import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement, useId } from 'react';
-
-// material-ui
+import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement } from 'react';
 import { alpha, useTheme } from '@mui/material/styles';
 import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, Typography, useMediaQuery } from '@mui/material';
-import { PopupTransition } from 'components/@extended/Transitions';
-
-// third-party
 import {
   useFilters,
   useExpanded,
@@ -19,34 +14,29 @@ import {
   Row,
   Cell
 } from 'react-table';
-
-// project import
 import Layout from 'layout';
 import Page from 'components/Page';
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import IconButton from 'components/@extended/IconButton';
-import { CSVExport, HeaderSort, SortingSelect, TablePagination } from 'components/third-party/ReactTable';
-
-import AddCustomer from 'sections/apps/client/AddCustomer';
-import AlertCustomerDelete from 'sections/apps/client/AlertCustomerDelete';
-
+import { PopupTransition } from 'components/@extended/Transitions';
+import { CSVExport, HeaderSort, SortingSelect, TablePagination, TableRowSelection } from 'components/third-party/ReactTable';
+import AddCustomer from 'sections/apps/parameter/client_position/AddCustomer';
+import AlertCustomerDelete from 'sections/apps/parameter/client_position/AlertCustomerDelete';
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
-
-// assets
-import { PlusOutlined, DeleteTwoTone } from '@ant-design/icons';
-import { ClientType } from 'types/client/client';
-import { useRouter } from 'next/router';
+import { PlusOutlined, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
+import { ParameterType } from 'types/parameter/parameter';
 
 // ==============================|| REACT TABLE ||============================== //
 
 interface Props {
   columns: Column[];
-  data: Array<ClientType>;
+  data: Array<ParameterType>;
   handleAdd: () => void;
   getHeaderProps: (column: HeaderGroup) => {};
 }
 
+// ReactTableコンポーネント
 function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
@@ -54,20 +44,18 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: 'id', desc: false };
 
-  const router = useRouter();
-
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    setHiddenColumns,
+    // setHiddenColumns,
     allColumns,
     rows,
     page,
     gotoPage,
     setPageSize,
-    state: { globalFilter, pageIndex, pageSize },
+    state: { globalFilter, selectedRowIds, pageIndex, pageSize },
     preGlobalFilteredRows,
     setGlobalFilter,
     setSortBy,
@@ -77,7 +65,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['email'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 10, sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -87,21 +75,9 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
     useRowSelect
   );
 
-  const handleChangeDetail = (newValue: string) => {
-    router.push(`/client/detail/${newValue}/basic`);
-  };
-
-  useEffect(() => {
-    if (matchDownSM) {
-      setHiddenColumns(['name_k', 'phone', 'address', 'email']);
-    } else {
-      setHiddenColumns(['name_k']);
-    }
-    // eslint-disable-next-line
-  }, [matchDownSM]);
-
   return (
     <>
+      <TableRowSelection selected={Object.keys(selectedRowIds).length} />
       <Stack spacing={3}>
         <Stack
           direction={matchDownSM ? 'column' : 'row'}
@@ -119,7 +95,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
             <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              追加
+              新規追加
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
@@ -147,8 +123,8 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
                 <Fragment key={i}>
                   <TableRow
                     {...row.getRowProps()}
-                    onClick={(e: MouseEvent<HTMLTableRowElement>) => {
-                      handleChangeDetail(row.values.id);
+                    onClick={() => {
+                      row.toggleRowSelected();
                     }}
                     sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                   >
@@ -162,7 +138,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
               );
             })}
             <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
-              <TableCell sx={{ p: 2, py: 3 }} colSpan={9} key={useId()}>
+              <TableCell sx={{ p: 2, py: 3 }} colSpan={9}>
                 <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
               </TableCell>
             </TableRow>
@@ -173,10 +149,9 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
   );
 }
 
-// ==============================|| CUSTOMER - LIST ||============================== //
 async function fetchTableData() {
   try {
-    const response = await fetch('/api/db/client/select');
+    const response = await fetch('/api/db/parameter/client_position/select');
     if (!response.ok) {
       throw new Error('API request failed');
     }
@@ -188,11 +163,11 @@ async function fetchTableData() {
   }
 }
 
-const CustomerClientPage = () => {
-  const theme = useTheme();
+// ==============================|| CUSTOMER - LIST ||============================== //
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const [tableData, setTableData] = useState<Array<ClientType>>(); // データを保持する状態変数
+// CustomerMailAccountPageコンポーネント
+const CustomerMailAccountPage = () => {
+  const [tableData, setTableData] = useState<Array<ParameterType>>([]); // データを保持する状態変数
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
@@ -206,10 +181,11 @@ const CustomerClientPage = () => {
       });
   }, []); // 空の依存リストを指定することで、一度だけ実行される
 
+  const theme = useTheme();
+
   const [open, setOpen] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
   const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
-  const [customerDeleteName, setCustomerDeleteName] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
 
   const handleAdd = () => {
@@ -220,60 +196,68 @@ const CustomerClientPage = () => {
   const handleClose = () => {
     setOpen(!open);
   };
+
   const columns = useMemo(
     () => [
       {
         Header: 'ID',
-        accessor: 'id',
-        className: 'cell-center'
+        accessor: 'id'
       },
       {
-        Header: '企業名',
-        accessor: 'name',
+        Header: '名前',
+        accessor: 'name'
+      },
+      {
+        Header: 'ユーザー',
+        accessor: 'user'
+      },
+      {
+        Header: 'パスワード',
+        accessor: 'pass',
         Cell: ({ row }: { row: Row }) => {
           const { values } = row;
           return (
             <Stack direction="row" spacing={1.5} alignItems="center">
               <Stack spacing={0}>
-                <Typography variant="caption" color="textSecondary">
-                  {values.name_k}
-                </Typography>
-                <Typography variant="subtitle1">{values.name}</Typography>
+                {values.pass && (
+                  <>
+                    <Typography variant="subtitle1">
+                      {/* {values.pass} */}
+                      {'****************'}
+                    </Typography>
+                  </>
+                )}
               </Stack>
             </Stack>
           );
         }
       },
       {
-        Header: '企業名カナ',
-        accessor: 'name_k',
-        disableSortBy: true
-      },
-      {
-        Header: '電話番号',
-        accessor: 'phone',
-        disableSortBy: true
-      },
-      {
-        Header: '住所',
-        accessor: 'address',
-        disableSortBy: true
-      },
-      {
         Header: 'アクション',
-        className: 'cell-center',
+        // className: 'cell-right',
         disableSortBy: true,
         Cell: ({ row }: { row: Row<{}> }) => {
           return (
-            <Stack direction="row" alignItems="center" justifyContent="center" spacing={0}>
-              <Tooltip title="Delete">
+            <Stack direction="row" alignItems="right" justifyContent="right" spacing={0}>
+              <Tooltip title="編集">
+                <IconButton
+                  color="primary"
+                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                    e.stopPropagation();
+                    setCustomer(row.values);
+                    handleAdd();
+                  }}
+                >
+                  <EditTwoTone twoToneColor={theme.palette.primary.main} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="削除">
                 <IconButton
                   color="error"
                   onClick={(e: MouseEvent<HTMLButtonElement>) => {
                     e.stopPropagation();
                     handleClose();
                     setCustomerDeleteId(row.values.id);
-                    setCustomerDeleteName(row.values.name);
                   }}
                 >
                   <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -289,48 +273,38 @@ const CustomerClientPage = () => {
   );
 
   return (
-    <Page title="企業一覧">
-      <MainCard content={false}>
-        {tableData && (
-          <Fragment>
-            <ScrollX>
-              <ReactTable
-                columns={columns}
-                data={tableData}
-                handleAdd={handleAdd}
-                getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
-              />
-            </ScrollX>
-
-            <AlertCustomerDelete
-              deleteId={customerDeleteId}
-              deleteName={customerDeleteName}
-              open={open}
-              handleClose={handleClose}
-              onReload={setTableData}
+    <Page title="契約パラメーター">
+      {tableData && (
+        <MainCard content={false}>
+          <ScrollX>
+            <ReactTable
+              columns={columns}
+              data={tableData}
+              handleAdd={handleAdd}
+              getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
             />
-            {/* add customer dialog */}
-            <Dialog
-              maxWidth="sm"
-              TransitionComponent={PopupTransition}
-              keepMounted
-              fullWidth
-              onClose={handleAdd}
-              open={add}
-              sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
-              aria-describedby="alert-dialog-slide-description"
-            >
-              {add && <AddCustomer customer={customer} onCancel={handleAdd} onReload={setTableData} />}
-            </Dialog>
-          </Fragment>
-        )}
-      </MainCard>
+          </ScrollX>
+          <AlertCustomerDelete id={customerDeleteId} open={open} handleClose={handleClose} onReload={setTableData} />
+          <Dialog
+            maxWidth="sm"
+            TransitionComponent={PopupTransition}
+            keepMounted
+            fullWidth
+            onClose={handleAdd}
+            open={add}
+            sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
+            aria-describedby="alert-dialog-slide-description"
+          >
+            {add && <AddCustomer customer={customer} onCancel={handleAdd} onReload={setTableData} />}
+          </Dialog>
+        </MainCard>
+      )}
     </Page>
   );
 };
 
-CustomerClientPage.getLayout = function getLayout(page: ReactElement) {
+CustomerMailAccountPage.getLayout = function getLayout(page: ReactElement) {
   return <Layout>{page}</Layout>;
 };
 
-export default CustomerClientPage;
+export default CustomerMailAccountPage;

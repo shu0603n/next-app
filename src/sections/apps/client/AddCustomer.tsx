@@ -18,7 +18,7 @@ import { ClientType } from 'types/client/client';
 // constant
 const getInitialValues = (customer: FormikValues | null) => {
   const newCustomer = {
-    id: null,
+    id: null as number | null,
     name: '',
     name_k: '',
     remarks: '',
@@ -76,7 +76,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     onSubmit: (values, { setSubmitting }) => {
       try {
         alertSnackBar('処理中…', 'secondary');
-        fetch(`/api/db/client/update`, {
+        fetch(`/api/db/client/insert`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
