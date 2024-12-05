@@ -68,9 +68,9 @@ const getInitialValues = (customer: FormikValues | null) => {
     address: '',
     joining_date: null,
     retirement_date: null,
-    employment_id: '',
-    position_id: '',
-    job_category_id: ''
+    employment: '',
+    position: '',
+    job_category: ''
   };
 
   if (customer) {
@@ -88,9 +88,9 @@ const getInitialValues = (customer: FormikValues | null) => {
     newCustomer.address = customer.address;
     newCustomer.joining_date = customer.joining_date;
     newCustomer.retirement_date = customer.retirement_date;
-    newCustomer.employment_id = customer.employment_id;
-    newCustomer.position_id = customer.position_id;
-    newCustomer.job_category_id = customer.job_category_id;
+    newCustomer.employment = customer.employment;
+    newCustomer.position = customer.position;
+    newCustomer.job_category = customer.job_category;
 
     return _.merge({}, newCustomer, customer);
   }
@@ -167,7 +167,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     // ページがロードされたときにデータを取得
     fetchPositionData()
       .then((data) => {
-        setPositionData(data.data.rows);
+        setPositionData(data.data);
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -175,7 +175,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
 
     fetchEmploymentData()
       .then((data) => {
-        setEmploymentData(data.data.rows);
+        setEmploymentData(data.data);
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -183,7 +183,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
 
     fetchJobCategoryData()
       .then((data) => {
-        setJobCategoryData(data.data.rows);
+        setJobCategoryData(data.data);
       })
       .catch((error) => {
         console.error('Error:', error);
@@ -243,7 +243,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
             return response.json();
           })
           .then((responseData) => {
-            onReload(responseData.data.rows);
+            onReload(responseData.data);
             dispatch(
               openSnackbar({
                 open: true,
@@ -505,96 +505,96 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-employment_id">雇用区分</InputLabel>
+                        <InputLabel htmlFor="customer-employment">雇用区分</InputLabel>
                         <FormControl fullWidth>
                           <Select
                             id="column-hiding"
                             displayEmpty
-                            {...getFieldProps('employment_id')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('employment_id', event.target.value as string)}
+                            {...getFieldProps('employment')}
+                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('employment', JSON.parse(event.target.value))}
                             input={<OutlinedInput id="select-column-hiding" placeholder="Sort by" />}
                             renderValue={(selected) => {
                               if (!selected) {
                                 return <Typography variant="subtitle1">選択してください</Typography>;
                               }
 
-                              return <Typography variant="subtitle2">{selected}</Typography>;
+                              return <Typography variant="subtitle2">{JSON.parse(JSON.stringify(selected)).name}</Typography>;
                             }}
                           >
                             {employmentData?.map((item: Parameter) => (
-                              <MenuItem key={item.id} value={item.id}>
+                              <MenuItem key={item.name} value={JSON.stringify(item)}>
                                 <ListItemText primary={item.name} />
                               </MenuItem>
                             ))}
                           </Select>
                         </FormControl>
-                        {touched.employment_id && errors.employment_id && (
+                        {touched.employment && errors.employment && (
                           <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.employment_id}
+                            {errors.employment}
                           </FormHelperText>
                         )}
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-position_id">役職</InputLabel>
+                        <InputLabel htmlFor="customer-position">役職</InputLabel>
                         <FormControl fullWidth>
                           <Select
                             id="column-hiding"
                             displayEmpty
-                            {...getFieldProps('position_id')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('position_id', event.target.value as string)}
+                            {...getFieldProps('position')}
+                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('position', JSON.parse(event.target.value))}
                             input={<OutlinedInput id="select-column-hiding" placeholder="Sort by" />}
                             renderValue={(selected) => {
                               if (!selected) {
                                 return <Typography variant="subtitle1">選択してください</Typography>;
                               }
 
-                              return <Typography variant="subtitle2">{selected}</Typography>;
+                              return <Typography variant="subtitle2">{JSON.parse(JSON.stringify(selected)).name}</Typography>;
                             }}
                           >
                             {positionData?.map((item: Parameter) => (
-                              <MenuItem key={item.id} value={item.id}>
+                              <MenuItem key={item.name} value={JSON.stringify(item)}>
                                 <ListItemText primary={item.name} />
                               </MenuItem>
                             ))}
                           </Select>
                         </FormControl>
-                        {touched.position_id && errors.position_id && (
+                        {touched.position && errors.position && (
                           <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.position_id}
+                            {errors.position}
                           </FormHelperText>
                         )}
                       </Stack>
                     </Grid>
                     <Grid item xs={12}>
                       <Stack spacing={1.25}>
-                        <InputLabel htmlFor="customer-job_category_id">職種区分</InputLabel>
+                        <InputLabel htmlFor="customer-job_category">職種区分</InputLabel>
                         <FormControl fullWidth>
                           <Select
                             id="column-hiding"
                             displayEmpty
-                            {...getFieldProps('job_category_id')}
-                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('job_category_id', event.target.value as string)}
+                            {...getFieldProps('job_category')}
+                            onChange={(event: SelectChangeEvent<string>) => setFieldValue('job_category', JSON.parse(event.target.value))}
                             input={<OutlinedInput id="select-column-hiding" placeholder="Sort by" />}
                             renderValue={(selected) => {
                               if (!selected) {
                                 return <Typography variant="subtitle1">選択してください</Typography>;
                               }
 
-                              return <Typography variant="subtitle2">{selected}</Typography>;
+                              return <Typography variant="subtitle2">{JSON.parse(JSON.stringify(selected)).name}</Typography>;
                             }}
                           >
                             {jobCategoryData?.map((item: Parameter) => (
-                              <MenuItem key={item.id} value={item.id}>
+                              <MenuItem key={item.name} value={JSON.stringify(item)}>
                                 <ListItemText primary={item.name} />
                               </MenuItem>
                             ))}
                           </Select>
                         </FormControl>
-                        {touched.job_category_id && errors.job_category_id && (
+                        {touched.job_category && errors.job_category && (
                           <FormHelperText error id="standard-weight-helper-text-email-login" sx={{ pl: 1.75 }}>
-                            {errors.job_category_id}
+                            {errors.job_category}
                           </FormHelperText>
                         )}
                       </Stack>

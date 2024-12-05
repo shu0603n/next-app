@@ -16,8 +16,7 @@ export type EmployeeType = {
   client_id: number;
   employee_project_id: number;
   employment: ParameterType;
-  job_category_id: number;
-  job_category_name: string;
+  job_category: ParameterType;
   position: ParameterType;
   postal_code: string;
   project_id: number;

@@ -1,5 +1,6 @@
-import { sql } from '@vercel/postgres';
 import { NextApiResponse, NextApiRequest } from 'next';
+import { prisma } from '../prisma'; // prisma インスタンスのインポート
+import { selectEmployee } from './select';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
@@ -20,76 +21,63 @@ export default async function handler(request: NextApiRequest, response: NextApi
       address,
       joining_date,
       retirement_date,
-      employment_id,
-      position_id,
-      job_category_id
+      employment,
+      position,
+      job_category
     } = request.body;
 
+    // 必須パラメータのチェック
     if (!sei || !mei) {
       throw new Error('パラメーターが不足しています');
     }
 
-    const result = await sql`
-    INSERT INTO employee (
-      sei,
-      mei,
-      sei_k,
-      mei_k,
-      gender,
-      birthday,
-      remarks,
-      phone_number,
-      email,
-      postal_code,
-      address,
-      joining_date,
-      retirement_date,
-      employment_id,
-      position_id,
-      job_category_id
-    )
-    VALUES (
-      ${toNull(sei)},
-      ${toNull(mei)},
-      ${toNull(sei_k)},
-      ${toNull(mei_k)},
-      ${toNull(gender)},
-      ${toNull(birthday)},
-      ${toNull(remarks)},
-      ${toNull(phone_number)},
-      ${toNull(email)},
-      ${toNull(postal_code)},
-      ${toNull(address)},
-      ${toNull(joining_date)},
-      ${toNull(retirement_date)},
-      ${toNull(employment_id)},
-      ${toNull(position_id)},
-      ${toNull(job_category_id)}
-    );
-  `;
+    // employee を挿入
+    const newEmployee = await prisma.employee.create({
+      data: {
+        sei: sei,
+        mei: mei,
+        sei_k: toNull(sei_k),
+        mei_k: toNull(mei_k),
+        gender: toNull(gender),
+        birthday: toNull(birthday),
+        remarks: toNull(remarks),
+        phone_number: toNull(phone_number),
+        email: toNull(email),
+        postal_code: toNull(postal_code),
+        address: toNull(address),
+        joining_date: toNull(joining_date),
+        retirement_date: toNull(retirement_date),
+        employment_id: employment ? employment.id : null,
+        position_id: position ? position.id : null,
+        job_category_id: job_category ? job_category.id : null
+      }
+    });
 
-    if (result.rowCount === 0) {
-      throw new Error('データを挿入できませんでした');
-    }
+    // 新しく挿入された employee の ID を取得
+    const employeeId = newEmployee.id;
 
-    if (result.rowCount !== 1) {
-      throw new Error('複数のレコードが更新されてしまった可能性があります');
-    }
+    // roles テーブルに関連するレコードを挿入
+    await prisma.roles.create({
+      data: {
+        super_role: false,
+        system_role: false,
+        employee_view: false,
+        client_view: false,
+        project_view: false,
+        employee_edit: false,
+        client_edit: false,
+        project_edit: false,
+        employee: {
+          connect: {
+            id: employeeId
+          }
+        }
+      }
+    });
 
-    const data = await sql`
-    SELECT 
-        emp.id,
-        emp.sei || ' ' || emp.mei AS name,
-        emp.sei_k || ' ' || emp.mei_k AS name_k,
-        emp.gender,
-        Job_category.name AS job_category_name,
-        Employment.name AS employment_name
-    FROM employee AS emp
-    LEFT JOIN job_category 
-        ON emp.job_category_id = job_category.id
-    LEFT JOIN employment
-        ON emp.employment_id = employment.id;
-    `;
+    // employee のデータを取得して返す
+    const data = await selectEmployee();
+
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);

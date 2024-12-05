@@ -1,31 +1,64 @@
-import { sql } from '@vercel/postgres';
-import { NextApiResponse, NextApiRequest } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { prisma } from '../prisma';
+
+export const selectEmployee = async () => {
+  const data = await prisma.employee.findMany({
+    select: {
+      id: true,
+      sei: true,
+      mei: true,
+      sei_k: true,
+      mei_k: true,
+      gender: true,
+      avatar: true,
+      job_category: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
+      employment: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
+      position: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
+      retirement_date: true,
+      joining_date: true
+    }
+  });
+
+  // 状態を設定するロジックを追加
+  return data.map((emp: any) => {
+    let status = 2; // デフォルトで 2 (その他)
+    if (emp.retirement_date && emp.retirement_date <= new Date()) {
+      status = 4; // 退職している場合
+    } else if (emp.joining_date && emp.joining_date <= new Date()) {
+      const currentTime = new Date();
+      const currentHours = currentTime.getHours();
+      // 09:00 ~ 18:00 の時間帯
+      if (currentHours >= 9 && currentHours < 18) {
+        status = 1; // 勤務中
+      }
+    }
+    return {
+      ...emp,
+      name: `${emp.sei} ${emp.mei}`,
+      name_k: `${emp.sei_k} ${emp.mei_k}`,
+      status
+    };
+  });
+};
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    const data = await sql`
-      SELECT 
-          emp.id,
-          emp.sei || ' ' || emp.mei AS name,
-          emp.sei_k || ' ' || emp.mei_k AS name_k,
-          emp.gender,
-          emp.avatar,
-          job_category.name AS job_category_name,
-          employment.name AS employment_name,
-          position.name AS position_name,
-          CASE 
-              WHEN emp.retirement_date <= CURRENT_DATE THEN 4
-              WHEN TO_CHAR((CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Tokyo'), 'HH24:MI:SS') BETWEEN '09:00:00' AND '18:00:00' THEN 1
-              ELSE 2
-          END AS status
-      FROM employee AS emp
-      LEFT JOIN job_category 
-          ON emp.job_category_id = job_category.id
-      LEFT JOIN employment
-          ON emp.employment_id = employment.id
-      LEFT JOIN position 
-          ON emp.position_id = position.id;
-    `;
+    const data = await selectEmployee();
     return response.status(200).json({ data });
   } catch (error) {
     console.error('エラーが発生しました:', error);
