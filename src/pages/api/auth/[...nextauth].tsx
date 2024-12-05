@@ -59,7 +59,7 @@ export default NextAuth({
 
         if (user && user.password === credentials.password) {
           // ロール情報を取得し、デフォルト値を設定
-          const roles = user.roles?.[0] || {
+          const roles = user.roles || {
             super_role: false,
             system_role: false,
             employee_view: false,

@@ -71,7 +71,7 @@ model employee {
   employee_project employee_project[]
   invoice          invoice[]
   project          project[]
-  roles            roles[]
+  roles            roles?
 }
 
 model employee_project {
@@ -336,8 +336,7 @@ model client_position {
 }
 
 model roles {
-  id            Int      @id @default(autoincrement())
-  employee_id   Int
+  employee_id   Int      @id(map: "pk_employee_id")
   super_role    Boolean? @default(false)
   system_role   Boolean? @default(false)
   employee_view Boolean? @default(false)
