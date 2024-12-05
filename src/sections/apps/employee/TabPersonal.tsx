@@ -253,8 +253,7 @@ const TabPersonal: React.FC<TabPersonalProps> = ({ closeHandle, updateIsComplete
         return response.json();
       })
       .then((responseData) => {
-        const row = responseData.data.rows[0];
-        setData(row);
+        setData(responseData.data);
         dispatch(
           openSnackbar({
             open: true,
