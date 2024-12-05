@@ -82,6 +82,10 @@ db から prisma ファイルを生成
 prisma ファイルを元にローカル prisma を更新
 `yarn prisma generate`
 
+## package.json変更を加えた後は以下を実行する
+package.jsonkaからライブラリをインストール
+`yarn`
+
 ## ビルドエラーの確認
 `yarn next build`
 
