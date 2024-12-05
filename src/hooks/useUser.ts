@@ -8,6 +8,18 @@ interface UserProps {
   avatar: string;
   thumb: string;
   jobCategories: string;
+  roles: Roles;
+}
+
+interface Roles {
+  superRole: boolean;
+  systemRole: boolean;
+  employeeView: boolean;
+  clientView: boolean;
+  projectView: boolean;
+  employeeEdit: boolean;
+  clientEdit: boolean;
+  projectEdit: boolean;
 }
 
 const useUser = () => {
@@ -28,7 +40,8 @@ const useUser = () => {
       email: user!.email!,
       avatar: user?.image!,
       thumb,
-      jobCategories: session?.jobCategories!
+      jobCategories: session?.jobCategories!,
+      roles: session?.roles!
     };
 
     return newUser;

@@ -31,7 +31,8 @@ import {
   Column,
   HeaderGroup,
   Row,
-  Cell
+  Cell,
+  CellProps
 } from 'react-table';
 
 // project import
@@ -103,7 +104,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
 
   useEffect(() => {
     if (matchDownSM) {
-      setHiddenColumns(['avatar', 'name_k', 'status', 'gender', 'employment_name', 'position_name', 'job_category_name']);
+      setHiddenColumns(['avatar', 'name_k', 'status', 'gender', 'employment', 'position', 'job_category']);
     } else {
       setHiddenColumns(['avatar', 'name_k']);
     }
@@ -212,7 +213,7 @@ const CustomerEmployeePage = () => {
     // ページがロードされたときにデータを取得
     fetchTableData()
       .then((data) => {
-        setTableData(data.data.rows); // データを状態に設定
+        setTableData(data.data); // データを状態に設定
       })
       .catch((error) => {
         // エラーハンドリング
@@ -276,18 +277,21 @@ const CustomerEmployeePage = () => {
       },
       {
         Header: '雇用形態',
-        accessor: 'employment_name',
-        disableSortBy: true
+        accessor: 'employment',
+        disableSortBy: true,
+        Cell: ({ value }: CellProps<any>) => value?.name ?? null
       },
       {
         Header: '職種',
-        accessor: 'job_category_name',
-        disableSortBy: true
+        accessor: 'job_category',
+        disableSortBy: true,
+        Cell: ({ value }: CellProps<any>) => value?.name ?? null
       },
       {
         Header: '役職',
-        accessor: 'position_name',
-        disableSortBy: true
+        accessor: 'position',
+        disableSortBy: true,
+        Cell: ({ value }: CellProps<any>) => value?.name ?? null
       },
       {
         Header: '勤怠',
