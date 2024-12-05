@@ -19,11 +19,13 @@ import TabSettings from 'sections/apps/employee/TabSettings';
 
 // assets
 import { ContainerOutlined, FileTextOutlined, LockOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import useUser from 'hooks/useUser';
 
 // ==============================|| PROFILE - ACCOUNT ||============================== //
 
 const EmployeeDetail = () => {
   const router = useRouter();
+  const user = useUser();
   const { id, tab } = router.query;
 
   const [value, setValue] = useState(tab);
@@ -40,10 +42,34 @@ const EmployeeDetail = () => {
           <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto" aria-label="account profile tab">
             <Tab label="プロフィール" icon={<UserOutlined />} value="basic" iconPosition="start" />
             <Tab label="スキル一覧" icon={<FileTextOutlined />} value="skill" iconPosition="start" />
-            <Tab label="請求一覧" icon={<FileTextOutlined />} value="invoice" iconPosition="start" />
-            <Tab label="アカウント情報" icon={<ContainerOutlined />} value="my-account" iconPosition="start" />
-            <Tab label="パスワード変更" icon={<LockOutlined />} value="password" iconPosition="start" />
-            <Tab label="設定" icon={<SettingOutlined />} value="settings" iconPosition="start" />
+            <Tab
+              label="請求一覧"
+              icon={<FileTextOutlined />}
+              value="invoice"
+              iconPosition="start"
+              disabled={!(user?.roles.superRole || user?.roles.systemRole)}
+            />
+            <Tab
+              label="アカウント情報"
+              icon={<ContainerOutlined />}
+              value="my-account"
+              iconPosition="start"
+              disabled={!(user?.roles.superRole || user?.roles.systemRole)}
+            />
+            <Tab
+              label="パスワード変更"
+              icon={<LockOutlined />}
+              value="password"
+              iconPosition="start"
+              disabled={!(user?.roles.superRole || user?.roles.systemRole || id === user?.id.toString())}
+            />
+            <Tab
+              label="設定"
+              icon={<SettingOutlined />}
+              value="settings"
+              iconPosition="start"
+              disabled={!(user?.roles.superRole || user?.roles.systemRole)}
+            />
           </Tabs>
         </Box>
         <Box sx={{ mt: 2.5 }}>

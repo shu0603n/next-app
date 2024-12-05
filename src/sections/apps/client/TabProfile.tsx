@@ -28,6 +28,7 @@ import { AimOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { Fragment, useEffect, useState } from 'react';
 import { PatternFormat } from 'react-number-format';
 import { ClientType } from 'types/client/client';
+import useUser from 'hooks/useUser';
 
 // ==============================|| ACCOUNT PROFILE - BASIC ||============================== //
 
@@ -47,6 +48,7 @@ async function fetchTableData(id: string) {
 
 const TabProfile = () => {
   const router = useRouter();
+  const user = useUser();
   const id = router.query.id as string;
 
   const matchDownMD = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
@@ -279,7 +281,11 @@ const TabProfile = () => {
               </Grid>
               <Grid item xs={12}>
                 <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
-                  <Button variant="contained" onClick={handleEdit}>
+                  <Button
+                    variant="contained"
+                    onClick={handleEdit}
+                    disabled={!(user?.roles.superRole || user?.roles.systemRole || user?.roles.clientEdit)}
+                  >
                     編集
                   </Button>
                 </Stack>

@@ -28,6 +28,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 import { EditTwoTone, PlusOutlined, DeleteTwoTone } from '@ant-design/icons';
 import { ProjectType } from 'types/project/project';
 import Loader from 'components/Loader';
+import useUser from 'hooks/useUser';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -54,6 +55,7 @@ function formatDateString(originalDateString: string, targetFormat: string) {
 
 function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
   const theme = useTheme();
+  const user = useUser();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
   const filterTypes = useMemo(() => renderFilterTypes, []);
@@ -193,8 +195,14 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
           />
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
-            <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              追加
+            <Button
+              variant="contained"
+              startIcon={<PlusOutlined />}
+              onClick={handleAdd}
+              size="small"
+              disabled={!(user?.roles.superRole || user?.roles.systemRole || user?.roles.projectEdit)}
+            >
+              新規追加
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}

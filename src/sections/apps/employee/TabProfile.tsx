@@ -29,6 +29,7 @@ import { AimOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { Fragment, useEffect, useState } from 'react';
 import { PatternFormat } from 'react-number-format';
 import { EmployeeType } from 'types/employee/employee';
+import useUser from 'hooks/useUser';
 
 // ==============================|| ACCOUNT PROFILE - BASIC ||============================== //
 
@@ -56,6 +57,7 @@ async function fetchTableData(id: string) {
 
 const TabProfile = () => {
   const router = useRouter();
+  const user = useUser();
   const id = router.query.id as string;
 
   const matchDownMD = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
@@ -334,7 +336,11 @@ const TabProfile = () => {
                   <Button variant="outlined" onClick={() => handleChangeDetailSkill(id)}>
                     業務履歴
                   </Button>
-                  <Button variant="contained" onClick={handleEdit}>
+                  <Button
+                    variant="contained"
+                    onClick={handleEdit}
+                    disabled={!(user?.roles.superRole || user?.roles.systemRole || user?.roles.employeeEdit)}
+                  >
                     編集
                   </Button>
                 </Stack>

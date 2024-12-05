@@ -37,6 +37,7 @@ import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 import { PlusOutlined, DeleteTwoTone } from '@ant-design/icons';
 import { ClientType } from 'types/client/client';
 import { useRouter } from 'next/router';
+import useUser from 'hooks/useUser';
 
 // ==============================|| REACT TABLE ||============================== //
 
@@ -55,6 +56,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
   const sortBy = { id: 'id', desc: false };
 
   const router = useRouter();
+  const user = useUser();
 
   const {
     getTableProps,
@@ -118,8 +120,14 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
           />
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
-            <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-              追加
+            <Button
+              variant="contained"
+              startIcon={<PlusOutlined />}
+              onClick={handleAdd}
+              size="small"
+              disabled={!(user?.roles.superRole || user?.roles.systemRole || user?.roles.clientEdit)}
+            >
+              新規追加
             </Button>
             <CSVExport
               data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
