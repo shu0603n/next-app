@@ -63,6 +63,7 @@ const TabProfile = () => {
   const matchDownMD = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
   const [data, setData] = useState<EmployeeType>();
+  const [allSkills, setAllSkills] = useState<any[]>();
 
   const [open, setOpen] = useState<boolean>(false);
 
@@ -72,6 +73,7 @@ const TabProfile = () => {
     fetchTableData(id)
       .then((data) => {
         setData(data.data);
+        setAllSkills(data.allSkills);
       })
       .catch((error) => {
         // エラーハンドリング
@@ -104,44 +106,6 @@ const TabProfile = () => {
   const handleChangeDetailSkill = (newValue: string) => {
     router.push(`/employee/skill-sheet/${id}`);
   };
-
-  const skill = [
-    {
-      experienct_years: 15,
-      technic_name: '言語',
-      skill_name: 'JAVA'
-    },
-    {
-      experienct_years: 4,
-      technic_name: '言語',
-      skill_name: 'Ptyhon'
-    },
-    {
-      experienct_years: 0,
-      technic_name: '言語',
-      skill_name: 'TypeScript'
-    },
-    {
-      experienct_years: 1.5,
-      technic_name: 'DataBase',
-      skill_name: 'Oracle'
-    },
-    {
-      experienct_years: 5,
-      technic_name: 'DataBase',
-      skill_name: 'postgreSQL'
-    },
-    {
-      experienct_years: 1.5,
-      technic_name: 'library',
-      skill_name: 'React'
-    },
-    {
-      experienct_years: 10,
-      technic_name: 'library',
-      skill_name: 'Flask'
-    }
-  ];
 
   return (
     <Grid container spacing={3}>
@@ -226,17 +190,25 @@ const TabProfile = () => {
               <Grid item xs={12}>
                 <MainCard title="Skills">
                   <Grid container spacing={1.25}>
-                    {skill.map((val, i) => (
-                      // eslint-disable-next-line react/jsx-key
-                      <Fragment key={`skill-${i}`}>
-                        <Grid item xs={6}>
-                          <Typography color="secondary">{val.skill_name}</Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          {/* <LinearWithLabelYear value={val.experienct_years} /> */}
-                        </Grid>
-                      </Fragment>
-                    ))}
+                    {allSkills && allSkills.length > 0 ? (
+                      allSkills.map((val, i) => (
+                        <Fragment key={`skill-${i}`}>
+                          <Grid item xs={6}>
+                            <Typography color="secondary">{val.skill_name}</Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography color="secondary">{val.technic_name}</Typography>
+                          </Grid>
+                          {/* <Grid item xs={6}>
+                            <LinearWithLabelYear value={val.experienct_years} />
+                          </Grid> */}
+                        </Fragment>
+                      ))
+                    ) : (
+                      <Grid item xs={12}>
+                        <Typography color="textSecondary">スキル情報がありません</Typography>
+                      </Grid>
+                    )}
                   </Grid>
                 </MainCard>
               </Grid>
