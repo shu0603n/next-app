@@ -138,7 +138,11 @@ const TabProfile = () => {
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       <Stack spacing={2.5} alignItems="center">
-                        <Avatar alt="Avatar 1" size="xl" src={`/assets/images/users/avatar-${data.avatar}.png`} />
+                        <Avatar
+                          alt="Avatar 1"
+                          size="xl"
+                          // src={`/assets/images/users/avatar-${data.avatar}.png`}
+                        />
                         <Stack spacing={0.5} alignItems="center">
                           <Typography variant="h5">{data.name}</Typography>
                         </Stack>
