@@ -12,7 +12,7 @@ import {
   QuestionOutlined,
   SmileOutlined,
   StopOutlined,
-  ControlOutlined
+  SettingOutlined
 } from '@ant-design/icons';
 
 // type
@@ -29,7 +29,7 @@ const icons = {
   QuestionOutlined,
   StopOutlined,
   SmileOutlined,
-  ControlOutlined
+  SettingOutlined
 };
 
 // ==============================|| MENU ITEMS - SUPPORT ||============================== //
@@ -43,7 +43,7 @@ const parameter: NavItemType = {
       id: 'parameter',
       title: <FormattedMessage id="parameter" />,
       type: 'collapse',
-      icon: icons.ControlOutlined,
+      icon: icons.SettingOutlined,
       children: [
         {
           id: 'skill',
