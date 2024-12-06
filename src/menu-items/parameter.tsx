@@ -35,8 +35,8 @@ const icons = {
 // ==============================|| MENU ITEMS - SUPPORT ||============================== //
 
 const parameter: NavItemType = {
-  id: 'parameter',
-  title: <FormattedMessage id="parameter" />,
+  id: 'system_setting',
+  title: <FormattedMessage id="system_setting" />,
   type: 'group',
   children: [
     {
