@@ -18,7 +18,7 @@ import {
 // third-party
 // import { PatternFormat } from 'react-number-format';
 
-// project import
+// end_date import
 import MainCard from 'components/MainCard';
 import Avatar from 'components/@extended/Avatar';
 import TabPersonal from './TabPersonal';
@@ -91,41 +91,16 @@ const TabProfile = () => {
     }
   };
 
-  const skill = [
+  const assign = [
     {
-      experienct_years: 15,
-      technic_name: '言語',
-      skill_name: 'JAVA'
+      employee: '村井俊介',
+      end_date: '2024/01/31',
+      flg: true
     },
     {
-      experienct_years: 4,
-      technic_name: '言語',
-      skill_name: 'Ptyhon'
-    },
-    {
-      experienct_years: 0,
-      technic_name: '言語',
-      skill_name: 'TypeScript'
-    },
-    {
-      experienct_years: 1.5,
-      technic_name: 'DataBase',
-      skill_name: 'Oracle'
-    },
-    {
-      experienct_years: 5,
-      technic_name: 'DataBase',
-      skill_name: 'postgreSQL'
-    },
-    {
-      experienct_years: 1.5,
-      technic_name: 'library',
-      skill_name: 'React'
-    },
-    {
-      experienct_years: 10,
-      technic_name: 'library',
-      skill_name: 'Flask'
+      employee: '高橋直樹',
+      end_date: '2024/03/31',
+      flg: false
     }
   ];
 
@@ -188,16 +163,28 @@ const TabProfile = () => {
                 </MainCard>
               </Grid>
               <Grid item xs={12}>
-                <MainCard title="Projects">
+                <MainCard title="アサイン状況(仮)">
                   <Grid container spacing={1.25}>
-                    {skill.map((val) => (
+                    <Fragment>
+                      <Grid item xs={6}>
+                        <Typography color="secondary">社員名</Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography color="secondary">次回更新月</Typography>
+                      </Grid>
+                    </Fragment>
+                    {assign.map((val) => (
                       // eslint-disable-next-line react/jsx-key
                       <Fragment>
                         <Grid item xs={6}>
-                          <Typography color="secondary">{val.skill_name}</Typography>
+                          <Typography>{val.employee}</Typography>
                         </Grid>
                         <Grid item xs={6}>
-                          {/* <LinearWithLabelYear value={val.experienct_years} /> */}
+                          {val.flg ? (
+                            <Typography color="error">{val.end_date}</Typography>
+                          ) : (
+                            <Typography color="primary">{val.end_date}</Typography>
+                          )}
                         </Grid>
                       </Fragment>
                     ))}
