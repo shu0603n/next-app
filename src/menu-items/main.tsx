@@ -34,14 +34,32 @@ const other: NavItemType = {
       title: <FormattedMessage id="client" />,
       type: 'item',
       url: '/client',
-      icon: icons.ApartmentOutlined
+      icon: icons.ApartmentOutlined,
+      children: [
+        {
+          id: 'client-detail',
+          title: <FormattedMessage id="client-detail" />,
+          type: 'item',
+          url: '/client/detail/[id]/[section]',
+          icon: icons.SolutionOutlined
+        }
+      ]
     },
     {
       id: 'employee',
       title: <FormattedMessage id="employee" />,
       type: 'item',
       url: '/employee',
-      icon: icons.SolutionOutlined
+      icon: icons.SolutionOutlined,
+      children: [
+        {
+          id: 'employee-detail',
+          title: <FormattedMessage id="employee-detail" />,
+          type: 'item',
+          url: '/employee/detail/[id]/[section]',
+          icon: icons.SolutionOutlined
+        }
+      ]
     },
     {
       id: 'project',
