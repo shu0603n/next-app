@@ -13,12 +13,11 @@ import MainCard from 'components/MainCard';
 import TabProfile from 'sections/apps/employee/TabProfile';
 import TabSkill from 'sections/apps/employee/TabSkill';
 import TabInvoice from 'sections/apps/employee/TabInvoice';
-import TabAccount from 'sections/apps/employee/TabAccount';
 import TabPassword from 'sections/apps/employee/TabPassword';
 import TabSettings from 'sections/apps/employee/TabSettings';
 
 // assets
-import { ContainerOutlined, FileTextOutlined, LockOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { FileTextOutlined, LockOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import useUser from 'hooks/useUser';
 
 // ==============================|| PROFILE - ACCOUNT ||============================== //
@@ -50,13 +49,6 @@ const EmployeeDetail = () => {
               disabled={!(user?.roles.superRole || user?.roles.systemRole)}
             />
             <Tab
-              label="アカウント情報"
-              icon={<ContainerOutlined />}
-              value="my-account"
-              iconPosition="start"
-              disabled={!(user?.roles.superRole || user?.roles.systemRole)}
-            />
-            <Tab
               label="パスワード変更"
               icon={<LockOutlined />}
               value="password"
@@ -76,7 +68,6 @@ const EmployeeDetail = () => {
           {tab === 'basic' && <TabProfile />}
           {tab === 'skill' && <TabSkill />}
           {tab === 'invoice' && <TabInvoice />}
-          {tab === 'my-account' && <TabAccount />}
           {tab === 'password' && <TabPassword />}
           {tab === 'settings' && <TabSettings />}
         </Box>

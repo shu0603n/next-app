@@ -18,6 +18,7 @@ import { openDrawer } from 'store/reducers/menu';
 
 // types
 import { MenuOrientation } from 'types/config';
+import { RightOutlined } from '@ant-design/icons';
 
 // ==============================|| MAIN LAYOUT ||============================== //
 
@@ -58,7 +59,7 @@ const MainLayout = ({ children }: Props) => {
             flexDirection: 'column'
           }}
         >
-          <Breadcrumbs navigation={navigation} title titleBottom card={false} divider={false} />
+          <Breadcrumbs title titleBottom card={false} divider={false} icon navigation={navigation} separator={RightOutlined} />
           {children}
           <Footer />
         </Container>
