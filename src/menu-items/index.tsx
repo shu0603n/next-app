@@ -1,6 +1,6 @@
 // project import
 import main from './main';
-import staffing from './Staffing';
+import staffing from './staffing';
 import engineering from './engineering';
 import other from './other';
 import parameter from './parameter';
