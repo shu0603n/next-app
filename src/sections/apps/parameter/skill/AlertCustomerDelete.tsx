@@ -7,7 +7,7 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
-import { ParameterType } from 'types/parameter/parameter';
+import { SkillParameterType } from 'types/parameter/parameter';
 import { alertSnackBar } from 'function/alert/alertSnackBar';
 
 // types
@@ -15,7 +15,7 @@ interface Props {
   id: string;
   open: boolean;
   handleClose: (status: boolean) => void;
-  onReload: (data: Array<ParameterType>) => void;
+  onReload: (item: Array<SkillParameterType>) => void;
 }
 
 // ==============================|| 顧客 - 削除 ||============================== //
