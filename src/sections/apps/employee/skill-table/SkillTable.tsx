@@ -199,7 +199,8 @@ const SkillTable = ({
   candidate_technics,
   candidate_processes,
   candidate_roles,
-  candidate_client
+  candidate_client,
+  reloadCandidateTechnics
 }: {
   data: SkillTableType[];
   candidate_skills: SkillParameterType[];
@@ -207,6 +208,7 @@ const SkillTable = ({
   candidate_processes: ParameterType[];
   candidate_roles: ParameterType[];
   candidate_client: ClientType[];
+  reloadCandidateTechnics: (item: SkillParameterType[]) => void;
 }) => {
   const theme = useTheme();
 
@@ -400,6 +402,7 @@ const SkillTable = ({
           candidate_processes={candidate_processes}
           candidate_roles={candidate_roles}
           candidate_client={candidate_client}
+          reloadCandidateTechnics={reloadCandidateTechnics}
         />
       </Dialog>
     </MainCard>

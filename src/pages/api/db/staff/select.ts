@@ -8,6 +8,12 @@ export const selectStaff = async () => {
       name: true,
       mail: true,
       birthday: true,
+      import_status: {
+        select: {
+          id: true,
+          name: true
+        }
+      },
       staff_status: {
         select: {
           id: true,

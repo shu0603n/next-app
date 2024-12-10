@@ -32,7 +32,7 @@ import { useFormik, Form, FormikProvider, FormikValues } from 'formik';
 import AlertCustomerDelete from './AlertCustomerDelete';
 import IconButton from 'components/@extended/IconButton';
 import { DeleteFilled } from '@ant-design/icons';
-import { ParameterType } from 'types/parameter/parameter';
+import { ParameterType, SkillParameterType } from 'types/parameter/parameter';
 import { alertSnackBar } from 'function/alert/alertSnackBar';
 
 const getInitialValues = (customer: FormikValues | null) => {
@@ -62,7 +62,7 @@ export interface Props {
   customer?: any;
   technicAll: Array<ParameterType>;
   onCancel: () => void;
-  onReload: (data: Array<ParameterType>) => void;
+  onReload: (item: Array<SkillParameterType>) => void;
 }
 
 const AddCustomer = ({ customer, technicAll, onCancel, onReload }: Props) => {

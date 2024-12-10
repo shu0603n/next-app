@@ -35,6 +35,10 @@ const TabRole = () => {
   const router = useRouter();
   const id = router.query.id as string;
 
+  const reloadCandidateTechnics = (items: SkillParameterType[]) => {
+    setCandidate_skills(items);
+  };
+
   useEffect(() => {
     // ページがロードされたときにデータを取得
     fetchTableData(id)
@@ -63,6 +67,7 @@ const TabRole = () => {
           candidate_processes={candidate_processes}
           candidate_roles={candidate_roles}
           candidate_client={candidate_client}
+          reloadCandidateTechnics={reloadCandidateTechnics}
         />
       </Grid>
     </Grid>

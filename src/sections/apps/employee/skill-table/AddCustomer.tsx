@@ -97,6 +97,7 @@ export interface Props {
   candidate_processes: ParameterType[];
   candidate_roles: ParameterType[];
   candidate_client: ClientType[];
+  reloadCandidateTechnics: (item: SkillParameterType[]) => void;
 }
 
 const AddCustomer = ({
@@ -107,7 +108,8 @@ const AddCustomer = ({
   candidate_technics,
   candidate_processes,
   candidate_roles,
-  candidate_client
+  candidate_client,
+  reloadCandidateTechnics
 }: Props) => {
   const isCreating = !customer;
   const router = useRouter();
@@ -130,10 +132,6 @@ const AddCustomer = ({
 
   const handleSkillAdd = () => {
     setSkillAdd(!skillAdd);
-  };
-
-  const skillReload = () => {
-    alert('再取得処理を追加');
   };
 
   const formik = useFormik({
@@ -598,7 +596,12 @@ const AddCustomer = ({
         aria-describedby="alert-dialog-slide-description"
       >
         {skillAdd && (
-          <SkillAddCustomer customer={customer} technicAll={candidate_technics} onCancel={handleSkillAdd} onReload={skillReload} />
+          <SkillAddCustomer
+            customer={customer}
+            technicAll={candidate_technics}
+            onCancel={handleSkillAdd}
+            onReload={reloadCandidateTechnics}
+          />
         )}
       </Dialog>
       {!isCreating && (
