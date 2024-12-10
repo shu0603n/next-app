@@ -73,6 +73,7 @@ const TabProfile = () => {
   useEffect(() => {
     // ページがロードされたときにデータを取得
     getUpdateData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 空の依存リストを指定することで、一度だけ実行される
 
   const handleEdit = () => {

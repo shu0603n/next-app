@@ -28,35 +28,35 @@ const icons = {
 
 // ==============================|| MENU ITEMS - SUPPORT ||============================== //
 
-const main: NavItemType = {
-  id: 'main',
-  title: <FormattedMessage id="main" />,
+const staffing: NavItemType = {
+  id: 'staffing',
+  title: <FormattedMessage id="staffing" />,
   type: 'group',
   children: [
     {
-      id: 'attendance',
-      title: <FormattedMessage id="attendance" />,
+      id: 'staff',
+      title: <FormattedMessage id="staff" />,
       type: 'item',
-      url: '/attendance',
-      icon: icons.HomeOutlined
-    },
-    {
-      id: 'employee',
-      title: <FormattedMessage id="employee" />,
-      type: 'item',
-      url: '/employee',
+      url: '/staff',
       icon: icons.TeamOutlined,
       children: [
         {
-          id: 'employee-detail',
-          title: <FormattedMessage id="employee-detail" />,
+          id: 'staff-detail',
+          title: <FormattedMessage id="staff-detail" />,
           type: 'item',
-          url: '/employee/detail/[id]/[section]',
+          url: '/staff/detail/[id]/[section]',
           icon: icons.TeamOutlined
         }
       ]
+    },
+    {
+      id: 'mail',
+      title: <FormattedMessage id="mail" />,
+      type: 'item',
+      url: '/mail',
+      icon: icons.MailOutlined
     }
   ]
 };
 
-export default main;
+export default staffing;
