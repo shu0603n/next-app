@@ -24,8 +24,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
         project_view,
         employee_edit,
         client_edit,
-        project_edit,
-      },
+        project_edit
+      }
     });
 
     if (!updatedRole) {

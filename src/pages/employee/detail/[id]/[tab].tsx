@@ -29,7 +29,7 @@ const EmployeeDetail = () => {
 
   const [value, setValue] = useState(tab);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = (_event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
     router.push(`/employee/detail/${id}/${newValue}`);
   };
@@ -40,7 +40,7 @@ const EmployeeDetail = () => {
         <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
           <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto" aria-label="account profile tab">
             <Tab label="プロフィール" icon={<UserOutlined />} value="sales" iconPosition="start" />
-            <Tab label="営業情報" icon={<UserOutlined />} value="basic" iconPosition="start"  disabled />
+            <Tab label="営業情報" icon={<UserOutlined />} value="basic" iconPosition="start" disabled />
             <Tab label="スキル一覧" icon={<FileTextOutlined />} value="skill" iconPosition="start" />
             <Tab
               label="請求一覧"

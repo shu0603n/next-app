@@ -91,7 +91,7 @@ const Breadcrumbs = ({
       }
 
       // Filter the breadcrumb trail to include only items (not groups)
-      return trail.filter(item => item.type === 'item');
+      return trail.filter((item) => item.type === 'item');
     };
 
     const breadcrumbs = buildBreadcrumbs(navigation?.items || [], asPath);
