@@ -83,7 +83,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
       columns,
       data,
       filterTypes,
-      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['id'], sortBy: [sortBy] }
+      initialState: { pageIndex: 0, pageSize: 100, hiddenColumns: ['id'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
@@ -255,6 +255,13 @@ const CustomerStaffPage = () => {
       {
         Header: 'ステータス',
         accessor: 'staff_status',
+        // Filter: SelectColumnFilter,
+        filter: 'includes',
+        Cell: ({ value }: CellProps<any>) => value?.name ?? null
+      },
+      {
+        Header: 'インポートステータス',
+        accessor: 'import_status',
         // Filter: SelectColumnFilter,
         filter: 'includes',
         Cell: ({ value }: CellProps<any>) => value?.name ?? null
