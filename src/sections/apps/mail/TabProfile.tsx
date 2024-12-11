@@ -1,7 +1,7 @@
 // material-ui
 import { Theme } from '@mui/material/styles';
 import { useRouter } from 'next/router';
-import { useMediaQuery, Button, Divider, Grid, List, ListItem, Stack, Typography, CircularProgress } from '@mui/material';
+import { useMediaQuery, Button, Divider, Grid, List, ListItem, Stack, Typography, CircularProgress, Chip } from '@mui/material';
 
 // end_date import
 import MainCard from 'components/MainCard';
@@ -118,7 +118,10 @@ const TabProfile = () => {
                     <Grid item xs={12}>
                       <Stack spacing={0.5}>
                         <Typography color="secondary">本文</Typography>
-                        <Typography>{data.main_text}</Typography>
+                        <Typography
+                          dangerouslySetInnerHTML={{ __html: data.main_text }}
+                          style={{ fontSize: '14px', lineHeight: '0.5' }} // 長い単語も折り返し
+                        />
                       </Stack>
                     </Grid>
                   </Grid>
@@ -132,7 +135,7 @@ const TabProfile = () => {
                           onClick={handleEdit}
                           disabled={areAllComplete() || !(user?.roles.superRole || user?.roles.systemRole || user?.roles.clientEdit)}
                         >
-                          送信する
+                          {areAllComplete() ? '送信済み' : '送信する'}
                         </Button>
                       )}
                     </Stack>
@@ -148,17 +151,25 @@ const TabProfile = () => {
                   <List sx={{ py: 0 }}>
                     <ListItem divider={!matchDownMD}>
                       <Grid container spacing={3}>
-                        <Grid item xs={12} md={6}>
-                          <Stack spacing={0.5}>
-                            {mailDestinationData &&
-                              mailDestinationData.map((item, i) => {
-                                return (
-                                  <Typography key={i}>
-                                    {item.complete_flg ? '送信済み' : 'エラー'}:{item?.staff?.name}
-                                  </Typography>
-                                );
-                              })}
-                          </Stack>
+                        <Grid item xs={12}>
+                          {mailDestinationData &&
+                            mailDestinationData.map((item, i) => (
+                              <Grid container spacing={1} key={i}>
+                                {/* 送信状態を表示 */}
+                                <Grid item xs={6}>
+                                  {item.complete_flg ? (
+                                    <Chip color="success" label="送信完了" size="small" variant="light" />
+                                  ) : (
+                                    <Chip color="error" label="送信エラー" size="small" variant="light" />
+                                  )}
+                                </Grid>
+
+                                {/* スタッフ名を表示 */}
+                                <Grid item xs={6}>
+                                  <Typography sx={{ lineHeight: 1.2 }}>{item?.staff?.name}</Typography>
+                                </Grid>
+                              </Grid>
+                            ))}
                         </Grid>
                       </Grid>
                     </ListItem>

@@ -93,9 +93,9 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
 
   useEffect(() => {
     if (matchDownSM) {
-      setHiddenColumns(['name_k', 'phone', 'address', 'email']);
+      setHiddenColumns(['main_text']);
     } else {
-      setHiddenColumns(['name_k']);
+      setHiddenColumns(['main_text']);
     }
     // eslint-disable-next-line
   }, [matchDownSM]);
