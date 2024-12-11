@@ -57,14 +57,13 @@ const TabProfile = () => {
           return response.json();
         })
         .then((data) => {
-          alertSnackBar('正常に送信されました。', 'success');
+          alertSnackBar('処理を開始しました。', 'success');
         })
         .catch((error) => {
           console.error('エラー:', error);
           alertSnackBar('データの更新に失敗しました。', 'error');
         })
         .finally(() => {
-          getUpdateData();
           setLoading(false); // ローディング終了
         });
     } catch (error) {
@@ -148,6 +147,13 @@ const TabProfile = () => {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <MainCard title="送信先一覧">
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <Button variant="outlined" onClick={getUpdateData}>
+                        ステータスを更新する
+                      </Button>
+                    </Grid>
+                  </Grid>
                   <List sx={{ py: 0 }}>
                     <ListItem divider={!matchDownMD}>
                       <Grid container spacing={3}>

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement } from
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
-import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, useMediaQuery } from '@mui/material';
+import { Button, Chip, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, useMediaQuery } from '@mui/material';
 
 import { PopupTransition } from 'components/@extended/Transitions';
 
@@ -49,10 +49,11 @@ interface Props {
   columns: Column[];
   data: Array<staffType>;
   handleAdd: () => void;
+  updateData: () => void;
   getHeaderProps: (column: HeaderGroup) => {};
 }
 
-function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
+function ReactTable({ columns, data, handleAdd, updateData, getHeaderProps }: Props) {
   const theme = useTheme();
   const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -124,6 +125,9 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
           />
           <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
             <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
+            <Button variant="outlined" onClick={updateData} size="small">
+              更新
+            </Button>
             <Button
               variant="contained"
               startIcon={<PlusOutlined />}
@@ -206,8 +210,7 @@ const CustomerStaffPage = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const [tableData, setTableData] = useState<Array<staffType>>(); // データを保持する状態変数
 
-  useEffect(() => {
-    // ページがロードされたときにデータを取得
+  const updateData = () => {
     fetchTableData()
       .then((data) => {
         setTableData(data.data); // データを状態に設定
@@ -216,6 +219,10 @@ const CustomerStaffPage = () => {
         // エラーハンドリング
         console.error('Error:', error);
       });
+  };
+  useEffect(() => {
+    // ページがロードされたときにデータを取得
+    updateData();
   }, []); // 空の依存リストを指定することで、一度だけ実行される
 
   const [customer, setCustomer] = useState<any>(null);
@@ -264,7 +271,15 @@ const CustomerStaffPage = () => {
         accessor: 'import_status',
         // Filter: SelectColumnFilter,
         filter: 'includes',
-        Cell: ({ value }: CellProps<any>) => value?.name ?? null
+        Cell: ({ value }: CellProps<any>) => {
+          if (value?.name === '処理待ち') {
+            return <Chip color="info" label={value?.name} size="small" variant="light" />;
+          } else if (value?.name === 'エラー') {
+            return <Chip color="error" label={value?.name} size="small" variant="light" />;
+          } else {
+            return <Chip color="success" label={value?.name} size="small" variant="light" />;
+          }
+        }
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -280,6 +295,7 @@ const CustomerStaffPage = () => {
               columns={columns}
               data={tableData}
               handleAdd={handleAdd}
+              updateData={updateData}
               getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
             />
           </ScrollX>

@@ -52,7 +52,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
           return response.json();
         })
         .then((data) => {
-          alertSnackBar('正常に更新されました。', 'success');
+          alertSnackBar('処理を開始しました。', 'success');
           // reloadDataAfterAdd(data.data);
           // setIsEditing(false);
         })
