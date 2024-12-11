@@ -63,10 +63,12 @@ const styles = StyleSheet.create({
     fontSize: '10px'
   },
   padding2: {
-    padding: 2
+    paddingLeft: 2,
+    paddingRight: 2
   },
   padding5: {
-    padding: 5
+    paddingLeft: 5,
+    paddingRight: 5
   },
   borderRight: {
     borderRight: `1px solid ${border}`,
@@ -109,14 +111,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'flex-start',
     textAlign: 'center',
-    gap: 2,
-    paddingLeft: 2,
-    paddingRight: 2
+    gap: 2
+  },
+  proccesText: {
+    fontSize: '9px',
+    lineHeight: 1.2,
+    lineWeight: 3
   },
   skill: {
-    gap: 1,
-    paddingLeft: 5,
-    paddingRight: 5
+    gap: 1
   },
   left: {
     justifyContent: 'center',
@@ -128,10 +131,7 @@ const styles = StyleSheet.create({
   },
   side: {
     display: 'flex',
-    flexDirection: 'column',
-    paddingTop: 20,
-    paddingBottom: 20,
-    gap: 20
+    flexDirection: 'column'
   },
   bold: {
     fontFamily: 'NotoSansJP',
@@ -148,7 +148,6 @@ const styles = StyleSheet.create({
   row: {
     display: 'flex',
     flexDirection: 'row'
-    // marginBottom: 24
   },
 
   column: {
@@ -165,13 +164,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderBottom: '1px solid #f0f0f0',
     borderTop: '1px solid #f0f0f0',
-    // paddingTop: 10,
-    // paddingBottom: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
     margin: 0
   },
-  paddingTopBottom: {
+  paddingTopBottom10: {
     paddingTop: 10,
     paddingBottom: 10
+  },
+  paddingTopBottom20: {
+    paddingTop: 20,
+    paddingBottom: 20
   },
   tableRow: {
     alignItems: 'center',
@@ -239,6 +242,32 @@ const Content = ({ list }: Props) => {
     });
     return newCheckList;
   };
+  const calculatePeriod = (startDate: string | null, endDate: string | null): string => {
+    // 開始日がない場合は空文字を返す
+    if (!startDate) {
+      return '';
+    }
+    // 開始日と終了日をDateオブジェクトに変換
+    const start = new Date(startDate);
+    const end = endDate ? new Date(endDate) : new Date();
+    // 日付の順序や有効性を確認
+    if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) {
+      return '';
+    }
+    // 差分の年と月を計算
+    let years = end.getFullYear() - start.getFullYear();
+    let months = end.getMonth() - start.getMonth();
+    if (months < 0) {
+      years -= 1;
+      months += 12;
+    }
+    // 結果をフォーマットして返す
+    if (years === 0 && months < 12) {
+      return `(${months}ヶ月)`;
+    } else {
+      return `(${years}年${months}ヶ月)`;
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -255,50 +284,53 @@ const Content = ({ list }: Props) => {
           <View style={[styles.border]} key={row.id}>
             <View style={[styles.row, styles.tableHeader, { backgroundColor: theme.palette.grey[100] }]}>
               <View style={[styles.borderRight, styles.tableTitle, styles.flex03]}>
-                <Text style={[styles.tableTitle, styles.paddingTopBottom]}>案件名</Text>
+                <Text style={[styles.tableTitle, styles.paddingTopBottom10]}>案件名</Text>
               </View>
               <View style={[styles.borderRight, styles.tableTitle, styles.flex15]}>
-                <Text style={[styles.tableTitle, styles.paddingTopBottom]}>{row.project_title}</Text>
+                <Text style={[styles.tableTitle, styles.paddingTopBottom10]}>{row.project_title}</Text>
               </View>
               <View style={[styles.borderRight, styles.tableTitle, styles.flex05]}>
-                <Text style={[styles.tableTitle, styles.paddingTopBottom]}>環境・言語</Text>
+                <Text style={[styles.tableTitle, styles.paddingTopBottom10]}>環境・言語</Text>
               </View>
               <View style={[styles.tableTitle, styles.flex05]}>
-                <Text style={[styles.tableTitle, styles.paddingTopBottom]}>役割・役職</Text>
+                <Text style={[styles.tableTitle, styles.paddingTopBottom10]}>役割・役職</Text>
               </View>
             </View>
             <View style={[styles.row]}>
-              <View style={[styles.borderRight, styles.column, styles.centerTop, styles.tableCell, styles.flex03]}>
+              <View
+                style={[styles.borderRight, styles.column, styles.centerTop, styles.tableCell, styles.flex03, styles.paddingTopBottom10]}
+              >
                 <Text style={[styles.padding2]}>{format(new Date(row.end_date), 'yyyy/MM/dd')}</Text>
                 <Text style={[styles.padding2]}>~</Text>
                 <Text style={[styles.padding2]}>{format(new Date(row.start_date), 'yyyy/MM/dd')}</Text>
+                <Text style={[styles.padding2, styles.paddingTopBottom10]}>{calculatePeriod(row.start_date, row.end_date)}</Text>
               </View>
-              <View style={[styles.borderRight, styles.flex15, styles.leftTop, styles.tableCell]}>
+              <View style={[styles.borderRight, styles.flex15, styles.leftTop, styles.tableCell, styles.paddingTopBottom10]}>
                 <Text style={[styles.padding5]}>{row.description}</Text>
               </View>
-              <View style={[styles.borderRight, styles.tableCell, styles.flex05]}>
+              <View style={[styles.borderRight, styles.tableCell, styles.flex05, styles.paddingTopBottom10]}>
                 {row.employee_project_skills.map((skill: SkillParameterType, index: number) => (
-                  <Text key={`skill-${index}`} style={[styles.skill]}>
+                  <Text key={`skill-${index}`} style={[styles.skill, styles.padding5]}>
                     {skill.name}
                   </Text>
                 ))}
               </View>
               <View style={[styles.column, styles.flex05, styles.side]}>
-                <View style={[styles.tableCell, styles.center]}>
+                <View style={[styles.tableCell, styles.center, styles.paddingTopBottom20]}>
                   <Text>PG</Text>
                 </View>
                 <View style={[styles.tableTitle, styles.tableHeader, { backgroundColor: theme.palette.grey[100] }]}>
-                  <Text style={[styles.tableTitle, styles.paddingTopBottom]}>規模・人数</Text>
+                  <Text style={[styles.tableTitle, styles.paddingTopBottom10]}>規模・人数</Text>
                 </View>
-                <View style={[styles.tableCell, styles.center]}>
+                <View style={[styles.tableCell, styles.center, styles.paddingTopBottom20]}>
                   <Text>{row.people ? `${row.people}人` : ''}</Text>
                 </View>
                 <View style={[styles.tableTitle, styles.tableHeader, { backgroundColor: theme.palette.grey[100] }]}>
-                  <Text style={[styles.tableTitle, styles.paddingTopBottom]}>担当工程</Text>
+                  <Text style={[styles.tableTitle, styles.paddingTopBottom10]}>担当工程</Text>
                 </View>
                 <View style={[styles.tableCell, styles.row, styles.procces]}>
                   {getProcesses(row.employee_project_processes).map((procces, index) => (
-                    <Text key={`process-${index}`} style={[styles.centerTop]}>
+                    <Text style={[styles.centerTop, styles.proccesText]} key={`process-${index}`}>
                       {procces}
                     </Text>
                   ))}
