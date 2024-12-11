@@ -40,8 +40,8 @@ const EmployeeDetail = () => {
       <MainCard border={false} boxShadow>
         <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
           <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto" aria-label="account profile tab">
-            <Tab label="プロフィール" icon={<UserOutlined />} value="sales" iconPosition="start" />
-            <Tab label="営業情報" icon={<UserOutlined />} value="basic" iconPosition="start" disabled />
+            <Tab label="プロフィール" icon={<UserOutlined />} value="basic" iconPosition="start" />
+            <Tab label="営業情報" icon={<UserOutlined />} value="sales" iconPosition="start" disabled />
             <Tab label="スキル一覧" icon={<FileTextOutlined />} value="skill" iconPosition="start" />
             <Tab label="業務履歴" icon={<FileTextOutlined />} value="workHistory" iconPosition="start" />
             <Tab

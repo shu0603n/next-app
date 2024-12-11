@@ -1,290 +1,286 @@
-import { ReactElement, useState } from 'react';
-// material-ui
-import { FormHelperText, Grid, Stack, Typography } from '@mui/material';
+import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement, useId } from 'react';
 
-// project imports
+// material-ui
+import { alpha, useTheme } from '@mui/material/styles';
+import { Button, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, useMediaQuery } from '@mui/material';
+import { PopupTransition } from 'components/@extended/Transitions';
+
+// third-party
+import {
+  useFilters,
+  useExpanded,
+  useGlobalFilter,
+  useRowSelect,
+  useSortBy,
+  useTable,
+  usePagination,
+  Column,
+  HeaderGroup,
+  Row,
+  Cell
+} from 'react-table';
+
+// project import
 import Layout from 'layout';
 import Page from 'components/Page';
 import MainCard from 'components/MainCard';
-import CsvFile from 'components/third-party/dropzone/CsvFile';
-import { PopupTransition } from 'components/@extended/Transitions';
-// third-party
-import { Formik } from 'formik';
-import * as yup from 'yup';
-
-import { useMemo } from 'react';
-
-// material-ui
-import { Button, Chip, Dialog, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
-
-// third-party
-import { useTable, useFilters, usePagination, useRowSelect, useGlobalFilter, Column, Row, HeaderGroup, Cell } from 'react-table';
-
-// project import
 import ScrollX from 'components/ScrollX';
-import { CSVExport, EmptyTable, TablePagination } from 'components/third-party/ReactTable';
-// import { IndeterminateCheckbox, TableRowSelection } from 'components/third-party/ReactTable';
-import { PlusOutlined } from '@ant-design/icons';
+import { CSVExport, HeaderSort, SortingSelect, TablePagination } from 'components/third-party/ReactTable';
 
-import { GlobalFilter, DefaultColumnFilter, SelectColumnFilter, NumberRangeColumnFilter, renderFilterTypes } from 'utils/react-table';
 import AddCustomer from 'sections/apps/mail/AddCustomer';
+
+import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
+
+// assets
+import { PlusOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/router';
+import useUser from 'hooks/useUser';
 import { mailListType } from 'types/mail/mail';
 
-// ==============================|| SAMPLE PAGE ||============================== //
+// ==============================|| REACT TABLE ||============================== //
 
 interface Props {
   columns: Column[];
   data: Array<mailListType>;
-  onReload: (data: Array<any>) => void;
+  handleAdd: () => void;
+  getHeaderProps: (column: HeaderGroup) => {};
 }
 
-function ReactTable({ columns, data, onReload }: Props) {
-  const filterTypes = useMemo(() => renderFilterTypes, []);
-  const defaultColumn = useMemo(() => ({ Filter: DefaultColumnFilter }), []);
-  const initialState = useMemo(
-    () => ({ pageIndex: 0, pageSize: 10, selectedRowIds: { 0: true, 5: true, 7: true }, filters: [{ id: 'status', value: '' }] }),
-    []
-  );
+function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
+  const theme = useTheme();
+  const matchDownSM = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const [add, setAdd] = useState<boolean>(false);
-  const handleAdd = () => {
-    setAdd(!add);
-  };
+  const filterTypes = useMemo(() => renderFilterTypes, []);
+  const sortBy = { id: 'id', desc: false };
+
+  const router = useRouter();
+  const user = useUser();
+
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
+    prepareRow,
+    setHiddenColumns,
+    allColumns,
     rows,
     page,
-    prepareRow,
-    state,
-    preGlobalFilteredRows,
-    setGlobalFilter,
     gotoPage,
     setPageSize,
-    state: { pageIndex, pageSize }
-    // state: { selectedRowIds, pageIndex, pageSize },
-    // selectedFlatRows
+    state: { globalFilter, pageIndex, pageSize },
+    preGlobalFilteredRows,
+    setGlobalFilter,
+    setSortBy,
+    selectedFlatRows
   } = useTable(
     {
       columns,
       data,
-      defaultColumn,
       filterTypes,
-      initialState
+      initialState: { pageIndex: 0, pageSize: 10, hiddenColumns: ['email'], sortBy: [sortBy] }
     },
     useGlobalFilter,
     useFilters,
+    useSortBy,
+    useExpanded,
     usePagination,
     useRowSelect
-    // (hooks) => {
-    //   hooks.allColumns.push((columns: Column[]) => [
-    //     {
-    //       id: 'row-selection-chk',
-    //       accessor: 'Selection',
-    //       Header: ({ getToggleAllPageRowsSelectedProps }) => (
-    //         <IndeterminateCheckbox indeterminate {...getToggleAllPageRowsSelectedProps()} />
-    //       ),
-    //       disableSortBy: true,
-    //       disableFilters: true,
-    //       Cell: ({ row }: any) => <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
-    //     },
-    //     ...columns
-    //   ]);
-    // }
   );
+
+  const handleChangeDetail = (newValue: string) => {
+    router.push(`/mail/detail/${newValue}/basic`);
+  };
+
+  useEffect(() => {
+    if (matchDownSM) {
+      setHiddenColumns(['name_k', 'phone', 'address', 'email']);
+    } else {
+      setHiddenColumns(['name_k']);
+    }
+    // eslint-disable-next-line
+  }, [matchDownSM]);
 
   return (
     <>
-      {/* <TableRowSelection selected={Object.keys(selectedRowIds).length} /> */}
-      <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ padding: 2 }}>
-        <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={state.globalFilter} setGlobalFilter={setGlobalFilter} />
-        <CSVExport data={rows.map((d: Row) => d.original)} filename={'filtering-table.csv'} />
-        <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-          メール作成
-        </Button>
-      </Stack>
-
-      <Table {...getTableProps()}>
-        <TableHead sx={{ borderTopWidth: 2 }}>
-          {headerGroups.map((headerGroup, index: number) => (
-            <TableRow {...headerGroup.getHeaderGroupProps()} key={index}>
-              {headerGroup.headers.map((column: HeaderGroup, i: number) => (
-                <TableCell {...column.getHeaderProps([{ className: column.className }])} key={i}>
-                  {column.render('Header')}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableHead>
-        <TableBody {...getTableBodyProps()}>
-          {headerGroups.map((group: HeaderGroup<{}>, index: number) => (
-            <TableRow {...group.getHeaderGroupProps()} key={index}>
-              {group.headers.map((column: HeaderGroup, i: number) => (
-                <TableCell {...column.getHeaderProps([{ className: column.className }])} key={i}>
-                  {column.canFilter ? column.render('Filter') : null}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-          {page.length > 0 ? (
-            page.map((row, i) => {
+      <Stack spacing={3}>
+        <Stack
+          direction={matchDownSM ? 'column' : 'row'}
+          spacing={1}
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ p: 3, pb: 0 }}
+        >
+          <GlobalFilter
+            preGlobalFilteredRows={preGlobalFilteredRows}
+            globalFilter={globalFilter}
+            setGlobalFilter={setGlobalFilter}
+            size="small"
+          />
+          <Stack direction={matchDownSM ? 'column' : 'row'} alignItems="center" spacing={1}>
+            <SortingSelect sortBy={sortBy.id} setSortBy={setSortBy} allColumns={allColumns} />
+            <Button
+              variant="contained"
+              startIcon={<PlusOutlined />}
+              onClick={handleAdd}
+              size="small"
+              disabled={!(user?.roles.superRole || user?.roles.systemRole || user?.roles.clientEdit)}
+            >
+              新規追加
+            </Button>
+            <CSVExport
+              data={selectedFlatRows.length > 0 ? selectedFlatRows.map((d: Row) => d.original) : data}
+              filename={'customer-list.csv'}
+            />
+          </Stack>
+        </Stack>
+        <Table {...getTableProps()}>
+          <TableHead>
+            {headerGroups.map((headerGroup: HeaderGroup<{}>, index: number) => (
+              <TableRow {...headerGroup.getHeaderGroupProps()} key={index} sx={{ '& > th:first-of-type': { width: '58px' } }}>
+                {headerGroup.headers.map((column: HeaderGroup, i: number) => (
+                  <TableCell {...column.getHeaderProps([{ className: column.className }, getHeaderProps(column)])} key={i}>
+                    <HeaderSort column={column} />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableHead>
+          <TableBody {...getTableBodyProps()}>
+            {page.map((row: Row, i: number) => {
               prepareRow(row);
+
               return (
-                <TableRow {...row.getRowProps()} key={i}>
-                  {row.cells.map((cell: Cell, index: number) => (
-                    <TableCell {...cell.getCellProps([{ className: cell.column.className }])} key={index}>
-                      {cell.render('Cell')}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                <Fragment key={i}>
+                  <TableRow
+                    {...row.getRowProps()}
+                    onClick={(e: MouseEvent<HTMLTableRowElement>) => {
+                      handleChangeDetail(row.values.id);
+                    }}
+                    sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
+                  >
+                    {row.cells.map((cell: Cell, i: number) => (
+                      <TableCell {...cell.getCellProps([{ className: cell.column.className }])} key={i}>
+                        {cell.render('Cell')}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </Fragment>
               );
-            })
-          ) : (
-            <EmptyTable msg="No Data" colSpan={7} />
-          )}
-          <TableRow>
-            <TableCell sx={{ p: 2, pb: 0 }} colSpan={8}>
-              <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-      <Dialog
-        maxWidth="sm"
-        TransitionComponent={PopupTransition}
-        keepMounted
-        fullWidth
-        onClose={handleAdd}
-        open={add}
-        sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
-        aria-describedby="alert-dialog-slide-description"
-      >
-        {add && <AddCustomer old={data} customer={rows.map((d: Row) => d.original)} onCancel={handleAdd} onReload={onReload} />}
-      </Dialog>
+            })}
+            <TableRow sx={{ '&:hover': { bgcolor: 'transparent !important' } }}>
+              <TableCell sx={{ p: 2, py: 3 }} colSpan={9} key={useId()}>
+                <TablePagination gotoPage={gotoPage} rows={rows} setPageSize={setPageSize} pageSize={pageSize} pageIndex={pageIndex} />
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </Stack>
     </>
   );
 }
 
-const Mail = () => {
-  const [data, setData] = useState<Array<any> | undefined>();
+// ==============================|| CUSTOMER - LIST ||============================== //
+async function fetchTableData() {
+  try {
+    const response = await fetch('/api/db/mail/select');
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    const data = await response.json();
+    return data; // APIから返されたデータを返します
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+}
 
-  const handleRelod = (newData: Array<any>) => {
-    setData(newData);
+const Mail = () => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const [tableData, setTableData] = useState<Array<mailListType>>(); // データを保持する状態変数
+
+  useEffect(() => {
+    // ページがロードされたときにデータを取得
+    fetchTableData()
+      .then((data) => {
+        setTableData(data.data); // データを状態に設定
+      })
+      .catch((error) => {
+        // エラーハンドリング
+        console.error('Error:', error);
+      });
+  }, []); // 空の依存リストを指定することで、一度だけ実行される
+
+  const [customer, setCustomer] = useState<any>(null);
+  const [add, setAdd] = useState<boolean>(false);
+
+  const handleAdd = () => {
+    setAdd(!add);
+    if (customer && !add) setCustomer(null);
   };
+
   const columns = useMemo(
     () =>
       [
         {
           Header: 'ID',
           accessor: 'id',
-          Filter: NumberRangeColumnFilter,
           filter: 'between'
         },
         {
-          Header: '氏名',
-          accessor: 'name'
+          Header: 'タイトル',
+          accessor: 'title'
         },
         {
-          Header: 'メール',
-          accessor: 'email'
-        },
-        {
-          Header: '年齢',
-          accessor: 'age',
-          Filter: NumberRangeColumnFilter,
-          filter: 'between'
-        },
-        {
-          Header: 'ステータス',
-          accessor: 'status',
-          Filter: SelectColumnFilter,
-          filter: 'includes',
-          Cell: ({ value }: { value: string | undefined }) => {
-            switch (value) {
-              case '新規':
-                return <Chip color="success" label="新規" size="small" variant="light" />;
-              case '既存':
-                return <Chip color="primary" label="既存" size="small" variant="light" />;
-              case '稼働中':
-                return <Chip color="primary" label="稼働中" size="small" variant="light" />;
-              case 'BL':
-                return <Chip color="primary" label="BL" size="small" variant="light" />;
-              case '抹消':
-                return <Chip color="error" label="抹消" size="small" variant="light" />;
-              case '配信停止':
-                return <Chip color="error" label="配信停止" size="small" variant="light" />;
-              case '空白':
-                return <Chip color="error" label="空白" size="small" variant="light" />;
-              default:
-                return <Chip color="info" label="None" size="small" variant="light" />;
-            }
-          }
-        },
-        {
-          Header: 'フラグ',
-          accessor: 'flag',
-          Filter: SelectColumnFilter,
-          filter: 'includes',
-          Cell: ({ value }: { value: string | undefined }) => {
-            switch (value) {
-              case '送信済み':
-                return <Chip color="success" label="送信済み" size="small" variant="light" />;
-              case 'エラー':
-                return <Chip color="error" label="エラー" size="small" variant="light" />;
-              default:
-                return <Chip color="info" label="未送信" size="small" variant="light" />;
-            }
-          }
+          Header: '本文',
+          accessor: 'main_text'
         }
+        // {
+        //   Header: 'フラグ',
+        //   accessor: 'flag',
+        //   Filter: SelectColumnFilter,
+        //   filter: 'includes',
+        //   Cell: ({ value }: { value: string | undefined }) => {
+        //     switch (value) {
+        //       case '送信済み':
+        //         return <Chip color="success" label="送信済み" size="small" variant="light" />;
+        //       case 'エラー':
+        //         return <Chip color="error" label="エラー" size="small" variant="light" />;
+        //       default:
+        //         return <Chip color="info" label="未送信" size="small" variant="light" />;
+        //     }
+        //   }
+        // }
       ] as Column[],
     []
   );
-
   return (
     <Page title="Mail">
-      <MainCard title="Mail">
-        <Typography variant="body2">
-          <Grid item xs={12}>
-            <Formik
-              initialValues={{ files: null }}
-              onSubmit={(values: any) => {
-                setData({ ...values, flag: '未送信' });
-              }}
-              validationSchema={yup.object().shape({
-                files: yup.mixed().required('Avatar is a required.')
-              })}
-            >
-              {({ values, handleSubmit, setFieldValue, touched, errors }) => (
-                <form onSubmit={handleSubmit}>
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <Stack spacing={1.5} alignItems="center">
-                        <CsvFile
-                          setFieldValue={setFieldValue}
-                          onRelode={setData}
-                          file={values.files}
-                          error={touched.files && !!errors.files}
-                        />
-                        {touched.files && errors.files && (
-                          <FormHelperText error id="standard-weight-helper-text-password-login">
-                            {errors.files}
-                          </FormHelperText>
-                        )}
-                      </Stack>
-                    </Grid>
-                  </Grid>
-                </form>
-              )}
-            </Formik>
-          </Grid>
-        </Typography>
-        {data && (
-          <MainCard content={false}>
+      <MainCard content={false}>
+        {tableData && (
+          <Fragment>
             <ScrollX>
-              <ReactTable columns={columns} data={data} onReload={handleRelod} />
+              <ReactTable
+                columns={columns}
+                data={tableData}
+                handleAdd={handleAdd}
+                getHeaderProps={(column: HeaderGroup) => column.getSortByToggleProps()}
+              />
             </ScrollX>
-          </MainCard>
+
+            {/* add customer dialog */}
+            <Dialog
+              maxWidth="sm"
+              TransitionComponent={PopupTransition}
+              keepMounted
+              fullWidth
+              onClose={handleAdd}
+              open={add}
+              sx={{ '& .MuiDialog-paper': { p: 0 }, transition: 'transform 225ms' }}
+              aria-describedby="alert-dialog-slide-description"
+            >
+              {add && <AddCustomer customer={customer} onCancel={handleAdd} onReload={setTableData} />}
+            </Dialog>
+          </Fragment>
         )}
       </MainCard>
     </Page>
