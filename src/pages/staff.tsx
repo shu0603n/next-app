@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement } from 'react';
+import { useEffect, useMemo, useState, Fragment, ReactElement } from 'react';
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
@@ -39,7 +39,6 @@ import {
 } from 'utils/react-table';
 // assets
 import { PlusOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/router';
 import useUser from 'hooks/useUser';
 import { staffType } from 'types/staff/staff';
 
@@ -60,7 +59,6 @@ function ReactTable({ columns, data, handleAdd, updateData, getHeaderProps }: Pr
   const filterTypes = useMemo(() => renderFilterTypes, []);
   const sortBy = { id: 'id', desc: false };
 
-  const router = useRouter();
   const user = useUser();
 
   const {
@@ -96,16 +94,12 @@ function ReactTable({ columns, data, handleAdd, updateData, getHeaderProps }: Pr
 
   useEffect(() => {
     if (matchDownSM) {
-      setHiddenColumns(['birthday']);
+      setHiddenColumns(['birthday', 'mail', 'age', 'staff_status']);
     } else {
       setHiddenColumns(['birthday']);
     }
     // eslint-disable-next-line
   }, [matchDownSM]);
-
-  const handleChangeDetail = (newValue: string) => {
-    router.push(`/employee/detail/${newValue}/basic`);
-  };
 
   return (
     <>
@@ -163,9 +157,6 @@ function ReactTable({ columns, data, handleAdd, updateData, getHeaderProps }: Pr
                 <Fragment key={i}>
                   <TableRow
                     {...row.getRowProps()}
-                    onClick={(e: MouseEvent<HTMLTableRowElement>) => {
-                      handleChangeDetail(row.values.id);
-                    }}
                     sx={{ cursor: 'pointer', bgcolor: row.isSelected ? alpha(theme.palette.primary.lighter, 0.35) : 'inherit' }}
                   >
                     {row.cells.map((cell: Cell, i: number) => (

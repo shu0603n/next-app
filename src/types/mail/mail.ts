@@ -1,3 +1,4 @@
+import { EmployeeParameterType } from 'types/parameter/parameter';
 import { staffType } from 'types/staff/staff';
 
 export type mailListType = {
@@ -6,4 +7,5 @@ export type mailListType = {
   main_text: string;
   staff?: staffType;
   complete_flg: boolean;
+  employee?: EmployeeParameterType;
 };

@@ -19,7 +19,7 @@ export const updateMailList = async (id: number, title: string, main_text: strin
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   if (request.method === 'POST') {
     try {
-      const { title, main_text } = request.body;
+      const { title, main_text, employee_id } = request.body;
 
       // リクエストボディに必要なデータが含まれていることを確認
       if (!title || !main_text) {
@@ -30,7 +30,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
       await prisma.mail_list.create({
         data: {
           title,
-          main_text
+          main_text,
+          employee_id
         }
       });
 

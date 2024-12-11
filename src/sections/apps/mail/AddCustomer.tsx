@@ -12,6 +12,7 @@ import 'react-quill/dist/quill.snow.css';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { mailListType } from 'types/mail/mail';
+import useUser from 'hooks/useUser';
 
 const ReactQuill = dynamic(() => import('react-quill'), {
   ssr: false
@@ -21,7 +22,8 @@ const ReactQuill = dynamic(() => import('react-quill'), {
 const getInitialValues = (customer: FormikValues | null) => {
   const newCustomer = {
     title: '',
-    main_text: ''
+    main_text: '',
+    employee_id: ''
   };
 
   if (customer) {
@@ -46,11 +48,13 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     main_text: Yup.string().required('本文は必須です。')
     // employee: Yup.string().trim().required('役割の選択は必須です')
   });
+  const user = useUser();
 
   const formik = useFormik({
     initialValues: getInitialValues(customer!),
     validationSchema: CustomerSchema,
     onSubmit: (values, { setSubmitting }) => {
+      values.employee_id = user?.id ?? '';
       try {
         const requestOptions = {
           method: 'POST',

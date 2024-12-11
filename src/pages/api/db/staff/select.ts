@@ -20,6 +20,9 @@ export const selectStaff = async () => {
           name: true
         }
       }
+    },
+    orderBy: {
+      id: 'asc'
     }
   });
   // 年齢を計算して追加

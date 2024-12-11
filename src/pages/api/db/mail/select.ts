@@ -7,7 +7,14 @@ export const selectMailList = async () => {
     select: {
       id: true,
       title: true,
-      main_text: true
+      main_text: true,
+      employee: {
+        select: {
+          id: true,
+          sei: true,
+          mei: true
+        }
+      }
     }
   });
 

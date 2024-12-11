@@ -17,7 +17,8 @@ import {
   Column,
   HeaderGroup,
   Row,
-  Cell
+  Cell,
+  CellProps
 } from 'react-table';
 
 // project import
@@ -233,6 +234,11 @@ const Mail = () => {
         {
           Header: '本文',
           accessor: 'main_text'
+        },
+        {
+          Header: '作成者',
+          accessor: 'employee',
+          Cell: ({ value }: CellProps<any>) => (value?.sei && value?.mei ? `${value?.sei} ${value?.mei}` : null)
         }
         // {
         //   Header: 'フラグ',

@@ -23,6 +23,9 @@ async function processStaffData(staffData: any[]) {
   const limit = pLimit(10); // ここで並列実行数を制限（例えば10）
 
   try {
+    // 配列を逆順にする
+    const reversedStaffData = staffData.reverse();
+
     // すべてのスタッフの import_status_id を 0 に設定
     await prisma.staff.updateMany({
       data: {
@@ -31,7 +34,7 @@ async function processStaffData(staffData: any[]) {
     });
 
     // 各スタッフデータに対する処理を並列で実行（並列数制限あり）
-    const staffPromises = staffData.map((staff) => {
+    const staffPromises = reversedStaffData.map((staff) => {
       return limit(async () => {
         const { id, name, mail, birthday, staff_status_id } = staff;
 
