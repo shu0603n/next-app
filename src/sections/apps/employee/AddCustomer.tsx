@@ -665,7 +665,9 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
           </Form>
         </LocalizationProvider>
       </FormikProvider>
-      {!isCreating && <AlertCustomerDelete title={customer.fatherName} open={openAlert} handleClose={handleAlertClose} />}
+      {!isCreating && (
+        <AlertCustomerDelete deleteId={customer.id} title={customer.fatherName} open={openAlert} handleClose={handleAlertClose} />
+      )}
     </>
   );
 };

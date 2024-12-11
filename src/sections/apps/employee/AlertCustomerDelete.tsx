@@ -10,7 +10,6 @@ import { PopupTransition } from 'components/@extended/Transitions';
 
 // assets
 import { DeleteFilled } from '@ant-design/icons';
-import { EmployeeType } from 'types/employee/employee';
 
 // types
 interface Props {
@@ -18,12 +17,11 @@ interface Props {
   title: string;
   open: boolean;
   handleClose: (status: boolean) => void;
-  onReload: (data: EmployeeType) => void;
 }
 
 // ==============================|| 顧客 - 削除 ||============================== //
 
-export default function AlertCustomerDelete({ deleteId, title, open, handleClose, onReload }: Props) {
+export default function AlertCustomerDelete({ deleteId, title, open, handleClose }: Props) {
   const router = useRouter();
   const handleDelete = async (title: string) => {
     try {
@@ -38,7 +36,6 @@ export default function AlertCustomerDelete({ deleteId, title, open, handleClose
       const data = await response.json();
       console.log('削除成功:', data);
       router.push(`/employee`);
-      // onReload(data);
       handleClose(false);
     } catch (error) {
       console.error('エラー:', error);
