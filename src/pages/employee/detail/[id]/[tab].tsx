@@ -15,6 +15,7 @@ import TabSkill from 'sections/apps/employee/TabSkill';
 import TabInvoice from 'sections/apps/employee/TabInvoice';
 import TabPassword from 'sections/apps/employee/TabPassword';
 import TabSettings from 'sections/apps/employee/TabSettings';
+import TabWorkHistory from 'sections/apps/employee/TabWorkHistory';
 
 // assets
 import { FileTextOutlined, LockOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
@@ -42,6 +43,7 @@ const EmployeeDetail = () => {
             <Tab label="プロフィール" icon={<UserOutlined />} value="basic" iconPosition="start" />
             <Tab label="営業情報" icon={<UserOutlined />} value="sales" iconPosition="start" disabled />
             <Tab label="スキル一覧" icon={<FileTextOutlined />} value="skill" iconPosition="start" />
+            <Tab label="業務履歴" icon={<FileTextOutlined />} value="workHistory" iconPosition="start" />
             <Tab
               label="請求一覧"
               icon={<FileTextOutlined />}
@@ -72,6 +74,7 @@ const EmployeeDetail = () => {
           {tab === 'invoice' && <TabInvoice />}
           {tab === 'password' && <TabPassword />}
           {tab === 'settings' && <TabSettings />}
+          {tab === 'workHistory' && <TabWorkHistory />}
         </Box>
       </MainCard>
     </Page>
