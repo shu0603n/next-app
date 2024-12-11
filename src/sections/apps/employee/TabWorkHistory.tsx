@@ -27,7 +27,7 @@ import { BasicCardType, ProjectCardType, SkillSheetType } from 'types/skillSheet
 
 // ==============================|| INVOICE - DETAILS ||============================== //
 
-const SkillSheet = () => {
+const TabWorkHistory = () => {
   const theme = useTheme();
   const router = useRouter();
   const { id } = router.query;
@@ -230,8 +230,8 @@ const SkillSheet = () => {
   );
 };
 
-SkillSheet.getLayout = function getLayout(page: ReactElement) {
+TabWorkHistory.getLayout = function getLayout(page: ReactElement) {
   return <Layout>{page}</Layout>;
 };
 
-export default SkillSheet;
+export default TabWorkHistory;
