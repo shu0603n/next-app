@@ -12,7 +12,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
     // mail_list_id に基づいて mail_destination テーブルからデータを取得
     const mailDestinations = await prisma.mail_destination.findMany({
       where: {
-        mail_list_id: Number(id) // リクエストの ID を使ってフィルタリング
+        mail_list_id: Number(id), // リクエストの ID を使ってフィルタリング
+        complete_flg: false // 未送信データのみ抽出
       },
       select: {
         staff: {

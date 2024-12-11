@@ -30,6 +30,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
             mail: true
           }
         },
+        complete_flg: true,
         create_at: true,
         update_at: true
       }

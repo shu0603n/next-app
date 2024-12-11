@@ -5,4 +5,5 @@ export type mailListType = {
   title: string;
   main_text: string;
   staff?: staffType;
+  complete_flg: boolean;
 };

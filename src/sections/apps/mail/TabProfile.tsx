@@ -64,8 +64,7 @@ const TabProfile = () => {
           alertSnackBar('データの更新に失敗しました。', 'error');
         })
         .finally(() => {
-          // setSubmitting(false);
-          // onCancel();
+          getUpdateData();
           setLoading(false); // ローディング終了
         });
     } catch (error) {
@@ -77,7 +76,6 @@ const TabProfile = () => {
       .then((data) => {
         setData(data.mailList);
         setMailDestinationData(data.mailDestination);
-        // setData(data.data.rows[0]);
       })
       .catch((error) => {
         // エラーハンドリング
@@ -94,6 +92,10 @@ const TabProfile = () => {
   const handleEdit = () => {
     sendMail();
   };
+
+  function areAllComplete(): boolean {
+    return !mailDestinationData?.some((item) => item.complete_flg === false);
+  }
 
   return (
     <Grid container spacing={3}>
@@ -128,7 +130,7 @@ const TabProfile = () => {
                         <Button
                           variant="contained"
                           onClick={handleEdit}
-                          disabled={!(user?.roles.superRole || user?.roles.systemRole || user?.roles.clientEdit)}
+                          disabled={areAllComplete() || !(user?.roles.superRole || user?.roles.systemRole || user?.roles.clientEdit)}
                         >
                           送信する
                         </Button>
@@ -150,7 +152,11 @@ const TabProfile = () => {
                           <Stack spacing={0.5}>
                             {mailDestinationData &&
                               mailDestinationData.map((item, i) => {
-                                return <Typography key={i}>{JSON.stringify(item?.staff)}</Typography>;
+                                return (
+                                  <Typography key={i}>
+                                    {item.complete_flg ? '送信済み' : 'エラー'}:{item?.staff?.name}
+                                  </Typography>
+                                );
                               })}
                           </Stack>
                         </Grid>
