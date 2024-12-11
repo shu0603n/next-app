@@ -112,6 +112,10 @@ const TabProfile = () => {
     }
   };
 
+  const handleClose = () => {
+    setDeleteOpen(!deleteOpen);
+  };
+
   return (
     <Grid container spacing={3}>
       {data && (
@@ -325,7 +329,6 @@ const TabProfile = () => {
                         e.stopPropagation();
                         setCustomerDeleteId(id);
                         setCustomerDeleteTitle(`${data.sei} ${data.mei}`);
-                        handleClose();
                       }}
                     >
                       <DeleteTwoTone twoToneColor={theme.palette.error.main} />
