@@ -86,7 +86,7 @@ const sendEmailsInBackground = async (mailDestinations: any, account: any) => {
     console.error('メール送信処理中にエラーが発生しました:', error);
   }
 };
-
+export const maxDuration = 300;
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
     const { id } = request.query;
