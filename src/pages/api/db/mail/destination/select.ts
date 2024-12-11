@@ -54,11 +54,24 @@ export const selectDestination = async () => {
 
   return staffWithAge;
 };
-
+export const selectIsComplete = async (id: string) => {
+  const count = await prisma.mail_destination.count({
+    where: {
+      mail_list_id: Number(id)
+    }
+  });
+  // 件数が 0 なら true、それ以外なら false を返す
+  return count !== 0;
+};
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
+    const id = request.query.id as string;
     const data = await selectDestination();
-    return response.status(200).json({ data });
+
+    // 件数が 0 なら true、それ以外なら false を返す
+    const isComplete = await selectIsComplete(id);
+
+    return response.status(200).json({ data, isComplete });
   } catch (error) {
     console.error('エラーが発生しました:', error);
     return response.status(500).json({ error: 'データを取得できませんでした。' });

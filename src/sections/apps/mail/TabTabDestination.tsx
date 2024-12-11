@@ -16,10 +16,12 @@ import { alertSnackBar } from 'function/alert/alertSnackBar';
 interface Props {
   columns: Column[];
   data: Array<staffType>;
+  isComplete: boolean;
   onReload: (data: Array<any>) => void;
+  handleRelodIsComplete: (data: boolean) => void;
 }
 
-function ReactTable({ columns, data, onReload }: Props) {
+function ReactTable({ columns, data, isComplete, onReload, handleRelodIsComplete }: Props) {
   const router = useRouter();
   const id = router.query.id as string;
   const filterTypes = useMemo(() => renderFilterTypes, []);
@@ -47,16 +49,15 @@ function ReactTable({ columns, data, onReload }: Props) {
         return response.json();
       })
       .then((data) => {
+        console.log(data.isComplete);
+        handleRelodIsComplete(data.isComplete);
         alertSnackBar('正常に更新されました。', 'success');
-        // reloadDataAfterAdd(data.data);
-        // setIsEditing(false);
       })
       .catch((error) => {
         console.error('エラー:', error);
         alertSnackBar('データの更新に失敗しました。', 'error');
       })
       .finally(() => {
-        // onCancel(false);
         setLoading(false); // ローディング終了
       });
   };
@@ -97,8 +98,8 @@ function ReactTable({ columns, data, onReload }: Props) {
       {/* <TableRowSelection selected={Object.keys(selectedRowIds).length} /> */}
       <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ padding: 2 }}>
         <GlobalFilter preGlobalFilteredRows={preGlobalFilteredRows} globalFilter={state.globalFilter} setGlobalFilter={setGlobalFilter} />
-        <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small">
-          送信先登録
+        <Button variant="contained" startIcon={<PlusOutlined />} onClick={handleAdd} size="small" disabled={isComplete}>
+          {isComplete ? '設定済み' : '送信先を設定する'}
         </Button>
       </Stack>
 
@@ -168,9 +169,13 @@ async function fetchTableData(id: string) {
 
 const TabDestination = () => {
   const [data, setData] = useState<staffType[]>([]);
+  const [isComplete, setIsComplete] = useState<boolean>(false);
   const router = useRouter();
   const id = router.query.id as string;
 
+  const handleRelodIsComplete = (newData: boolean) => {
+    setIsComplete(newData);
+  };
   const handleRelod = (newData: Array<any>) => {
     setData(newData);
   };
@@ -180,6 +185,7 @@ const TabDestination = () => {
     fetchTableData(id)
       .then((fetchedData) => {
         setData(fetchedData.data);
+        setIsComplete(fetchedData.isComplete);
       })
       .catch((error) => {
         // エラーハンドリング
@@ -245,7 +251,7 @@ const TabDestination = () => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
-        {data && <ReactTable columns={columns} data={data} onReload={handleRelod} />}
+        {data && <ReactTable columns={columns} data={data} onReload={handleRelod} isComplete={isComplete} handleRelodIsComplete={handleRelodIsComplete}/>}
       </Grid>
     </Grid>
   );
