@@ -260,6 +260,7 @@ model mail_account {
   name             String?            @db.VarChar(255)
   user             String?            @db.VarChar(255)
   pass             String?            @db.VarChar(255)
+  use              Boolean?           @default(true)
   mail_destination mail_destination[]
 }
 

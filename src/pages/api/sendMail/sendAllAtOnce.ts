@@ -103,7 +103,14 @@ export default async function handler(request: NextApiRequest, response: NextApi
     });
 
     const account = await prisma.mail_account.findMany({
-      select: { id: true, user: true, pass: true }
+      where: {
+        use: true
+      },
+      select: {
+        id: true,
+        user: true,
+        pass: true
+      }
     });
 
     // バックグラウンドでメール送信を実行
