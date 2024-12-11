@@ -1,6 +1,6 @@
 import { NextApiResponse, NextApiRequest } from 'next';
 import { prisma } from '../../prisma';
-import { selectDestination } from './select';
+import { selectIsComplete } from './select';
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   if (request.method === 'POST') {
@@ -27,11 +27,11 @@ export default async function handler(request: NextApiRequest, response: NextApi
         })
       );
 
-      // 全てのCREATEが完了したら、selectDestinationを呼び出して結果を取得
-      const data = await selectDestination();
+      // 件数が 0 なら true、それ以外なら false を返す
+      const isComplete = await selectIsComplete(id);
 
       // 結果を返す
-      return response.status(200).json({ data });
+      return response.status(200).json({ isComplete });
     } catch (error) {
       console.error('処理中にエラーが発生しました:', error);
       return response.status(500).json({ error: 'データ処理中にエラーが発生しました。' });
