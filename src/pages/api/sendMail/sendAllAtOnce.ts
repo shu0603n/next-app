@@ -23,7 +23,12 @@ export default async function handler(request: NextApiRequest, response: NextApi
             mail: true
           }
         },
-        mail_list_id: true // mail_list_id も取得
+        mail_list: {
+          select: {
+            title: true,
+            main_text: true
+          }
+        }
       }
     });
 
@@ -54,11 +59,11 @@ export default async function handler(request: NextApiRequest, response: NextApi
         const mailOptions: nodemailer.SendMailOptions = {
           to: item.staff.mail,
           from: `"トライブ株式会社 北海道支店" <saiyo-hokkaido@tribe-group.jp>`,
-          subject: item.staff.title, // メールの件名
+          subject: item.mail_list.title, // メールの件名
           html: `
             <p>${item.staff.name} 様</p>
             <br />
-            <p>${item.staff.description}</p><br />
+            <p>${item.mail_list.main_text}</p><br />
             <p>
             ――――――――――――――――――――<br/>
             トライブ株式会社<br/>
