@@ -147,13 +147,15 @@ const TabProfile = () => {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <MainCard title="送信先一覧">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <Button variant="outlined" onClick={getUpdateData}>
-                        ステータスを更新する
-                      </Button>
+                  {mailDestinationData && (
+                    <Grid container spacing={3}>
+                      <Grid item xs={12}>
+                        <Button variant="outlined" onClick={getUpdateData}>
+                          ステータスを更新する
+                        </Button>
+                      </Grid>
                     </Grid>
-                  </Grid>
+                  )}
                   <List sx={{ py: 0 }}>
                     <ListItem divider={!matchDownMD}>
                       <Grid container spacing={3}>
