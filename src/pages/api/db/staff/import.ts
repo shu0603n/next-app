@@ -16,6 +16,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
     response.status(405).json({ error: 'Method Not Allowed' });
   }
 }
+
 // 有効な日付をチェックするユーティリティ関数
 function isValidDate(date: string | Date): boolean {
   const parsedDate = new Date(date);
@@ -24,29 +25,26 @@ function isValidDate(date: string | Date): boolean {
 
 async function processStaffData(staffData: any[]) {
   try {
-    // トランザクションを開始
-    await prisma.$transaction(async (prisma) => {
-      // すべてのデータを削除
-      await prisma.staff.deleteMany();
+    // すべてのデータを削除
+    await prisma.staff.deleteMany();
 
-      // 新しいデータを一括挿入
-      const formattedData = staffData.map((staff) => {
-        // 日付を変換し、無効な場合は `null` に設定
-        const birthday = isValidDate(staff.birthday) ? new Date(staff.birthday) : null;
+    // 新しいデータを一括挿入
+    const formattedData = staffData.map((staff) => {
+      // 日付を変換し、無効な場合は `null` に設定
+      const birthday = isValidDate(staff.birthday) ? new Date(staff.birthday) : null;
 
-        return {
-          id: staff.id,
-          name: staff.name,
-          mail: staff.mail,
-          birthday, // 無効な日付なら `null` になる
-          staff_status_id: parseInt(staff.staff_status_id),
-          import_status_id: 1 // INSERTの場合は常に 1 を設定
-        };
-      });
+      return {
+        id: staff.id,
+        name: staff.name,
+        mail: staff.mail,
+        birthday, // 無効な日付なら `null` になる
+        staff_status_id: parseInt(staff.staff_status_id),
+        import_status_id: 1 // INSERTの場合は常に 1 を設定
+      };
+    });
 
-      await prisma.staff.createMany({
-        data: formattedData
-      });
+    await prisma.staff.createMany({
+      data: formattedData
     });
 
     console.log('スタッフデータ処理完了: すべてのデータがINSERTされました');
