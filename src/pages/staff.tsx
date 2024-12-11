@@ -264,7 +264,26 @@ const CustomerStaffPage = () => {
         accessor: 'staff_status',
         // Filter: SelectColumnFilter,
         filter: 'includes',
-        Cell: ({ value }: CellProps<any>) => value?.name ?? null
+        Cell: ({ value }: CellProps<any>) => {
+          switch (value?.name) {
+            case '新規':
+              return <Chip color="success" label="新規" size="small" variant="light" />;
+            case '既存':
+              return <Chip color="primary" label="既存" size="small" variant="light" />;
+            case '稼働中':
+              return <Chip color="secondary" label="稼働中" size="small" variant="light" />;
+            case 'BL':
+              return <Chip color="warning" label="BL" size="small" variant="light" />;
+            case '抹消':
+              return <Chip color="error" label="抹消" size="small" variant="light" />;
+            case '配信停止':
+              return <Chip color="error" label="配信停止" size="small" variant="light" />;
+            case '空白':
+              return <Chip color="error" label="空白" size="small" variant="light" />;
+            default:
+              return <Chip color="error" label="None" size="small" variant="light" />;
+          }
+        }
       },
       {
         Header: 'インポートステータス',
