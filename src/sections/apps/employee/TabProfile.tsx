@@ -69,10 +69,12 @@ const TabProfile = () => {
   const [allSkills, setAllSkills] = useState<any[]>();
 
   const [open, setOpen] = useState<boolean>(false);
+  const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
 
   const [editData, setEditData] = useState<EmployeeType | null>(null);
 
   const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
+  const [customerDeleteTitle, setCustomerDeleteTitle] = useState<any>('');
 
   const theme = useTheme();
 
@@ -115,7 +117,7 @@ const TabProfile = () => {
   };
 
   const handleClose = () => {
-    setOpen(!open);
+    setDeleteOpen(!deleteOpen);
   };
 
   return (
@@ -316,12 +318,10 @@ const TabProfile = () => {
               </Grid>
               <Grid item xs={12}>
                 <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
-                  {/* 業務履歴 ボタン */}
                   <Button variant="outlined" onClick={() => handleChangeDetailSkill(id)}>
                     業務履歴
                   </Button>
 
-                  {/* 編集 ボタン */}
                   <Button
                     variant="contained"
                     onClick={handleEdit}
@@ -335,8 +335,9 @@ const TabProfile = () => {
                       color="error"
                       onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                         e.stopPropagation();
-                        handleClose();
                         setCustomerDeleteId(id);
+                        setCustomerDeleteTitle(`${data.sei} ${data.mei}`);
+                        handleClose();
                       }}
                     >
                       <DeleteTwoTone twoToneColor={theme.palette.error.main} />
@@ -345,7 +346,7 @@ const TabProfile = () => {
                 </Stack>
               </Grid>
 
-              <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} />
+              <AlertCustomerDelete deleteId={customerDeleteId} title={customerDeleteTitle} open={deleteOpen} handleClose={handleClose} />
 
               {/* 編集用ダイアログ */}
               <Dialog maxWidth="lg" onClose={() => setOpen(false)} open={open} fullWidth>
