@@ -33,7 +33,6 @@ const useUser = () => {
       thumb = '/assets/images/users/avatar-thumb-1.png';
     }
 
-    console.log('useSession', session);
     const newUser: UserProps = {
       id: session?.id!, // ID を追加
       name: user!.name!,

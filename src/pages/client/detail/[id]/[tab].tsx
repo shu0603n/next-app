@@ -46,12 +46,14 @@ const ClientDetail = () => {
               iconPosition="start"
               disabled={!(user?.roles.superRole || user?.roles.systemRole || user?.roles.projectView)}
             />
+            <Tab label="担当者一覧" icon={<FileTextOutlined />} value="member" iconPosition="start" disabled />
           </Tabs>
         </Box>
         <Box sx={{ mt: 2.5 }}>
           {tab === 'basic' && <TabProfile />}
           {tab === 'history' && <TabHistory />}
           {tab === 'project' && <TabProject />}
+          {tab === 'member' && <TabProfile />}
         </Box>
       </MainCard>
     </Page>

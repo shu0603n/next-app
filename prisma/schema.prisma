@@ -347,3 +347,26 @@ model roles {
   project_edit  Boolean? @default(false)
   employee      employee @relation(fields: [employee_id], references: [id], onDelete: Cascade, map: "fk_employee")
 }
+
+model staff {
+  id               Int            @id
+  birthday         DateTime?      @db.Date
+  name             String?        @db.VarChar(255)
+  staff_status_id  Int?
+  mail             String?        @db.VarChar(255)
+  import_status_id Int?
+  import_status    import_status? @relation(fields: [import_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_import_status")
+  staff_status     staff_status?  @relation(fields: [staff_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_staff_status")
+}
+
+model staff_status {
+  id    Int     @id
+  name  String  @db.VarChar(30)
+  staff staff[]
+}
+
+model import_status {
+  id    Int     @id
+  name  String  @db.VarChar(30)
+  staff staff[]
+}

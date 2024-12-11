@@ -21,6 +21,8 @@ Font.register({
     { src: '/fonts/NotoSansJP-Thin.ttf', fontWeight: 100 }
   ]
 });
+// 改行時のハイフンを空文字にする
+Font.registerHyphenationCallback((word) => Array.from(word).flatMap((char) => [char, '']));
 
 const textPrimary = '#262626';
 const textSecondary = '#8c8c8c';
@@ -38,9 +40,15 @@ const styles = StyleSheet.create({
   },
   card: {
     border: `1px solid ${border}`,
-    borderRadius: '2px',
-    padding: '20px',
+    borderRadius: 2,
+    padding: 20,
     width: '48%'
+  },
+  contents: {
+    gap: 20,
+    margin: 0,
+    width: '100%',
+    height: '100%'
   },
   title: {
     fontFamily: 'NotoSansJP',
@@ -54,18 +62,76 @@ const styles = StyleSheet.create({
     color: textSecondary,
     fontSize: '10px'
   },
+  padding2: {
+    paddingLeft: 2,
+    paddingRight: 2
+  },
+  padding5: {
+    paddingLeft: 5,
+    paddingRight: 5
+  },
+  borderRight: {
+    borderRight: `1px solid ${border}`,
+    margin: 0
+  },
+  border: {
+    border: `1px solid ${border}`,
+    borderRadius: 2,
+    margin: 0
+  },
   tableTitle: {
     alignItems: 'center',
     fontFamily: 'NotoSansJP',
     fontWeight: 500,
     color: textPrimary,
-    fontSize: '10px'
+    fontSize: '10px',
+    margin: 0
   },
   tableCell: {
     fontFamily: 'NotoSansJP',
     fontWeight: 400,
     color: textPrimary,
-    fontSize: '10px'
+    fontSize: '10px',
+    margin: 0
+  },
+  leftTop: {
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    flexDirection: 'column'
+  },
+  centerTop: {
+    justifyContent: 'flex-start',
+    alignItems: 'center'
+  },
+  center: {
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  procces: {
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    textAlign: 'center',
+    gap: 2
+  },
+  proccesText: {
+    fontSize: '9px',
+    lineHeight: 1.2,
+    lineWeight: 3
+  },
+  skill: {
+    gap: 1
+  },
+  left: {
+    justifyContent: 'center',
+    alignItems: 'flex-start'
+  },
+  right: {
+    justifyContent: 'center',
+    alignItems: 'flex-end'
+  },
+  side: {
+    display: 'flex',
+    flexDirection: 'column'
   },
   bold: {
     fontFamily: 'NotoSansJP',
@@ -73,19 +139,19 @@ const styles = StyleSheet.create({
     color: textPrimary,
     fontSize: '12px'
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24
-  },
-
   subRow: {
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     margin: 0,
     paddingBottom: 20
   },
+  row: {
+    display: 'flex',
+    flexDirection: 'row'
+  },
+
   column: {
+    display: 'flex',
     flexDirection: 'column'
   },
 
@@ -98,10 +164,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderBottom: '1px solid #f0f0f0',
     borderTop: '1px solid #f0f0f0',
-    paddingTop: '10px',
-    paddingBottom: '10px',
-    margin: 0,
-    paddingLeft: 10
+    paddingTop: 10,
+    paddingBottom: 10,
+    margin: 0
+  },
+  paddingTopBottom10: {
+    paddingTop: 10,
+    paddingBottom: 10
+  },
+  paddingTopBottom20: {
+    paddingTop: 20,
+    paddingBottom: 20
   },
   tableRow: {
     alignItems: 'center',
@@ -154,6 +227,47 @@ const Content = ({ list }: Props) => {
   const birthday = new Date(String(list?.birthday)); // list?.birthday を Date オブジェクトに変換
   const ageInMilliseconds = now.getTime() - birthday.getTime();
   const age = Math.floor(ageInMilliseconds / (1000 * 60 * 60 * 24 * 365.25));
+  const checkList = ['要件定義', '基本設計', '詳細設計', '製造', '単体テスト', '結合テスト', 'システムテスト', '運用保守', 'データ移行'];
+
+  const getProcesses = (processes: ParameterType[]): string[] => {
+    // checkList に全角スペースで補完を加える
+    const newCheckList = checkList.map((item) => {
+      // checkItem に '●' が付いているかをチェック
+      const hasMatch = processes.some((process) => process.name === item);
+      // '●' を追加する場合はその分の長さを調整
+      const itemWithMarker = hasMatch ? '●' + item : '-' + item;
+      // 最大長より長くならないように調整
+      const itemWithNewlines = itemWithMarker.split('').join('\n');
+      return itemWithNewlines.replace('ー', '｜'); // 各文字列の間に改行を追加
+    });
+    return newCheckList;
+  };
+  const calculatePeriod = (startDate: string | null, endDate: string | null): string => {
+    // 開始日がない場合は空文字を返す
+    if (!startDate) {
+      return '';
+    }
+    // 開始日と終了日をDateオブジェクトに変換
+    const start = new Date(startDate);
+    const end = endDate ? new Date(endDate) : new Date();
+    // 日付の順序や有効性を確認
+    if (isNaN(start.getTime()) || isNaN(end.getTime()) || start > end) {
+      return '';
+    }
+    // 差分の年と月を計算
+    let years = end.getFullYear() - start.getFullYear();
+    let months = end.getMonth() - start.getMonth();
+    if (months < 0) {
+      years -= 1;
+      months += 12;
+    }
+    // 結果をフォーマットして返す
+    if (years === 0 && months < 12) {
+      return `(${months}ヶ月)`;
+    } else {
+      return `(${years}年${months}ヶ月)`;
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -165,50 +279,63 @@ const Content = ({ list }: Props) => {
           <Text style={[styles.caption, styles.pb5]}>{list?.address}</Text>
         </View>
       </View>
-      <View>
-        <View style={[styles.row, styles.tableHeader, { backgroundColor: theme.palette.grey[100] }]}>
-          <Text style={[styles.tableTitle, styles.flex03]}>No</Text>
-          <Text style={[styles.tableTitle, styles.flex05]}>期間</Text>
-          <View style={styles.flex20}>
-            <Text style={styles.tableTitle}>プロジェクト名</Text>
-            <Text style={styles.tableTitle}>詳細</Text>
-          </View>
-          <View style={styles.flex05}>
-            <Text style={[styles.tableTitle]}>人数</Text>
-            <Text style={[styles.tableTitle]}>役割</Text>
-          </View>
-          <View style={styles.flex05}>
-            <Text style={[styles.tableTitle]}>スキル</Text>
-            <Text style={[styles.tableTitle]}>工程</Text>
-          </View>
-        </View>
-        {list?.project.map((row: any, index: number) => (
-          <View style={[styles.row, styles.tableRow]} key={row.id}>
-            <Text style={[styles.tableCell, styles.flex03]}>{index + 1}</Text>
-            <View style={styles.flex05}>
-              <Text style={styles.tableCell}>{format(new Date(row.end_date), 'yyyy/MM/dd')}</Text>
-              <Text style={styles.tableCell}>~</Text>
-              <Text style={styles.tableCell}>{format(new Date(row.start_date), 'yyyy/MM/dd')}</Text>
+      <View style={[styles.contents]}>
+        {list?.project.map((row: any) => (
+          <View style={[styles.border]} key={row.id}>
+            <View style={[styles.row, styles.tableHeader, { backgroundColor: theme.palette.grey[100] }]}>
+              <View style={[styles.borderRight, styles.tableTitle, styles.flex03]}>
+                <Text style={[styles.tableTitle, styles.paddingTopBottom10]}>案件名</Text>
+              </View>
+              <View style={[styles.borderRight, styles.tableTitle, styles.flex15]}>
+                <Text style={[styles.tableTitle, styles.paddingTopBottom10]}>{row.project_title}</Text>
+              </View>
+              <View style={[styles.borderRight, styles.tableTitle, styles.flex05]}>
+                <Text style={[styles.tableTitle, styles.paddingTopBottom10]}>環境・言語</Text>
+              </View>
+              <View style={[styles.tableTitle, styles.flex05]}>
+                <Text style={[styles.tableTitle, styles.paddingTopBottom10]}>役割・役職</Text>
+              </View>
             </View>
-            <View style={styles.flex20}>
-              <Text style={[styles.tableCell, styles.bold]}>{row.project_title}</Text>
-              <Text style={styles.tableCell}>{row.description}</Text>
-            </View>
-            <View style={styles.flex05}>
-              <Text style={styles.tableCell}>{row.people}人</Text>
-              <Text style={styles.tableCell}>{row.end_date}</Text>
-            </View>
-            <View style={styles.flex05}>
-              {row.employee_project_skills.map((skill: SkillParameterType, index: number) => (
-                <Text key={`skill-${index}`} style={styles.tableCell}>
-                  {skill.name}
-                </Text>
-              ))}
-              {row.employee_project_processes.map((proces: ParameterType, index: number) => (
-                <Text key={`process-${index}`} style={styles.tableCell}>
-                  {proces.name}
-                </Text>
-              ))}
+            <View style={[styles.row]}>
+              <View
+                style={[styles.borderRight, styles.column, styles.centerTop, styles.tableCell, styles.flex03, styles.paddingTopBottom10]}
+              >
+                <Text style={[styles.padding2]}>{format(new Date(row.end_date), 'yyyy/MM/dd')}</Text>
+                <Text style={[styles.padding2]}>~</Text>
+                <Text style={[styles.padding2]}>{format(new Date(row.start_date), 'yyyy/MM/dd')}</Text>
+                <Text style={[styles.padding2, styles.paddingTopBottom10]}>{calculatePeriod(row.start_date, row.end_date)}</Text>
+              </View>
+              <View style={[styles.borderRight, styles.flex15, styles.leftTop, styles.tableCell, styles.paddingTopBottom10]}>
+                <Text style={[styles.padding5]}>{row.description}</Text>
+              </View>
+              <View style={[styles.borderRight, styles.tableCell, styles.flex05, styles.paddingTopBottom10]}>
+                {row.employee_project_skills.map((skill: SkillParameterType, index: number) => (
+                  <Text key={`skill-${index}`} style={[styles.skill, styles.padding5]}>
+                    {skill.name}
+                  </Text>
+                ))}
+              </View>
+              <View style={[styles.column, styles.flex05, styles.side]}>
+                <View style={[styles.tableCell, styles.center, styles.paddingTopBottom20]}>
+                  <Text>PG</Text>
+                </View>
+                <View style={[styles.tableTitle, styles.tableHeader, { backgroundColor: theme.palette.grey[100] }]}>
+                  <Text style={[styles.tableTitle, styles.paddingTopBottom10]}>規模・人数</Text>
+                </View>
+                <View style={[styles.tableCell, styles.center, styles.paddingTopBottom20]}>
+                  <Text>{row.people ? `${row.people}人` : ''}</Text>
+                </View>
+                <View style={[styles.tableTitle, styles.tableHeader, { backgroundColor: theme.palette.grey[100] }]}>
+                  <Text style={[styles.tableTitle, styles.paddingTopBottom10]}>担当工程</Text>
+                </View>
+                <View style={[styles.tableCell, styles.row, styles.procces]}>
+                  {getProcesses(row.employee_project_processes).map((procces, index) => (
+                    <Text style={[styles.centerTop, styles.proccesText]} key={`process-${index}`}>
+                      {procces}
+                    </Text>
+                  ))}
+                </View>
+              </View>
             </View>
           </View>
         ))}

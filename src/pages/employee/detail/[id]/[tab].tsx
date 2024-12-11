@@ -13,12 +13,11 @@ import MainCard from 'components/MainCard';
 import TabProfile from 'sections/apps/employee/TabProfile';
 import TabSkill from 'sections/apps/employee/TabSkill';
 import TabInvoice from 'sections/apps/employee/TabInvoice';
-import TabAccount from 'sections/apps/employee/TabAccount';
 import TabPassword from 'sections/apps/employee/TabPassword';
 import TabSettings from 'sections/apps/employee/TabSettings';
 
 // assets
-import { ContainerOutlined, FileTextOutlined, LockOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
+import { FileTextOutlined, LockOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import useUser from 'hooks/useUser';
 
 // ==============================|| PROFILE - ACCOUNT ||============================== //
@@ -30,7 +29,7 @@ const EmployeeDetail = () => {
 
   const [value, setValue] = useState(tab);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = (_event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
     router.push(`/employee/detail/${id}/${newValue}`);
   };
@@ -40,19 +39,13 @@ const EmployeeDetail = () => {
       <MainCard border={false} boxShadow>
         <Box sx={{ borderBottom: 1, borderColor: 'divider', width: '100%' }}>
           <Tabs value={value} onChange={handleChange} variant="scrollable" scrollButtons="auto" aria-label="account profile tab">
-            <Tab label="プロフィール" icon={<UserOutlined />} value="basic" iconPosition="start" />
+            <Tab label="プロフィール" icon={<UserOutlined />} value="sales" iconPosition="start" />
+            <Tab label="営業情報" icon={<UserOutlined />} value="basic" iconPosition="start" disabled />
             <Tab label="スキル一覧" icon={<FileTextOutlined />} value="skill" iconPosition="start" />
             <Tab
               label="請求一覧"
               icon={<FileTextOutlined />}
               value="invoice"
-              iconPosition="start"
-              disabled={!(user?.roles.superRole || user?.roles.systemRole)}
-            />
-            <Tab
-              label="アカウント情報"
-              icon={<ContainerOutlined />}
-              value="my-account"
               iconPosition="start"
               disabled={!(user?.roles.superRole || user?.roles.systemRole)}
             />
@@ -74,9 +67,9 @@ const EmployeeDetail = () => {
         </Box>
         <Box sx={{ mt: 2.5 }}>
           {tab === 'basic' && <TabProfile />}
+          {tab === 'sales' && <TabProfile />}
           {tab === 'skill' && <TabSkill />}
           {tab === 'invoice' && <TabInvoice />}
-          {tab === 'my-account' && <TabAccount />}
           {tab === 'password' && <TabPassword />}
           {tab === 'settings' && <TabSettings />}
         </Box>

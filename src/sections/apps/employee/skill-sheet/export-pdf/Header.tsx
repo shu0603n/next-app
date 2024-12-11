@@ -1,5 +1,5 @@
 // third-party
-import { Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+import { Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer';
 import { format } from 'date-fns';
 
 // assets
@@ -7,6 +7,15 @@ const Logo = '/assets/images/tribe-logo.png';
 
 // types
 import { InvoiceList } from 'types/invoice';
+
+// フォント登録
+Font.register({
+  family: 'NotoSansJP',
+  fonts: [
+    { src: '/fonts/NotoSansJP-Medium.ttf', fontWeight: 500 },
+    { src: '/fonts/NotoSansJP-Regular.ttf', fontWeight: 400 }
+  ]
+});
 
 const textPrimary = '#262626';
 const textSecondary = '#8c8c8c';
@@ -53,13 +62,25 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'flex-end'
   },
+  column: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-end'
+  },
   title: {
+    fontFamily: 'NotoSansJP',
+    fontWeight: 500,
     color: textPrimary,
     fontSize: '10px'
   },
   caption: {
+    fontFamily: 'NotoSansJP',
+    fontWeight: 400,
     color: textSecondary,
     fontSize: '10px'
+  },
+  right: {
+    alignItems: 'flex-end'
   }
 });
 
@@ -79,9 +100,9 @@ const Header = ({ list }: Props) => {
         </View>
       </View>
       <View>
-        <View style={[styles.row, { marginTop: 8 }]}>
+        <View style={[styles.column, styles.right, { marginTop: 8 }]}>
           <Text style={styles.title}>作成日付</Text>
-          <Text style={styles.caption}> {format(new Date(), 'yyyy/mm/dd')}</Text>
+          <Text style={styles.caption}> {format(new Date(), 'yyyy/MM/dd')}</Text>
         </View>
       </View>
     </View>
