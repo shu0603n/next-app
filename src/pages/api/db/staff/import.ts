@@ -33,7 +33,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
                 mail,
                 birthday: new Date(birthday), // PrismaのDate型に合わせる
                 staff_status_id: parseInt(staff_status_id),
-                import_status_id: 2 // UPDATEの場合は 2 を設定
+                import_status_id: 2, // UPDATEの場合は 2 を設定
+                updated_at: new Date() // 現在の日時を updated_at に設定
               }
             });
           } else {

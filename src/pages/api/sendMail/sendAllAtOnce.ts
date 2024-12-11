@@ -94,7 +94,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
               },
               data: {
                 complete_flg: true,
-                mail_account_id: account[accountIndex].id
+                mail_account_id: account[accountIndex].id,
+                log: 'sucsses'
               }
             });
 
@@ -113,7 +114,8 @@ export default async function handler(request: NextApiRequest, response: NextApi
               },
               data: {
                 complete_flg: false,
-                mail_account_id: account[accountIndex].id
+                mail_account_id: account[accountIndex].id,
+                log: JSON.stringify(error)
               }
             });
 
