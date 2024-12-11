@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../prisma';
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   if (request.method === 'POST') {
     const staffData = request.body; // 受け取ったスタッフデータの配列
