@@ -7,48 +7,57 @@ const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    const { title, description, user: name } = request.body;
-    const account = await prisma.mail_account.findMany({
+    const { id } = request.query;
+
+    // mail_list_id に基づいて mail_destination テーブルからデータを取得
+    const mailDestinations = await prisma.mail_destination.findMany({
       where: {
-        name
+        mail_list_id: Number(id) // リクエストの ID を使ってフィルタリング
       },
       select: {
+        staff: {
+          select: {
+            id: true,
+            name: true,
+            mail: true
+          }
+        },
+        mail_list_id: true // mail_list_id も取得
+      }
+    });
+
+    // アカウント情報の取得
+    const account = await prisma.mail_account.findMany({
+      select: {
+        id: true,
         user: true,
         pass: true
       }
     });
 
-    const newArray: any[] = [];
-
-    // データのプロパティが数値のキーを持つものだけを取り出す
-    const items = Object.values(request.body).filter((item) => typeof item === 'object');
-
-    // map を使用して処理
-    const mappedData = items.map((item: any) => {
-      const { id, name, email, age, status } = item;
-      return { id, name, email, age, status };
-    });
-
     try {
-      // nodemailerの設定
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: account[0].user,
-          pass: account[0].pass
-        }
-      } as TransportOptions);
-
       // メール送信の非同期処理を配列に格納
-      const emailPromises = mappedData.map(async (item: any) => {
+      const emailPromises = mailDestinations.map(async (item: any, index: number) => {
+        // アカウント情報を順番に使用するため、インデックスを使ってループ
+        const accountIndex = index % account.length; // 最後まで行ったら最初に戻る
+
+        // nodemailer の設定を毎回新しく作成
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: account[accountIndex].user, // 現在使用するアカウントのユーザー
+            pass: account[accountIndex].pass // 現在使用するアカウントのパスワード
+          }
+        } as TransportOptions);
+
         const mailOptions: nodemailer.SendMailOptions = {
-          to: item.email,
-          from: '"トライブ株式会社 北海道支店" <saiyo-hokkaido@tribe-group.jp>',
-          subject: title, // メールの件名
+          to: item.staff.mail,
+          from: `"トライブ株式会社 北海道支店" <saiyo-hokkaido@tribe-group.jp>`,
+          subject: item.staff.title, // メールの件名
           html: `
-            <p>${item.name} 様</p>
+            <p>${item.staff.name} 様</p>
             <br />
-            <p>${description}</p><br />
+            <p>${item.staff.description}</p><br />
             <p>
             ――――――――――――――――――――<br/>
             トライブ株式会社<br/>
@@ -65,27 +74,51 @@ export default async function handler(request: NextApiRequest, response: NextApi
             </p>`
         };
 
-        if (item.email && item.email.length !== 0) {
+        // メール送信の処理
+        if (item.staff.mail && item.staff.mail.length !== 0) {
           try {
-            // メール送信処理
+            // メール送信の際にそのアカウントを使用
             await transporter.sendMail(mailOptions);
-            newArray.push({ id: item.id, name: item.name, email: item.email, age: item.age, status: item.status, flag: '送信済み' });
+
+            // メール送信成功時に complete_flg を true に更新
+            await prisma.mail_destination.updateMany({
+              where: {
+                mail_list_id: item.mail_list_id,
+                staff_id: item.staff.id
+              },
+              data: {
+                complete_flg: true,
+                mail_account_id: account[accountIndex].id
+              }
+            });
+
             console.log('メール送信完了:', {
-              id: item.id,
-              name: item.name,
-              email: item.email,
-              age: item.age,
-              status: item.status,
+              id: item.staff.id,
+              name: item.staff.name,
+              email: item.staff.mail,
               flag: '送信済み'
             });
           } catch (error) {
-            // if(error.responseCode && error.responseCode === 454 ){
+            // メール送信エラー時に complete_flg を false に更新
+            await prisma.mail_destination.updateMany({
+              where: {
+                mail_list_id: item.mail_list_id,
+                staff_id: item.staff.id
+              },
+              data: {
+                complete_flg: false,
+                mail_account_id: account[accountIndex].id
+              }
+            });
 
-            // }
-            newArray.push({ id: item.id, name: item.name, email: item.email, age: item.age, status: item.status, flag: 'エラー' });
             console.error(
               'メールの送信エラー:',
-              { id: item.id, name: item.name, email: item.email, age: item.age, status: item.status, flag: 'エラー' },
+              {
+                id: item.staff.id,
+                name: item.staff.name,
+                email: item.staff.mail,
+                flag: 'エラー'
+              },
               error
             );
           }
@@ -94,17 +127,17 @@ export default async function handler(request: NextApiRequest, response: NextApi
         // 3秒の遅延
         await sleep(10000);
 
-        return { id: item.id, name: item.name, email: item.email, age: item.age, status: item.status, flag: '送信済み' };
+        return { id: item.staff.id, name: item.staff.name, email: item.staff.mail, flag: '送信済み' };
       });
 
       // 全ての非同期処理が完了するのを待つ
       await Promise.all(emailPromises);
     } catch (error) {
-      console.error('メールの送信処理が失敗しました:', items, error);
+      console.error('メールの送信処理が失敗しました:', error);
       throw error;
     }
 
-    return response.status(200).json({ message: '正常に処理が完了しました。', data: newArray });
+    return response.status(200).json({ message: '正常に処理が完了しました。' });
   } catch (error) {
     console.error('エラーが発生しました:', error);
     return response.status(500).json({ error: 'データを取得できませんでした。' });
