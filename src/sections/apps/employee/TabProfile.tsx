@@ -1,5 +1,5 @@
 // material-ui
-import { Theme } from '@mui/material/styles';
+import { Theme, useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/router';
 import {
   useMediaQuery,
@@ -13,7 +13,8 @@ import {
   ListItemIcon,
   ListItemSecondaryAction,
   Stack,
-  Typography
+  Typography,
+  Tooltip
 } from '@mui/material';
 
 // third-party
@@ -23,9 +24,11 @@ import {
 import MainCard from 'components/MainCard';
 import Avatar from 'components/@extended/Avatar';
 import TabPersonal from './TabPersonal';
+import IconButton from 'components/@extended/IconButton';
+import AlertCustomerDelete from 'sections/apps/employee/AlertCustomerDelete';
 
 // assets
-import { AimOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
+import { AimOutlined, DeleteTwoTone, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { Fragment, useEffect, useState } from 'react';
 import { PatternFormat } from 'react-number-format';
 import { EmployeeType } from 'types/employee/employee';
@@ -66,8 +69,14 @@ const TabProfile = () => {
   const [allSkills, setAllSkills] = useState<any[]>();
 
   const [open, setOpen] = useState<boolean>(false);
+  const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
 
   const [editData, setEditData] = useState<EmployeeType | null>(null);
+
+  const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
+  const [customerDeleteTitle, setCustomerDeleteTitle] = useState<any>('');
+
+  const theme = useTheme();
 
   const getUpdateData = () => {
     fetchTableData(id)
@@ -103,8 +112,8 @@ const TabProfile = () => {
     }
   };
 
-  const handleChangeDetailSkill = (newValue: string) => {
-    router.push(`/employee/skill-sheet/${id}`);
+  const handleClose = () => {
+    setDeleteOpen(!deleteOpen);
   };
 
   return (
@@ -305,9 +314,6 @@ const TabProfile = () => {
               </Grid>
               <Grid item xs={12}>
                 <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
-                  <Button variant="outlined" onClick={() => handleChangeDetailSkill(id)}>
-                    業務履歴
-                  </Button>
                   <Button
                     variant="contained"
                     onClick={handleEdit}
@@ -315,8 +321,24 @@ const TabProfile = () => {
                   >
                     編集
                   </Button>
+
+                  <Tooltip title="削除">
+                    <IconButton
+                      color="error"
+                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                        e.stopPropagation();
+                        setCustomerDeleteId(id);
+                        setCustomerDeleteTitle(`${data.sei} ${data.mei}`);
+                      }}
+                    >
+                      <DeleteTwoTone twoToneColor={theme.palette.error.main} />
+                    </IconButton>
+                  </Tooltip>
                 </Stack>
               </Grid>
+
+              <AlertCustomerDelete deleteId={customerDeleteId} title={customerDeleteTitle} open={deleteOpen} handleClose={handleClose} />
+
               {/* 編集用ダイアログ */}
               <Dialog maxWidth="lg" onClose={() => setOpen(false)} open={open} fullWidth>
                 <TabPersonal

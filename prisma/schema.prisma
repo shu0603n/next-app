@@ -63,13 +63,16 @@ model employee {
   employment_id    Int?
   password         String?            @db.VarChar(255)
   avatar           String?
+  department_id    Int?
   attendance       attendance[]
   client_history   client_history[]
   employment       employment?        @relation(fields: [employment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   job_category     job_category?      @relation(fields: [job_category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   position         position?          @relation(fields: [position_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  department       department?        @relation(fields: [department_id], references: [id], map: "fk_department")
   employee_project employee_project[]
   invoice          invoice[]
+  mail_list        mail_list[]
   project          project[]
   roles            roles?
 }
@@ -253,10 +256,11 @@ model your_table_name {
 }
 
 model mail_account {
-  id   Int     @id @default(autoincrement())
-  name String? @db.VarChar(255)
-  user String? @db.VarChar(255)
-  pass String? @db.VarChar(255)
+  id               Int                @id @default(autoincrement())
+  name             String?            @db.VarChar(255)
+  user             String?            @db.VarChar(255)
+  pass             String?            @db.VarChar(255)
+  mail_destination mail_destination[]
 }
 
 model accounts {
@@ -349,14 +353,15 @@ model roles {
 }
 
 model staff {
-  id               Int            @id
-  birthday         DateTime?      @db.Date
-  name             String?        @db.VarChar(255)
+  id               Int                @id
+  birthday         DateTime?          @db.Date
+  name             String?            @db.VarChar(255)
   staff_status_id  Int?
-  mail             String?        @db.VarChar(255)
+  mail             String?            @db.VarChar(255)
   import_status_id Int?
-  import_status    import_status? @relation(fields: [import_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_import_status")
-  staff_status     staff_status?  @relation(fields: [staff_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_staff_status")
+  mail_destination mail_destination[]
+  import_status    import_status?     @relation(fields: [import_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_import_status")
+  staff_status     staff_status?      @relation(fields: [staff_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_staff_status")
 }
 
 model staff_status {
@@ -369,4 +374,36 @@ model import_status {
   id    Int     @id
   name  String  @db.VarChar(30)
   staff staff[]
+}
+
+model department {
+  id         Int        @id @default(autoincrement())
+  name       String     @db.VarChar(50)
+  created_at DateTime?  @default(now()) @db.Timestamp(6)
+  updated_at DateTime?  @default(now()) @db.Timestamp(6)
+  employee   employee[]
+}
+
+model mail_destination {
+  mail_list_id    Int
+  staff_id        Int
+  create_at       DateTime?     @default(now()) @db.Timestamp(6)
+  update_at       DateTime?     @default(now()) @db.Timestamp(6)
+  id              Int           @id @default(autoincrement())
+  complete_flg    Boolean?      @default(false)
+  mail_account_id Int?
+  mail_account    mail_account? @relation(fields: [mail_account_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_mail_account")
+  mail_list       mail_list     @relation(fields: [mail_list_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_mail_list")
+  staff           staff         @relation(fields: [staff_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_staff")
+}
+
+model mail_list {
+  id               Int                @id @default(autoincrement())
+  title            String             @db.VarChar(255)
+  main_text        String?
+  create_at        DateTime?          @default(now()) @db.Timestamp(6)
+  update_at        DateTime?          @default(now()) @db.Timestamp(6)
+  employee_id      Int?
+  mail_destination mail_destination[]
+  employee         employee?          @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_employee")
 }

@@ -1,8 +1,9 @@
+import { staffType } from 'types/staff/staff';
+
 export type mailListType = {
   id: number;
-  name: string;
-  mail: string;
-  age: number;
-  status: string;
-  flag: string;
+  title: string;
+  main_text: string;
+  staff?: staffType;
+  complete_flg: boolean;
 };

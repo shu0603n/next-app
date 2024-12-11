@@ -2,20 +2,7 @@ import { useEffect, useMemo, useState, Fragment, MouseEvent, ReactElement } from
 
 // material-ui
 import { alpha, useTheme } from '@mui/material/styles';
-import {
-  Button,
-  Chip,
-  Dialog,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Tooltip,
-  Typography,
-  useMediaQuery
-} from '@mui/material';
+import { Button, Chip, Dialog, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography, useMediaQuery } from '@mui/material';
 
 import { PopupTransition } from 'components/@extended/Transitions';
 
@@ -41,15 +28,12 @@ import Page from 'components/Page';
 import MainCard from 'components/MainCard';
 import ScrollX from 'components/ScrollX';
 import Avatar from 'components/@extended/Avatar';
-import IconButton from 'components/@extended/IconButton';
 import { CSVExport, HeaderSort, SortingSelect, TablePagination } from 'components/third-party/ReactTable';
 
 import AddCustomer from 'sections/apps/employee/AddCustomer';
-import AlertCustomerDelete from 'sections/apps/employee/AlertCustomerDelete';
-
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 // assets
-import { PlusOutlined, DeleteTwoTone } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
 import { EmployeeType } from 'types/employee/employee';
 import useUser from 'hooks/useUser';
@@ -229,18 +213,12 @@ const CustomerEmployeePage = () => {
       });
   }, []); // 空の依存リストを指定することで、一度だけ実行される
 
-  const [open, setOpen] = useState<boolean>(false);
   const [customer, setCustomer] = useState<any>(null);
-  const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
   const [add, setAdd] = useState<boolean>(false);
 
   const handleAdd = () => {
     setAdd(!add);
     if (customer && !add) setCustomer(null);
-  };
-
-  const handleClose = () => {
-    setOpen(!open);
   };
 
   const columns = useMemo(
@@ -317,29 +295,6 @@ const CustomerEmployeePage = () => {
               return <Chip color="error" label="退職者" size="small" variant="light" />;
           }
         }
-      },
-      {
-        Header: '削除',
-        className: 'cell-center',
-        disableSortBy: true,
-        Cell: ({ row }: { row: Row<{}> }) => {
-          return (
-            <Stack>
-              <Tooltip title="削除">
-                <IconButton
-                  color="error"
-                  onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation();
-                    handleClose();
-                    setCustomerDeleteId(row.values.id);
-                  }}
-                >
-                  <DeleteTwoTone twoToneColor={theme.palette.error.main} />
-                </IconButton>
-              </Tooltip>
-            </Stack>
-          );
-        }
       }
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -360,7 +315,6 @@ const CustomerEmployeePage = () => {
           </ScrollX>
         )}
 
-        <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} />
         {/* add customer dialog */}
         <Dialog
           maxWidth="sm"
