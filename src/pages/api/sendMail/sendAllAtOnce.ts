@@ -4,7 +4,7 @@ import { prisma } from '../db/prisma';
 import pLimit from 'p-limit';
 
 // 非同期処理の遅延関数
-const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+// const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 const sendEmailsInBackground = async (mailDestinations: any, account: any) => {
   try {
@@ -55,7 +55,7 @@ const sendEmailsInBackground = async (mailDestinations: any, account: any) => {
                 staff_id: item.staff.id
               },
               data: {
-                complete_flg: true,
+                complete_flg: 1,
                 mail_account_id: account[accountIndex].id,
                 log: 'success'
               }
@@ -68,7 +68,7 @@ const sendEmailsInBackground = async (mailDestinations: any, account: any) => {
                 staff_id: item.staff.id
               },
               data: {
-                complete_flg: false,
+                complete_flg: -1,
                 mail_account_id: account[accountIndex].id,
                 log: JSON.stringify(error)
               }
@@ -76,7 +76,7 @@ const sendEmailsInBackground = async (mailDestinations: any, account: any) => {
             console.error('メール送信エラー:', item.staff.mail, error);
           }
         }
-        await sleep(10000); // 10秒の遅延
+        // await sleep(10000); // 10秒の遅延
       });
     });
 
@@ -94,7 +94,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
     const mailDestinations = await prisma.mail_destination.findMany({
       where: {
         mail_list_id: Number(id),
-        complete_flg: false
+        OR: [{ complete_flg: null }, { complete_flg: 0 }, { complete_flg: -1 }]
       },
       select: {
         staff: { select: { id: true, name: true, mail: true } },

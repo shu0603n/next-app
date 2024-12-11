@@ -38,7 +38,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     onSubmit: () => {
       setLoading(true); // ローディング開始
       alertSnackBar('処理中…', 'secondary');
-      fetch(`/api/db/staff/import2`, {
+      fetch(`/api/db/staff/import`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

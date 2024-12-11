@@ -92,8 +92,8 @@ const TabProfile = () => {
     sendMail();
   };
 
-  function areAllComplete(): boolean {
-    return !mailDestinationData?.some((item) => item.complete_flg === false);
+  function areAllComplete() {
+    return mailDestinationData?.every((item) => item.complete_flg === 1) ?? false;
   }
 
   return (
@@ -165,10 +165,12 @@ const TabProfile = () => {
                               <Grid container spacing={1} key={i}>
                                 {/* 送信状態を表示 */}
                                 <Grid item xs={6}>
-                                  {item.complete_flg ? (
+                                  {item.complete_flg === 1 ? (
                                     <Chip color="success" label="送信完了" size="small" variant="light" />
-                                  ) : (
+                                  ) : item.complete_flg === -1 ? (
                                     <Chip color="error" label="送信エラー" size="small" variant="light" />
+                                  ) : (
+                                    <Chip color="primary" label="未送信" size="small" variant="light" />
                                   )}
                                 </Grid>
 
