@@ -1,5 +1,5 @@
 // material-ui
-import { Theme } from '@mui/material/styles';
+import { Theme, useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/router';
 import {
   useMediaQuery,
@@ -13,7 +13,8 @@ import {
   ListItemIcon,
   ListItemSecondaryAction,
   Stack,
-  Typography
+  Typography,
+  Tooltip
 } from '@mui/material';
 
 // third-party
@@ -23,9 +24,11 @@ import {
 import MainCard from 'components/MainCard';
 import Avatar from 'components/@extended/Avatar';
 import TabPersonal from './TabPersonal';
+import IconButton from 'components/@extended/IconButton';
+import AlertCustomerDelete from 'sections/apps/employee/AlertCustomerDelete';
 
 // assets
-import { AimOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
+import { AimOutlined, DeleteTwoTone, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { Fragment, useEffect, useState } from 'react';
 import { PatternFormat } from 'react-number-format';
 import { EmployeeType } from 'types/employee/employee';
@@ -69,6 +72,10 @@ const TabProfile = () => {
 
   const [editData, setEditData] = useState<EmployeeType | null>(null);
 
+  const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
+
+  const theme = useTheme();
+
   const getUpdateData = () => {
     fetchTableData(id)
       .then((data) => {
@@ -105,6 +112,10 @@ const TabProfile = () => {
 
   const handleChangeDetailSkill = (newValue: string) => {
     router.push(`/employee/skill-sheet/${id}`);
+  };
+
+  const handleClose = () => {
+    setOpen(!open);
   };
 
   return (
@@ -305,9 +316,12 @@ const TabProfile = () => {
               </Grid>
               <Grid item xs={12}>
                 <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={2}>
+                  {/* 業務履歴 ボタン */}
                   <Button variant="outlined" onClick={() => handleChangeDetailSkill(id)}>
                     業務履歴
                   </Button>
+
+                  {/* 編集 ボタン */}
                   <Button
                     variant="contained"
                     onClick={handleEdit}
@@ -315,8 +329,24 @@ const TabProfile = () => {
                   >
                     編集
                   </Button>
+
+                  <Tooltip title="削除">
+                    <IconButton
+                      color="error"
+                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                        e.stopPropagation();
+                        handleClose();
+                        setCustomerDeleteId(id);
+                      }}
+                    >
+                      <DeleteTwoTone twoToneColor={theme.palette.error.main} />
+                    </IconButton>
+                  </Tooltip>
                 </Stack>
               </Grid>
+
+              <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} />
+
               {/* 編集用ダイアログ */}
               <Dialog maxWidth="lg" onClose={() => setOpen(false)} open={open} fullWidth>
                 <TabPersonal
