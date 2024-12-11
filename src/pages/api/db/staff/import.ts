@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../prisma';
 
+export const maxDuration = 60;
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   if (request.method === 'POST') {
     const staffData = request.body; // 受け取ったスタッフデータの配列
@@ -25,9 +26,6 @@ function isValidDate(date: string | Date): boolean {
 
 async function processStaffData(staffData: any[]) {
   try {
-    // すべてのデータを削除
-    await prisma.staff.deleteMany();
-
     // 新しいデータを一括挿入
     const formattedData = staffData.map((staff) => {
       // 日付を変換し、無効な場合は `null` に設定

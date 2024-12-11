@@ -34,5 +34,19 @@ module.exports = withTM({
         permanent: true
       }
     ];
+  },
+  async headers() {
+    const headers = [];
+    // noindex ヘッダーを追加
+    headers.push({
+      headers: [
+        {
+          key: 'X-Robots-Tag',
+          value: 'noindex'
+        }
+      ],
+      source: '/:path*' // すべてのページに適用
+    });
+    return headers;
   }
 });
