@@ -15,17 +15,17 @@ export default async function handler(request: NextApiRequest, response: NextApi
         }
       });
 
-      // staffDataの配列分、mail_destinationテーブルに新規レコードを作成
-      await Promise.all(
-        staffData.map(async (staff: any) => {
-          await prisma.mail_destination.create({
-            data: {
-              staff_id: staff.id, // 新規レコードにstaff_idを設定
-              mail_list_id: Number(id) // mail_list_idを設定
-            }
-          });
-        })
-      );
+      // 新しいスタッフデータを一括で追加
+      const staffRecords = staffData.map((staff: any) => ({
+        staff_id: staff.id,
+        mail_list_id: Number(id),
+      }));
+
+      if (staffRecords.length > 0) {
+        await prisma.mail_destination.createMany({
+          data: staffRecords
+        });
+      }
 
       // 件数が 0 なら true、それ以外なら false を返す
       const isComplete = await selectIsComplete(id);

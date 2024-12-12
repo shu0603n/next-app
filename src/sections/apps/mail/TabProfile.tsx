@@ -38,6 +38,37 @@ const TabProfile = () => {
       throw error;
     }
   }
+  const checkProcessingStatus = async () => {
+    try {
+      const response = await fetch('/api/sendMail/sendAllAtOnce');
+      if (!response.ok) {
+        throw new Error('ステータス確認に失敗しました。');
+      }
+      const data = await response.json();
+      switch (data.status.status) {
+        case 'completed':
+          alertSnackBar('ステータス：完了済み', 'success');
+          return true;
+        case 'processing':
+          alertSnackBar('ステータス：実行中', 'secondary');
+          return false;
+        case 'timeout':
+          alertSnackBar('ステータス：タイムアウト', 'error');
+          return false;
+        case 'error':
+          alertSnackBar('ステータス：エラー', 'error');
+          return false;
+        default:
+          alertSnackBar('ステータス：不明なエラー', 'error');
+          return false;
+      }
+    } catch (error) {
+      console.error('ステータス確認エラー:', error);
+      alertSnackBar('ステータス確認に失敗しました。', 'error');
+      return false;
+    }
+  };
+
   async function sendMail() {
     try {
       const requestOptions = {
@@ -88,13 +119,41 @@ const TabProfile = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 空の依存リストを指定することで、一度だけ実行される
 
-  const handleEdit = () => {
-    sendMail();
+  const handleEdit = async () => {
+    await checkProcessingStatus().then((status) => {
+      if (status) {
+        sendMail();
+      }
+    });
   };
 
-  function areAllComplete() {
+  const areAllComplete = () => {
     return mailDestinationData?.every((item) => item.complete_flg === 1) ?? false;
-  }
+  };
+  const getErrorReason = (str: string) => {
+    try {
+      // JSONを解析
+      const data = JSON.parse(str);
+
+      // 必要なプロパティが存在するか確認
+      if (!data.responseCode) {
+        return 'エラーコードがありません';
+      }
+
+      // responseCodeに基づいてエラー理由を返す
+      switch (data.responseCode) {
+        case 454:
+          return '試行回数が多すぎます';
+        case 535:
+          return 'アカウント情報に誤りがあります';
+        default:
+          return `不明なエラーコード: ${data.responseCode}`;
+      }
+    } catch (e) {
+      // JSON解析エラーの場合
+      return str;
+    }
+  };
 
   return (
     <Grid container spacing={3}>
@@ -147,6 +206,18 @@ const TabProfile = () => {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <MainCard title="送信先一覧">
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <Button
+                        variant="outlined"
+                        onClick={() => {
+                          checkProcessingStatus();
+                        }}
+                      >
+                        APIステータスを確認する
+                      </Button>
+                    </Grid>
+                  </Grid>
                   {mailDestinationData && (
                     <Grid container spacing={3}>
                       <Grid item xs={12}>
@@ -166,11 +237,29 @@ const TabProfile = () => {
                                 {/* 送信状態を表示 */}
                                 <Grid item xs={6}>
                                   {item.complete_flg === 1 ? (
-                                    <Chip color="success" label="送信完了" onClick={() => alert(item?.log)} size="small" variant="light" />
+                                    <Chip
+                                      color="success"
+                                      label="送信完了"
+                                      onClick={() => alert(getErrorReason(item?.log))}
+                                      size="small"
+                                      variant="light"
+                                    />
                                   ) : item.complete_flg === -1 ? (
-                                    <Chip color="error" label="送信エラー" onClick={() => alert(item?.log)} size="small" variant="light" />
+                                    <Chip
+                                      color="error"
+                                      label="送信エラー"
+                                      onClick={() => alert(getErrorReason(item?.log))}
+                                      size="small"
+                                      variant="light"
+                                    />
                                   ) : (
-                                    <Chip color="primary" label="未送信" onClick={() => alert(item?.log)} size="small" variant="light" />
+                                    <Chip
+                                      color="primary"
+                                      label="未送信"
+                                      onClick={() => alert(getErrorReason(item?.log))}
+                                      size="small"
+                                      variant="light"
+                                    />
                                   )}
                                 </Grid>
 

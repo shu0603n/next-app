@@ -3,24 +3,37 @@ import nodemailer, { TransportOptions } from 'nodemailer';
 import { prisma } from '../db/prisma';
 import pLimit from 'p-limit';
 
-// 非同期処理の遅延関数
-// const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+// タイムアウト時間の設定
+export const maxDuration = 300;
 
-const sendEmailsInBackground = async (mailDestinations: any, account: any) => {
+// トークンをキャッシュするためのオブジェクト
+const tokenCache = new Map();
+
+const sendEmailsInBackground = async (mailDestinations: any, account: any, maxDuration: number) => {
   try {
-    // 並列処理の数を制限するための制限値 (例: 5)
-    const limit = pLimit(10);
+    const limit = pLimit(10); // 並列処理数の制限
+
+    const timeoutPromise = (ms: number) => new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
 
     const emailPromises = mailDestinations.map(async (item: any, index: number) => {
       return limit(async () => {
         const accountIndex = index % account.length;
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: account[accountIndex].user,
-            pass: account[accountIndex].pass
-          }
-        } as TransportOptions);
+        const cachedToken = tokenCache.get(account[accountIndex].user);
+
+        if (!cachedToken) {
+          // トークンがキャッシュされていない場合、新しいトークンを取得してキャッシュ
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: account[accountIndex].user,
+              pass: account[accountIndex].pass
+            }
+          } as TransportOptions);
+
+          tokenCache.set(account[accountIndex].user, transporter);
+        }
+
+        const transporter = tokenCache.get(account[accountIndex].user);
 
         const mailOptions: nodemailer.SendMailOptions = {
           to: item.staff.mail,
@@ -76,50 +89,86 @@ const sendEmailsInBackground = async (mailDestinations: any, account: any) => {
             console.error('メール送信エラー:', item.staff.mail, error);
           }
         }
-        // await sleep(10000); // 10秒の遅延
       });
     });
 
-    // 全てのメール送信を並列で処理
-    await Promise.all(emailPromises);
+    await Promise.race([Promise.all(emailPromises), timeoutPromise(maxDuration * 1000)]);
   } catch (error) {
     console.error('メール送信処理中にエラーが発生しました:', error);
+    throw error; // タイムアウトの場合も含む
   }
 };
-export const maxDuration = 300;
+
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    const { id } = request.query;
+    if (request.method === 'GET') {
+      // 現在の処理状態を返す
+      const status = await prisma.send_mail_status.findFirst({
+        orderBy: { start_at: 'desc' } // start_atでソート
+      });
+      return response.status(200).json({ status });
+    }
 
-    const mailDestinations = await prisma.mail_destination.findMany({
-      where: {
-        mail_list_id: Number(id),
-        OR: [{ complete_flg: null }, { complete_flg: 0 }, { complete_flg: -1 }]
-      },
-      select: {
-        staff: { select: { id: true, name: true, mail: true } },
-        mail_list: { select: { title: true, main_text: true } }
-      },
-      orderBy: {
-        staff_id: 'asc'
+    if (request.method === 'POST') {
+      const { id } = request.query;
+
+      const mailDestinations = await prisma.mail_destination.findMany({
+        where: {
+          mail_list_id: Number(id),
+          OR: [{ complete_flg: null }, { complete_flg: 0 }, { complete_flg: -1 }]
+        },
+        select: {
+          staff: { select: { id: true, name: true, mail: true } },
+          mail_list: { select: { title: true, main_text: true } }
+        },
+        orderBy: {
+          staff_id: 'asc'
+        }
+      });
+
+      const account = await prisma.mail_account.findMany({
+        where: { use: true },
+        select: { id: true, user: true, pass: true }
+      });
+
+      // メール送信処理を開始し、ステータスを「processing」に設定
+      const statusRecord = await prisma.send_mail_status.create({
+        data: {
+          status: 'processing',
+          error_log: '',
+          start_at: new Date() // start_atに現在の時間を設定
+        }
+      });
+
+      try {
+        // バックグラウンドでメール送信を実行
+        await sendEmailsInBackground(mailDestinations, account, maxDuration);
+
+        // メール送信完了後、ステータスを更新
+        await prisma.send_mail_status.update({
+          where: { id: statusRecord.id },
+          data: {
+            status: 'completed',
+            error_log: '',
+            end_at: new Date() // end_atに現在の時間を設定
+          }
+        });
+      } catch (error: any) {
+        // エラー時、ステータスを更新
+        await prisma.send_mail_status.update({
+          where: { id: statusRecord.id },
+          data: {
+            status: error.message === 'Timeout' ? 'timeout' : 'error',
+            error_log: JSON.stringify(error),
+            end_at: new Date() // end_atに現在の時間を設定
+          }
+        });
       }
-    });
 
-    const account = await prisma.mail_account.findMany({
-      where: {
-        use: true
-      },
-      select: {
-        id: true,
-        user: true,
-        pass: true
-      }
-    });
+      return response.status(200).json({ message: 'メール送信処理がバックグラウンドで開始されました。' });
+    }
 
-    // バックグラウンドでメール送信を実行
-    sendEmailsInBackground(mailDestinations, account);
-
-    return response.status(200).json({ message: 'メール送信処理がバックグラウンドで開始されました。' });
+    return response.status(405).json({ error: 'Method Not Allowed' });
   } catch (error) {
     console.error('エラーが発生しました:', error);
     return response.status(500).json({ error: 'データを取得できませんでした。' });
