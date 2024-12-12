@@ -1,5 +1,5 @@
 // material-ui
-import { Theme } from '@mui/material/styles';
+import { Theme, useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/router';
 import {
   useMediaQuery,
@@ -12,19 +12,22 @@ import {
   ListItemIcon,
   ListItemSecondaryAction,
   Stack,
-  Typography
+  Typography,
+  Tooltip
 } from '@mui/material';
 
 // third-party
 // import { PatternFormat } from 'react-number-format';
 
-// end_date import
+// project import
 import MainCard from 'components/MainCard';
 import Avatar from 'components/@extended/Avatar';
 import TabPersonal from './TabPersonal';
+import IconButton from 'components/@extended/IconButton';
+import AlertCustomerDelete from 'sections/apps/client/AlertCustomerDelete';
 
 // assets
-import { AimOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
+import { AimOutlined, DeleteTwoTone, MailOutlined, PhoneOutlined } from '@ant-design/icons';
 import { Fragment, useEffect, useState } from 'react';
 import { PatternFormat } from 'react-number-format';
 import { ClientType } from 'types/client/client';
@@ -53,11 +56,17 @@ const TabProfile = () => {
 
   const matchDownMD = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
+  const theme = useTheme();
+
   const [data, setData] = useState<ClientType>();
 
   const [open, setOpen] = useState<boolean>(false);
+  const [deleteOpen, setDeleteOpen] = useState<boolean>(false);
 
   const [editData, setEditData] = useState<ClientType | null>(null);
+
+  const [customerDeleteId, setCustomerDeleteId] = useState<any>('');
+  const [customerDeleteName, setCustomerDeleteName] = useState<any>('');
 
   const getUpdateData = () => {
     fetchTableData(id)
@@ -90,6 +99,10 @@ const TabProfile = () => {
     if (result) {
       getUpdateData();
     }
+  };
+
+  const handleClose = () => {
+    setDeleteOpen(!deleteOpen);
   };
 
   const assign = [
@@ -276,8 +289,29 @@ const TabProfile = () => {
                   >
                     編集
                   </Button>
+                  <Tooltip title="Delete">
+                    <IconButton
+                      color="error"
+                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                        e.stopPropagation();
+                        handleClose();
+                        setCustomerDeleteId(data.id);
+                        setCustomerDeleteName(data.name);
+                      }}
+                    >
+                      <DeleteTwoTone twoToneColor={theme.palette.error.main} />
+                    </IconButton>
+                  </Tooltip>
                 </Stack>
               </Grid>
+
+              <AlertCustomerDelete
+                deleteId={customerDeleteId}
+                deleteName={customerDeleteName}
+                open={deleteOpen}
+                handleClose={handleClose}
+              />
+
               {/* 編集用ダイアログ */}
               <Dialog maxWidth="lg" onClose={() => setOpen(false)} open={open} fullWidth>
                 <TabPersonal

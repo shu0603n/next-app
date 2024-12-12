@@ -256,13 +256,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
         </LocalizationProvider>
       </FormikProvider>
       {!isCreating && (
-        <AlertCustomerDelete
-          deleteId={customer.id}
-          deleteName={customer.name}
-          open={openAlert}
-          handleClose={handleAlertClose}
-          onReload={onReload}
-        />
+        <AlertCustomerDelete deleteId={customer.id} deleteName={customer.name} open={openAlert} handleClose={handleAlertClose} />
       )}
     </>
   );

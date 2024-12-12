@@ -2,8 +2,8 @@ import { Button, Dialog, DialogContent, Stack, Typography } from '@mui/material'
 import Avatar from 'components/@extended/Avatar';
 import { PopupTransition } from 'components/@extended/Transitions';
 import { DeleteFilled } from '@ant-design/icons';
-import { ClientType } from 'types/client/client';
 import { alertSnackBar } from 'function/alert/alertSnackBar';
+import { useRouter } from 'next/router';
 
 // types
 interface Props {
@@ -11,32 +11,12 @@ interface Props {
   deleteName: string;
   open: boolean;
   handleClose: (status: boolean) => void;
-  onReload: (data: Array<ClientType>) => void;
 }
 
 // ==============================|| 顧客 - 削除 ||============================== //
 
-// export default function AlertCustomerDelete({ deleteId, deleteName, open, handleClose, onReload }: Props) {
-//   const handleDelete = async (deleteId: string) => {
-//     try {
-//       const response = await fetch(`/api/db/client/delete?id=${deleteId}`, {
-//         method: 'DELETE'
-//       });
-
-//       if (!response.ok) {
-//         throw new Error('削除に失敗しました');
-//       }
-
-//       const data = await response.json();
-//       console.log('削除成功:', data);
-//       onReload(data.projects);
-//       handleClose(false);
-//     } catch (error) {
-//       console.error('エラー:', error);
-//     }
-//   };
-
-export default function AlertCustomerDelete({ deleteId, deleteName, open, handleClose, onReload }: Props) {
+export default function AlertCustomerDelete({ deleteId, deleteName, open, handleClose }: Props) {
+  const router = useRouter();
   const handleDelete = (isDelete: boolean) => {
     if (isDelete) {
       alertSnackBar('処理中…', 'secondary');
@@ -49,8 +29,8 @@ export default function AlertCustomerDelete({ deleteId, deleteName, open, handle
         })
         .then((data) => {
           console.log(data.data);
-          onReload(data.data);
           alertSnackBar('正常に削除されました。', 'success');
+          router.push(`/client`);
         })
         .catch((error) => {
           console.error('エラー:', error);
