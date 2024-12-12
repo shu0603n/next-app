@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../prisma';
+import pLimit from 'p-limit'; // 並列処理数を制限
 
 export const maxDuration = 300;
 
@@ -42,16 +43,20 @@ async function processStaffData(staffData: any[]) {
       };
     });
 
-    // 一度にすべてのデータを挿入するのではなく、データをいくつかのバッチに分けて並列処理
     const batchSize = 100; // 一度に処理するデータのサイズ
+    const limit = pLimit(5); // 並列処理数を制限（例: 同時に5つのバッチを処理）
     const promises = [];
+
+    // バッチ処理を並列に実行
     for (let i = 0; i < formattedData.length; i += batchSize) {
       const batch = formattedData.slice(i, i + batchSize);
 
-      // 各バッチごとに挿入処理を並列で実行
-      const insertPromise = prisma.staff.createMany({
-        data: batch,
-      });
+      // 各バッチを並列で処理
+      const insertPromise = limit(() =>
+        prisma.staff.createMany({
+          data: batch
+        })
+      );
 
       promises.push(insertPromise);
     }
