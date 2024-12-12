@@ -141,9 +141,31 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
 };
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
+  let statusRecord;
   try {
     if (request.method === 'POST') {
       const { id } = request.query;
+
+      // 現在の処理状態を返す
+      const status = await prisma.send_mail_status.findFirst({
+        orderBy: { start_at: 'desc' } // start_atでソート
+      });
+
+      const currentTime = new Date();
+      if (status && status.start_at && currentTime.getTime() - new Date(status.start_at).getTime() < 30000) {
+        return response.status(429).json({
+          error: '前回の処理が開始されてから30秒以内です。少し時間をおいて再試行してください。'
+        });
+      }
+
+      // メール送信処理を開始し、ステータスを「processing」に設定
+      statusRecord = await prisma.send_mail_status.create({
+        data: {
+          status: 'processing',
+          error_log: '',
+          start_at: new Date() // start_atに現在の時間を設定
+        }
+      });
 
       const mailDestinations = await prisma.mail_destination.findMany({
         where: {
@@ -165,12 +187,37 @@ export default async function handler(request: NextApiRequest, response: NextApi
       });
 
       await sendEmailsInBackground(mailDestinations, accounts, maxDuration);
+
+      // メール送信完了後、ステータスを更新
+      await prisma.send_mail_status.update({
+        where: { id: statusRecord.id },
+        data: {
+          status: 'completed',
+          error_log: '',
+          end_at: new Date() // end_atに現在の時間を設定
+        }
+      });
+
       return response.status(200).json({ message: 'メール送信処理が完了しました。' });
     }
 
     return response.status(405).json({ error: 'Method Not Allowed' });
   } catch (error) {
     console.error('エラーが発生しました:', error);
+
+    // エラー時にステータスを「failed」に更新
+    if (statusRecord) {
+      await prisma.send_mail_status.update({
+        where: { id: statusRecord.id },
+        data: {
+          status: 'failed',
+          error_log: JSON.stringify(error),
+          end_at: new Date() // end_atに現在の時間を設定
+        }
+      });
+    }
+
     return response.status(500).json({ error: 'データを取得できませんでした。' });
   }
 }
+

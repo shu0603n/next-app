@@ -53,16 +53,23 @@ const TabProfile = () => {
       fetch(`/api/sendMail/sendAllAtOnce?id=${id}`, requestOptions)
         .then((response) => {
           if (!response.ok) {
-            throw new Error('更新に失敗しました。');
+            if (response.status === 429) {
+              // エラー時にresponseをエラーオブジェクトに追加
+              const error = new Error('前回の処理が開始されてから30秒以内です。少し時間をおいて再試行してください。');
+              throw error;
+            }
+            // エラー時にresponseをエラーオブジェクトに追加
+            const error = new Error('送信処理中にエラーが発生しました。');
+            throw error;
           }
           return response.json();
         })
         .then((data) => {
-          alertSnackBar('処理を開始しました。', 'success');
+          alertSnackBar('送信処理が完了しました。', 'success');
         })
         .catch((error) => {
           console.error('エラー:', error);
-          alertSnackBar('データの更新に失敗しました。', 'error');
+          alertSnackBar(error.message, 'error');
         })
         .finally(() => {
           setLoading(false); // ローディング終了
