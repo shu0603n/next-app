@@ -127,9 +127,33 @@ const TabProfile = () => {
     });
   };
 
-  function areAllComplete() {
+  const areAllComplete = () => {
     return mailDestinationData?.every((item) => item.complete_flg === 1) ?? false;
-  }
+  };
+  const getErrorReason = (str: string) => {
+    try {
+      // JSONを解析
+      const data = JSON.parse(str);
+
+      // 必要なプロパティが存在するか確認
+      if (!data.responseCode) {
+        return 'エラーコードがありません';
+      }
+
+      // responseCodeに基づいてエラー理由を返す
+      switch (data.responseCode) {
+        case 454:
+          return '試行回数が多すぎます';
+        case 535:
+          return 'アカウント情報に誤りがあります';
+        default:
+          return `不明なエラーコード: ${data.responseCode}`;
+      }
+    } catch (e) {
+      // JSON解析エラーの場合
+      return str;
+    }
+  };
 
   return (
     <Grid container spacing={3}>
@@ -213,11 +237,29 @@ const TabProfile = () => {
                                 {/* 送信状態を表示 */}
                                 <Grid item xs={6}>
                                   {item.complete_flg === 1 ? (
-                                    <Chip color="success" label="送信完了" onClick={() => alert(item?.log)} size="small" variant="light" />
+                                    <Chip
+                                      color="success"
+                                      label="送信完了"
+                                      onClick={() => alert(getErrorReason(item?.log))}
+                                      size="small"
+                                      variant="light"
+                                    />
                                   ) : item.complete_flg === -1 ? (
-                                    <Chip color="error" label="送信エラー" onClick={() => alert(item?.log)} size="small" variant="light" />
+                                    <Chip
+                                      color="error"
+                                      label="送信エラー"
+                                      onClick={() => alert(getErrorReason(item?.log))}
+                                      size="small"
+                                      variant="light"
+                                    />
                                   ) : (
-                                    <Chip color="primary" label="未送信" onClick={() => alert(item?.log)} size="small" variant="light" />
+                                    <Chip
+                                      color="primary"
+                                      label="未送信"
+                                      onClick={() => alert(getErrorReason(item?.log))}
+                                      size="small"
+                                      variant="light"
+                                    />
                                   )}
                                 </Grid>
 
