@@ -6,6 +6,9 @@ import pLimit from 'p-limit';
 // タイムアウト時間の設定
 export const maxDuration = 300;
 
+// トークンをキャッシュするためのオブジェクト
+const tokenCache = new Map();
+
 const sendEmailsInBackground = async (mailDestinations: any, account: any, maxDuration: number) => {
   try {
     const limit = pLimit(10); // 並列処理数の制限
@@ -15,17 +18,26 @@ const sendEmailsInBackground = async (mailDestinations: any, account: any, maxDu
     const emailPromises = mailDestinations.map(async (item: any, index: number) => {
       return limit(async () => {
         const accountIndex = index % account.length;
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: account[accountIndex].user,
-            pass: account[accountIndex].pass
-          }
-        } as TransportOptions);
+        const cachedToken = tokenCache.get(account[accountIndex].user);
+
+        if (!cachedToken) {
+          // トークンがキャッシュされていない場合、新しいトークンを取得してキャッシュ
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: account[accountIndex].user,
+              pass: account[accountIndex].pass
+            }
+          } as TransportOptions);
+
+          tokenCache.set(account[accountIndex].user, transporter);
+        }
+
+        const transporter = tokenCache.get(account[accountIndex].user);
 
         const mailOptions: nodemailer.SendMailOptions = {
           to: item.staff.mail,
-          from: `\"トライブ株式会社 北海道支店\" <saiyo-hokkaido@tribe-group.jp>`,
+          from: `"トライブ株式会社 北海道支店" <saiyo-hokkaido@tribe-group.jp>`,
           subject: item.mail_list.title,
           html: `
             <p>${item.staff.name} 様</p>

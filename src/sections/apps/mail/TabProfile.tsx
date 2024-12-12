@@ -45,10 +45,27 @@ const TabProfile = () => {
         throw new Error('ステータス確認に失敗しました。');
       }
       const data = await response.json();
-      alertSnackBar(`ステータス：${data.status.status}`, 'success');
+      switch (data.status.status) {
+        case 'completed':
+          alertSnackBar('ステータス：完了済み', 'success');
+          return true;
+        case 'processing':
+          alertSnackBar('ステータス：実行中', 'secondary');
+          return false;
+        case 'timeout':
+          alertSnackBar('ステータス：タイムアウト', 'error');
+          return false;
+        case 'error':
+          alertSnackBar('ステータス：エラー', 'error');
+          return false;
+        default:
+          alertSnackBar('ステータス：不明なエラー', 'error');
+          return false;
+      }
     } catch (error) {
       console.error('ステータス確認エラー:', error);
       alertSnackBar('ステータス確認に失敗しました。', 'error');
+      return false;
     }
   };
 
@@ -102,8 +119,12 @@ const TabProfile = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 空の依存リストを指定することで、一度だけ実行される
 
-  const handleEdit = () => {
-    sendMail();
+  const handleEdit = async () => {
+    await checkProcessingStatus().then((status) => {
+      if (status) {
+        sendMail();
+      }
+    });
   };
 
   function areAllComplete() {
