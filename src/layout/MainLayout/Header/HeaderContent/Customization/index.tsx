@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { Accordion, AccordionDetails, AccordionSummary, Box, Drawer, Stack, Typography } from '@mui/material';
 
-// project import
+// プロジェクトのインポート
 import ThemeLayout from './ThemeLayout';
 import DefaultThemeMode from './ThemeMode';
 import ColorScheme from './ColorScheme';
@@ -17,10 +17,10 @@ import AnimateButton from 'components/@extended/AnimateButton';
 import SimpleBar from 'components/third-party/SimpleBar';
 import useConfig from 'hooks/useConfig';
 
-// types
+// 型のインポート
 import { ThemeMode } from 'types/config';
 
-// assets
+// アイコンのインポート
 import {
   LayoutOutlined,
   HighlightOutlined,
@@ -31,7 +31,7 @@ import {
   FontColorsOutlined
 } from '@ant-design/icons';
 
-// ==============================|| HEADER CONTENT - CUSTOMIZATION ||============================== //
+// ==============================|| ヘッダーコンテンツ - カスタマイズ ||============================== //
 
 const Customization = () => {
   const theme = useTheme();
@@ -66,7 +66,7 @@ const Customization = () => {
           variant="light"
           sx={{ color: 'text.primary', bgcolor: open ? iconBackColorOpen : iconBackColor }}
           onClick={handleToggle}
-          aria-label="settings toggler"
+          aria-label="設定"
         >
           <AnimateButton type="rotate">
             <SettingOutlined />
@@ -88,7 +88,7 @@ const Customization = () => {
       >
         {open && (
           <MainCard
-            title="Theme Customization"
+            title="テーマのカスタマイズ"
             sx={{
               border: 'none',
               borderRadius: 0,
@@ -137,16 +137,16 @@ const Customization = () => {
                         color="primary"
                         sx={{ bgcolor: 'primary.lighter' }}
                         onClick={handleToggle}
-                        aria-label="settings toggler"
+                        aria-label="設定トグル"
                       >
                         <LayoutOutlined />
                       </IconButton>
                       <Stack>
                         <Typography variant="subtitle1" color="textPrimary">
-                          Theme Layout
+                          テーマレイアウト
                         </Typography>
                         <Typography variant="caption" color="textSecondary">
-                          Choose your layout
+                          レイアウトを選択
                         </Typography>
                       </Stack>
                     </Stack>
@@ -161,16 +161,16 @@ const Customization = () => {
                         color="primary"
                         sx={{ bgcolor: 'primary.lighter' }}
                         onClick={handleToggle}
-                        aria-label="settings toggler"
+                        aria-label="設定トグル"
                       >
                         <BorderInnerOutlined />
                       </IconButton>
                       <Stack>
                         <Typography variant="subtitle1" color="textPrimary">
-                          Menu Orientation
+                          メニューの方向
                         </Typography>
                         <Typography variant="caption" color="textSecondary">
-                          Choose Vertical or Horizontal Menu Orientation
+                          垂直または水平メニューの方向を選択
                         </Typography>
                       </Stack>
                     </Stack>
@@ -185,16 +185,16 @@ const Customization = () => {
                         color="primary"
                         sx={{ bgcolor: 'primary.lighter' }}
                         onClick={handleToggle}
-                        aria-label="settings toggler"
+                        aria-label="設定トグル"
                       >
                         <HighlightOutlined />
                       </IconButton>
                       <Stack>
                         <Typography variant="subtitle1" color="textPrimary">
-                          Theme Mode
+                          テーマモード
                         </Typography>
                         <Typography variant="caption" color="textSecondary">
-                          Choose light or dark mode
+                          ライトモードまたはダークモードを選択
                         </Typography>
                       </Stack>
                     </Stack>
@@ -209,16 +209,16 @@ const Customization = () => {
                         color="primary"
                         sx={{ bgcolor: 'primary.lighter' }}
                         onClick={handleToggle}
-                        aria-label="settings toggler"
+                        aria-label="設定トグル"
                       >
                         <BgColorsOutlined />
                       </IconButton>
                       <Stack>
                         <Typography variant="subtitle1" color="textPrimary">
-                          Color Scheme
+                          カラースキーム
                         </Typography>
                         <Typography variant="caption" color="textSecondary">
-                          Choose your primary theme color
+                          プライマリカラーを選択
                         </Typography>
                       </Stack>
                     </Stack>
@@ -233,16 +233,16 @@ const Customization = () => {
                         color="primary"
                         sx={{ bgcolor: 'primary.lighter' }}
                         onClick={handleToggle}
-                        aria-label="settings toggler"
+                        aria-label="設定トグル"
                       >
                         <BorderInnerOutlined />
                       </IconButton>
                       <Stack>
                         <Typography variant="subtitle1" color="textPrimary">
-                          Layout Width
+                          レイアウト幅
                         </Typography>
                         <Typography variant="caption" color="textSecondary">
-                          Choose fluid or container layout
+                          フルイドまたはコンテナレイアウトを選択
                         </Typography>
                       </Stack>
                     </Stack>
@@ -257,16 +257,16 @@ const Customization = () => {
                         color="primary"
                         sx={{ bgcolor: 'primary.lighter' }}
                         onClick={handleToggle}
-                        aria-label="settings toggler"
+                        aria-label="設定トグル"
                       >
                         <FontColorsOutlined />
                       </IconButton>
                       <Stack>
                         <Typography variant="subtitle1" color="textPrimary">
-                          Font Family
+                          フォントファミリー
                         </Typography>
                         <Typography variant="caption" color="textSecondary">
-                          Choose your font family.
+                          フォントファミリーを選択
                         </Typography>
                       </Stack>
                     </Stack>
