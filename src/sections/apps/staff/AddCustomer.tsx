@@ -36,22 +36,12 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
     initialValues: { files: null },
     validationSchema: CustomerSchema,
     onSubmit: async () => {
-      const chunkSize = 100; // 1回のリクエストで送信するデータ数
-      const chunkData = (data: any) => {
-        const chunks = [];
-        for (let i = 0; i < data.length; i += chunkSize) {
-          chunks.push(data.slice(i, i + chunkSize));
-        }
-        return chunks;
-      };
-
       setLoading(true); // ローディング開始
       alertSnackBar('処理中…', 'secondary');
-
       try {
         // 最初にimport_delete APIを呼び出し
         const deleteResponse = await fetch('/api/db/staff/import_delete', {
-          method: 'DELETE',
+          method: 'DELETE'
         });
 
         if (!deleteResponse.ok) {
@@ -61,46 +51,29 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
         const deleteData = await deleteResponse.json();
         console.log('削除完了:', deleteData.message);
 
-        // データを100件ごとに分割
-        const chunks = chunkData(data);
+        // バックエンドで処理を分けるので、データはそのまま送信
+        const response = await fetch('/api/db/staff/import', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data), // ここで全データを一度に送信
+        });
 
-        const processChunks = async () => {
-          try {
-            for (let i = 0; i < chunks.length; i++) {
-              // 1バッチずつ処理
-              const response = await fetch('/api/db/staff/import', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(chunks[i]),
-              });
+        if (!response.ok) {
+          throw new Error('データの更新に失敗しました。');
+        }
 
-              if (!response.ok) {
-                throw new Error(`バッチ${i + 1}の更新に失敗しました。`);
-              }
+        const responseData = await response.json();
+        console.log('データ処理完了:', responseData);
+        alertSnackBar('処理が完了しました。', 'success');
 
-              const responseData = await response.json();
-              console.log(`バッチ${i + 1}処理完了:`, responseData);
-              // 必要であればここでデータを更新する処理を追加
-            }
-
-            alertSnackBar('処理が完了しました。', 'success');
-          } catch (error) {
-            console.error('エラー:', error);
-            alertSnackBar('データの更新に失敗しました。', 'error');
-          } finally {
-            setLoading(false); // ローディング終了
-          }
-        };
-
-        processChunks();
       } catch (error) {
         console.error('エラー:', error);
         alertSnackBar('データ削除に失敗しました。', 'error');
         setLoading(false); // ローディング終了
       }
-    },
+    }
   });
   const { errors, touched, handleSubmit, setFieldValue } = formik;
 

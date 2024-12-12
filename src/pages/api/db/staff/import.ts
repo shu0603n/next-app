@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '../prisma';
 
 export const maxDuration = 300;
+
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   if (request.method === 'POST') {
     const staffData = request.body; // 受け取ったスタッフデータの配列
@@ -26,7 +27,7 @@ function isValidDate(date: string | Date): boolean {
 
 async function processStaffData(staffData: any[]) {
   try {
-    // 新しいデータを一括挿入
+    // スタッフデータを整形
     const formattedData = staffData.map((staff) => {
       // 日付を変換し、無効な場合は `null` に設定
       const birthday = isValidDate(staff.birthday) ? new Date(staff.birthday) : null;
@@ -41,9 +42,22 @@ async function processStaffData(staffData: any[]) {
       };
     });
 
-    await prisma.staff.createMany({
-      data: formattedData
-    });
+    // 一度にすべてのデータを挿入するのではなく、データをいくつかのバッチに分けて並列処理
+    const batchSize = 100; // 一度に処理するデータのサイズ
+    const promises = [];
+    for (let i = 0; i < formattedData.length; i += batchSize) {
+      const batch = formattedData.slice(i, i + batchSize);
+
+      // 各バッチごとに挿入処理を並列で実行
+      const insertPromise = prisma.staff.createMany({
+        data: batch,
+      });
+
+      promises.push(insertPromise);
+    }
+
+    // すべての並列処理が完了するまで待つ
+    await Promise.all(promises);
 
     console.log('スタッフデータ処理完了: すべてのデータがINSERTされました');
   } catch (error) {
