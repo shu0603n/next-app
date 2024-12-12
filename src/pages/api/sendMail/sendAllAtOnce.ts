@@ -165,7 +165,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
         });
       }
 
-      return response.status(200).json({ message: 'メール送信処理がバックグラウンドで開始されました。' });
+      return response.status(200).json({ message: 'メール送信処理が完了しました。' });
     }
 
     return response.status(405).json({ error: 'Method Not Allowed' });
