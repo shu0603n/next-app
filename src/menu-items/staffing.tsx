@@ -54,7 +54,16 @@ const staffing: NavItemType = {
       title: <FormattedMessage id="mail" />,
       type: 'item',
       url: '/mail',
-      icon: icons.MailOutlined
+      icon: icons.MailOutlined,
+      children: [
+        {
+          id: 'mail-detail',
+          title: <FormattedMessage id="mail-detail" />,
+          type: 'item',
+          url: '/mail/detail/[id]/[section]',
+          icon: icons.TeamOutlined
+        }
+      ]
     }
   ]
 };
