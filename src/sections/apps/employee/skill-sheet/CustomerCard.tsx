@@ -84,6 +84,15 @@ const CustomerCard = ({ customer }: { customer: ProjectCardType }) => {
             </Grid>
           </Grid>
           <Grid item xs={12} md={5}>
+            {customer?.people_number !== null && (
+              <Grid item xs={12}>
+                <Typography variant="h5" component="span">
+                  規模・人数
+                </Typography>
+                <Typography>{`${customer?.people_number}人`}</Typography>
+              </Grid>
+            )}
+
             {customer.employee_project_skills?.some((skill) => skill) && (
               <Grid item xs={12}>
                 <Typography variant="h5" component="span">

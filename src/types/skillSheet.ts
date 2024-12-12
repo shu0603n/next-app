@@ -21,7 +21,7 @@ export interface ProjectCardType {
   id: number;
   start_date: string;
   end_date: string;
-  people?: number;
+  people_number?: number;
   client?: ClientType;
   project_position?: ParameterType;
   project_title: string;

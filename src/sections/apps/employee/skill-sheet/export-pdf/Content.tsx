@@ -323,7 +323,7 @@ const Content = ({ list }: Props) => {
                   <Text style={[styles.tableTitle, styles.paddingTopBottom10]}>規模・人数</Text>
                 </View>
                 <View style={[styles.tableCell, styles.center, styles.paddingTopBottom20]}>
-                  <Text>{row.people ? `${row.people}人` : ''}</Text>
+                  <Text>{row.people_number ? `${row.people_number}人` : ''}</Text>
                 </View>
                 <View style={[styles.tableTitle, styles.tableHeader, { backgroundColor: theme.palette.grey[100] }]}>
                   <Text style={[styles.tableTitle, styles.paddingTopBottom10]}>担当工程</Text>

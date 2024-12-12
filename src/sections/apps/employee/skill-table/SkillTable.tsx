@@ -369,7 +369,19 @@ const SkillTable = ({
     [theme]
   );
 
-  const renderRowSubComponent = useCallback(({ row }: { row: Row<{}> }) => <CustomerView data={data[Number(row.id)]} />, [data]);
+  const renderRowSubComponent = useCallback(
+    ({ row }: { row: Row<SkillTableType> }) => {
+      const customerData = data.find((item) => item.id === row.original.id);
+
+      if (!customerData) {
+        return <div>データが見つかりません</div>;
+      }
+
+      return <CustomerView data={customerData} />;
+    },
+    [data]
+  );
+
   return (
     <MainCard content={false}>
       <ScrollX>
@@ -382,7 +394,7 @@ const SkillTable = ({
         />
       </ScrollX>
       <AlertCustomerDelete title={customerDeleteId} open={open} handleClose={handleClose} reloadDataAfterDelete={handleReloadData} />
-      {/* add customer dialog */}
+
       <Dialog
         maxWidth="sm"
         TransitionComponent={PopupTransition}
