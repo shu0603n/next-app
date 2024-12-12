@@ -5,16 +5,28 @@ import pLimit from 'p-limit'; // 並列処理数を制限
 export const maxDuration = 300;
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
-  if (request.method === 'POST') {
+  if (request.method === 'DELETE') {
+    try {
+      // スタッフデータをすべて削除
+      await prisma.staff.deleteMany();
+      response.status(200).json({ message: 'スタッフデータが正常に削除されました。' });
+    } catch (error) {
+      console.error('削除中にエラーが発生しました:', error);
+      response.status(500).json({ error: 'データの削除中にエラーが発生しました。' });
+    }
+  } else if (request.method === 'POST') {
     const staffData = request.body; // 受け取ったスタッフデータの配列
 
-    // 即座にレスポンスを返す
-    response.status(200).json({ message: '処理がバックグラウンドで開始されました' });
+    try {
+      // スタッフデータの処理を待機
+      await processStaffData(staffData);
 
-    // 長時間かかる処理をバックグラウンドで実行
-    processStaffData(staffData).catch((error) => {
+      // 処理が完了した後にレスポンスを返す
+      response.status(200).json({ message: 'スタッフデータの処理が完了しました' });
+    } catch (error) {
       console.error('バックグラウンドで処理中にエラーが発生しました:', error);
-    });
+      response.status(500).json({ error: 'データ処理中にエラーが発生しました' });
+    }
   } else {
     response.status(405).json({ error: 'Method Not Allowed' });
   }
@@ -43,8 +55,8 @@ async function processStaffData(staffData: any[]) {
       };
     });
 
-    const batchSize = 50; // 一度に処理するデータのサイズ
-    const limit = pLimit(2); // 並列処理数を制限（例: 同時に5つのバッチを処理）
+    const batchSize = 10; // 一度に処理するデータのサイズ
+    const limit = pLimit(1); // 並列処理数を制限（例: 同時に1つのバッチを処理）
     const promises = [];
 
     // バッチ処理を並列に実行
@@ -67,5 +79,6 @@ async function processStaffData(staffData: any[]) {
     console.log('スタッフデータ処理完了: すべてのデータがINSERTされました');
   } catch (error) {
     console.error('バックグラウンド処理中にエラーが発生しました:', error);
+    throw error; // エラーが発生した場合は上位にエラーをスロー
   }
 }

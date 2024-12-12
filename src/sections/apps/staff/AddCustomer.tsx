@@ -40,7 +40,7 @@ const AddCustomer = ({ customer, onCancel, onReload }: Props) => {
       alertSnackBar('処理中…', 'secondary');
       try {
         // 最初にimport_delete APIを呼び出し
-        const deleteResponse = await fetch('/api/db/staff/import_delete', {
+        const deleteResponse = await fetch('/api/db/staff/import', {
           method: 'DELETE'
         });
 
