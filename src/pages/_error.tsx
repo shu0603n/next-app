@@ -11,10 +11,10 @@ const Error = ({ statusCode }: ErrorProps) => {
   useEffect(() => {
     if (statusCode === 500) {
       router.replace('/500'); // 500エラー時の遷移先
+    } else {
+      router.replace('/under-construction');
     }
-    if (statusCode !== 500) {
-      router.replace('/500'); // 500エラー時の遷移先
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   // return (
