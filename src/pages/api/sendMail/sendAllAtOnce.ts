@@ -99,6 +99,9 @@ export default async function handler(request: NextApiRequest, response: NextApi
       select: {
         staff: { select: { id: true, name: true, mail: true } },
         mail_list: { select: { title: true, main_text: true } }
+      },
+      orderBy: {
+        staff_id: 'asc'
       }
     });
 

@@ -36,7 +36,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
         update_at: true
       },
       orderBy: {
-        id: 'asc'
+        staff_id: 'asc'
       }
     });
 
