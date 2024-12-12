@@ -166,11 +166,11 @@ const TabProfile = () => {
                                 {/* 送信状態を表示 */}
                                 <Grid item xs={6}>
                                   {item.complete_flg === 1 ? (
-                                    <Chip color="success" label="送信完了" size="small" variant="light" />
+                                    <Chip color="success" label="送信完了" onClick={() => alert(item?.log)} size="small" variant="light" />
                                   ) : item.complete_flg === -1 ? (
-                                    <Chip color="error" label="送信エラー" size="small" variant="light" />
+                                    <Chip color="error" label="送信エラー" onClick={() => alert(item?.log)} size="small" variant="light" />
                                   ) : (
-                                    <Chip color="primary" label="未送信" size="small" variant="light" />
+                                    <Chip color="primary" label="未送信" onClick={() => alert(item?.log)} size="small" variant="light" />
                                   )}
                                 </Grid>
 

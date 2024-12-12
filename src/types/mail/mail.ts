@@ -8,4 +8,5 @@ export type mailListType = {
   staff?: staffType;
   complete_flg: number;
   employee?: EmployeeParameterType;
+  log: string;
 };
