@@ -13,6 +13,7 @@ const sendEmailsInBackground = async (mailDestinations: any, account: any, maxDu
   try {
     const limit = pLimit(10); // 並列処理数の制限
 
+    const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
     const timeoutPromise = (ms: number) => new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
 
     const emailPromises = mailDestinations.map(async (item: any, index: number) => {
@@ -61,6 +62,7 @@ const sendEmailsInBackground = async (mailDestinations: any, account: any, maxDu
         if (item.staff.mail && item.staff.mail.length !== 0) {
           try {
             await transporter.sendMail(mailOptions);
+            await sleep(10000); // 各メール送信後に10秒スリープ
 
             await prisma.mail_destination.updateMany({
               where: {
