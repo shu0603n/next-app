@@ -107,7 +107,7 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
           } catch (error: any) {
             console.error('メール送信エラー:', item.staff.mail, error);
 
-            if ([454, 535].includes(error?.responseCode)) {
+            if ([454, 535, 550].includes(error?.responseCode)) {
               console.warn(`無効化されるアカウント: ${accounts[0].user}`);
               accounts.shift(); // アカウントを削除
             }

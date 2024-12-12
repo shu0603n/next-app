@@ -119,6 +119,8 @@ const TabProfile = () => {
           return '試行回数が多すぎます';
         case 535:
           return 'アカウント情報に誤りがあります';
+        case 550:
+          return '1日に送信できるメールの上限を超えました';
         default:
           return `不明なエラーコード: ${data.responseCode}`;
       }
