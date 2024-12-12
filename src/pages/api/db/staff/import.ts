@@ -41,22 +41,24 @@ function isValidDate(date: string | Date): boolean {
 async function processStaffData(staffData: any[]) {
   try {
     // スタッフデータを整形
-    const formattedData = staffData.map((staff) => {
-      // 日付を変換し、無効な場合は `null` に設定
-      const birthday = isValidDate(staff.birthday) ? new Date(staff.birthday) : null;
+    const formattedData = staffData
+      .filter((staff) => staff.id) // id が存在しないデータを除外
+      .map((staff) => {
+        // 日付を変換し、無効な場合は `null` に設定
+        const birthday = isValidDate(staff.birthday) ? new Date(staff.birthday) : null;
 
-      return {
-        id: staff.id,
-        name: staff.name,
-        mail: staff.mail,
-        birthday, // 無効な日付なら `null` になる
-        staff_status_id: parseInt(staff.staff_status_id),
-        import_status_id: 1 // INSERTの場合は常に 1 を設定
-      };
-    });
+        return {
+          id: staff.id,
+          name: staff.name,
+          mail: staff.mail,
+          birthday, // 無効な日付なら `null` になる
+          staff_status_id: parseInt(staff.staff_status_id),
+          import_status_id: 1 // INSERTの場合は常に 1 を設定
+        };
+      });
 
-    const batchSize = 10; // 一度に処理するデータのサイズ
-    const limit = pLimit(1); // 並列処理数を制限（例: 同時に1つのバッチを処理）
+    const batchSize = 100; // 一度に処理するデータのサイズ
+    const limit = pLimit(5); // 並列処理数を制限（例: 同時に1つのバッチを処理）
     const promises = [];
 
     // バッチ処理を並列に実行
@@ -78,7 +80,7 @@ async function processStaffData(staffData: any[]) {
 
     console.log('スタッフデータ処理完了: すべてのデータがINSERTされました');
   } catch (error) {
-    console.error('バックグラウンド処理中にエラーが発生しました:', error);
+    console.error('エラーが発生しました:', error);
     throw error; // エラーが発生した場合は上位にエラーをスロー
   }
 }
