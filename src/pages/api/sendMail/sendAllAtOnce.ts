@@ -3,92 +3,131 @@ import nodemailer, { TransportOptions } from 'nodemailer';
 import { prisma } from '../db/prisma';
 import pLimit from 'p-limit';
 
-// タイムアウト時間の設定
+// 処理全体のタイムアウト時間の設定(ms)
 export const maxDuration = 300;
 
 // トークンをキャッシュするためのオブジェクト
 const tokenCache = new Map();
+// １回の送信処理のタイムアウト(s)
+const maxTimeOut = 10000; // 10秒
+// １回の送信処理のリトライ回数
+const retries = 3;
 
-const sendEmailsInBackground = async (mailDestinations: any, account: any, maxDuration: number) => {
+// メール送信用トランスポーターを作成またはキャッシュから取得
+const getTransporter = (account: { user: string; pass: string }) => {
+  const cachedTransporter = tokenCache.get(account.user);
+  if (cachedTransporter) {
+    return cachedTransporter;
+  }
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: account.user,
+      pass: account.pass,
+    },
+  } as TransportOptions);
+  tokenCache.set(account.user, transporter);
+  return transporter;
+};
+
+// メールオプションを生成
+const buildMailOptions = (item: any) => {
+  return {
+    to: item.staff.mail,
+    from: `"トライブ株式会社 北海道支店" <saiyo-hokkaido@tribe-group.jp>`,
+    subject: item.mail_list.title,
+    html: `
+      <p>${item.staff.name} 様</p>
+      <br />
+      <p>${item.mail_list.main_text}</p><br />
+      <p>―――――――――――――――――――<br/>
+      トライブ株式会社<br/>
+      E-mail：saiyo-hokkaido@tribe-group.jp<br/>
+      ●北海道支店<br/>
+      〒060-0031<br/>
+      北海道札幌市中央区北1条東1丁目4番地1 サン経成ビル6F<br/>
+      Tel：011-590-4888 Fax：011-590-4887<br/>
+      ――――――――――――――――――――<br/>
+      【秘密保持のお願い】<br/>
+      送信したメールには、個人情報や機密情報が含まれている場合がございます。<br/>
+      誠に恐れ入りますが、誤って送信したメールを受信された際には、このメールのコピー・使用・公開等をなさらず、<br/>
+      速やかに送信元にご連絡いただくとともに、このメールを削除いただきますようお願い申し上げます。<br/>
+      </p>`
+  };
+};
+
+// リトライ付きメール送信
+const sendMailWithRetry = async (transporter: any, mailOptions: any) => {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await transporter.sendMail(mailOptions);
+      return 'success';
+    } catch (error: any) {
+      console.warn(`メール送信エラー (試行 ${attempt}/${retries}):`, error);
+      if (attempt === retries) {
+        throw error;
+      }
+    }
+  }
+};
+
+const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxDuration: number) => {
   try {
     const limit = pLimit(10); // 並列処理数の制限
 
-    const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
-    const timeoutPromise = (ms: number) => new Promise<never>((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
+    const timeoutPromise = (ms: any) => new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
 
-    const emailPromises = mailDestinations.map(async (item: any, index: number) => {
+    const emailPromises = mailDestinations.map((item: any, index: any) => {
       return limit(async () => {
-        const accountIndex = index % account.length;
-        const cachedToken = tokenCache.get(account[accountIndex].user);
+        const accountIndex = index % accounts.length;
 
-        if (!cachedToken) {
-          // トークンがキャッシュされていない場合、新しいトークンを取得してキャッシュ
-          const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-              user: account[accountIndex].user,
-              pass: account[accountIndex].pass
-            }
-          } as TransportOptions);
-
-          tokenCache.set(account[accountIndex].user, transporter);
+        if (accounts.length === 0) {
+          throw new Error('全てのメールアカウントが無効化されました。');
         }
 
-        const transporter = tokenCache.get(account[accountIndex].user);
+        const currentAccount = accounts[accountIndex];
+        const transporter = getTransporter(currentAccount);
 
-        const mailOptions: nodemailer.SendMailOptions = {
-          to: item.staff.mail,
-          from: `"トライブ株式会社 北海道支店" <saiyo-hokkaido@tribe-group.jp>`,
-          subject: item.mail_list.title,
-          html: `
-            <p>${item.staff.name} 様</p>
-            <br />
-            <p>${item.mail_list.main_text}</p><br />
-            <p>―――――――――――――――――――<br/>
-            トライブ株式会社<br/>
-            E-mail：saiyo-hokkaido@tribe-group.jp<br/>
-            ●北海道支店<br/>
-            〒060-0031<br/>
-            北海道札幌市中央区北1条東1丁目4番地1 サン経成ビル6F<br/>
-            Tel：011-590-4888 Fax：011-590-4887<br/>
-            ――――――――――――――――――――<br/>
-            【秘密保持のお願い】<br/>
-            送信したメールには、個人情報や機密情報が含まれている場合がございます。<br/>
-            誠に恐れ入りますが、誤って送信したメールを受信された際には、このメールのコピー・使用・公開等をなさらず、<br/>
-            速やかに送信元にご連絡いただくとともに、このメールを削除いただきますようお願い申し上げます。<br/>
-            </p>`
-        };
+        const mailOptions = buildMailOptions(item);
 
-        if (item.staff.mail && item.staff.mail.length !== 0) {
+        if (item.staff.mail) {
           try {
-            await transporter.sendMail(mailOptions);
-            await sleep(10000); // 各メール送信後に10秒スリープ
+            await Promise.race([
+              sendMailWithRetry(transporter, mailOptions),
+              timeoutPromise(maxTimeOut), // 30秒のタイムアウト
+            ]);
 
             await prisma.mail_destination.updateMany({
               where: {
                 mail_list_id: item.mail_list_id,
-                staff_id: item.staff.id
+                staff_id: item.staff.id,
               },
               data: {
                 complete_flg: 1,
-                mail_account_id: account[accountIndex].id,
-                log: 'success'
-              }
+                mail_account_id: currentAccount.id,
+                log: 'success',
+              },
             });
             console.log('メール送信完了:', item.staff.mail);
-          } catch (error) {
+          } catch (error: any) {
+            console.error('メール送信エラー:', item.staff.mail, error);
+
+            if ([454, 535].includes(error?.responseCode)) {
+              console.warn(`無効化されるアカウント: ${currentAccount.user}`);
+              accounts.splice(accountIndex, 1);
+            }
+
             await prisma.mail_destination.updateMany({
               where: {
                 mail_list_id: item.mail_list_id,
-                staff_id: item.staff.id
+                staff_id: item.staff.id,
               },
               data: {
                 complete_flg: -1,
-                mail_account_id: account[accountIndex].id,
-                log: JSON.stringify(error)
-              }
+                mail_account_id: currentAccount.id,
+                log: JSON.stringify(error),
+              },
             });
-            console.error('メール送信エラー:', item.staff.mail, error);
           }
         }
       });
@@ -97,76 +136,35 @@ const sendEmailsInBackground = async (mailDestinations: any, account: any, maxDu
     await Promise.race([Promise.all(emailPromises), timeoutPromise(maxDuration * 1000)]);
   } catch (error) {
     console.error('メール送信処理中にエラーが発生しました:', error);
-    throw error; // タイムアウトの場合も含む
+    throw error;
   }
 };
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   try {
-    if (request.method === 'GET') {
-      // 現在の処理状態を返す
-      const status = await prisma.send_mail_status.findFirst({
-        orderBy: { start_at: 'desc' } // start_atでソート
-      });
-      return response.status(200).json({ status });
-    }
-
     if (request.method === 'POST') {
       const { id } = request.query;
 
       const mailDestinations = await prisma.mail_destination.findMany({
         where: {
           mail_list_id: Number(id),
-          OR: [{ complete_flg: null }, { complete_flg: 0 }, { complete_flg: -1 }]
+          OR: [{ complete_flg: null }, { complete_flg: 0 }, { complete_flg: -1 }],
         },
         select: {
           staff: { select: { id: true, name: true, mail: true } },
-          mail_list: { select: { title: true, main_text: true } }
+          mail_list: { select: { title: true, main_text: true } },
         },
         orderBy: {
-          staff_id: 'asc'
-        }
+          staff_id: 'asc',
+        },
       });
 
-      const account = await prisma.mail_account.findMany({
+      const accounts = await prisma.mail_account.findMany({
         where: { use: true },
-        select: { id: true, user: true, pass: true }
+        select: { id: true, user: true, pass: true },
       });
 
-      // メール送信処理を開始し、ステータスを「processing」に設定
-      const statusRecord = await prisma.send_mail_status.create({
-        data: {
-          status: 'processing',
-          error_log: '',
-          start_at: new Date() // start_atに現在の時間を設定
-        }
-      });
-
-      try {
-        // バックグラウンドでメール送信を実行
-        await sendEmailsInBackground(mailDestinations, account, maxDuration);
-
-        // メール送信完了後、ステータスを更新
-        await prisma.send_mail_status.update({
-          where: { id: statusRecord.id },
-          data: {
-            status: 'completed',
-            error_log: '',
-            end_at: new Date() // end_atに現在の時間を設定
-          }
-        });
-      } catch (error: any) {
-        // エラー時、ステータスを更新
-        await prisma.send_mail_status.update({
-          where: { id: statusRecord.id },
-          data: {
-            status: error.message === 'Timeout' ? 'timeout' : 'error',
-            error_log: JSON.stringify(error),
-            end_at: new Date() // end_atに現在の時間を設定
-          }
-        });
-      }
-
+      await sendEmailsInBackground(mailDestinations, accounts, maxDuration);
       return response.status(200).json({ message: 'メール送信処理が完了しました。' });
     }
 

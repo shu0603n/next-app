@@ -38,36 +38,6 @@ const TabProfile = () => {
       throw error;
     }
   }
-  const checkProcessingStatus = async () => {
-    try {
-      const response = await fetch('/api/sendMail/sendAllAtOnce');
-      if (!response.ok) {
-        throw new Error('ステータス確認に失敗しました。');
-      }
-      const data = await response.json();
-      switch (data.status.status) {
-        case 'completed':
-          alertSnackBar('ステータス：完了済み', 'success');
-          return true;
-        case 'processing':
-          alertSnackBar('ステータス：実行中', 'secondary');
-          return false;
-        case 'timeout':
-          alertSnackBar('ステータス：タイムアウト', 'error');
-          return false;
-        case 'error':
-          alertSnackBar('ステータス：エラー', 'error');
-          return false;
-        default:
-          alertSnackBar('ステータス：不明なエラー', 'error');
-          return false;
-      }
-    } catch (error) {
-      console.error('ステータス確認エラー:', error);
-      alertSnackBar('ステータス確認に失敗しました。', 'error');
-      return false;
-    }
-  };
 
   async function sendMail() {
     try {
@@ -120,11 +90,7 @@ const TabProfile = () => {
   }, []); // 空の依存リストを指定することで、一度だけ実行される
 
   const handleEdit = async () => {
-    await checkProcessingStatus().then((status) => {
-      if (status) {
-        sendMail();
-      }
-    });
+    sendMail();
   };
 
   const areAllComplete = () => {
@@ -206,18 +172,6 @@ const TabProfile = () => {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <MainCard title="送信先一覧">
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <Button
-                        variant="outlined"
-                        onClick={() => {
-                          checkProcessingStatus();
-                        }}
-                      >
-                        APIステータスを確認する
-                      </Button>
-                    </Grid>
-                  </Grid>
                   {mailDestinationData && (
                     <Grid container spacing={3}>
                       <Grid item xs={12}>
