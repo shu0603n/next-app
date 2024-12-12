@@ -57,8 +57,12 @@ const buildMailOptions = (item: any) => {
 };
 
 // リトライ付きメール送信
-const sendMailWithRetry = async (transporter: any, mailOptions: any) => {
+const sendMailWithRetry = async (mailOptions: any, accounts: any) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
+    const accountIndex = (attempt - 1) % accounts.length; // リトライ時に異なるアカウントを選択
+    const currentAccount = accounts[accountIndex];
+    const transporter = getTransporter(currentAccount);
+
     try {
       await transporter.sendMail(mailOptions);
       return 'success';
@@ -79,22 +83,13 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
 
     const emailPromises = mailDestinations.map((item: any, index: any) => {
       return limit(async () => {
-        const accountIndex = index % accounts.length;
-
-        if (accounts.length === 0) {
-          throw new Error('全てのメールアカウントが無効化されました。');
-        }
-
-        const currentAccount = accounts[accountIndex];
-        const transporter = getTransporter(currentAccount);
-
         const mailOptions = buildMailOptions(item);
 
         if (item.staff.mail) {
           try {
             await Promise.race([
-              sendMailWithRetry(transporter, mailOptions),
-              timeoutPromise(maxTimeOut), // 30秒のタイムアウト
+              sendMailWithRetry(mailOptions, accounts), // 異なるアカウントでリトライ
+              timeoutPromise(maxTimeOut), // タイムアウト設定
             ]);
 
             await prisma.mail_destination.updateMany({
@@ -104,7 +99,7 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
               },
               data: {
                 complete_flg: 1,
-                mail_account_id: currentAccount.id,
+                mail_account_id: accounts[0].id, // 最初のアカウントIDを記録
                 log: 'success',
               },
             });
@@ -113,8 +108,8 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
             console.error('メール送信エラー:', item.staff.mail, error);
 
             if ([454, 535].includes(error?.responseCode)) {
-              console.warn(`無効化されるアカウント: ${currentAccount.user}`);
-              accounts.splice(accountIndex, 1);
+              console.warn(`無効化されるアカウント: ${accounts[0].user}`);
+              accounts.shift(); // アカウントを削除
             }
 
             await prisma.mail_destination.updateMany({
@@ -124,7 +119,7 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
               },
               data: {
                 complete_flg: -1,
-                mail_account_id: currentAccount.id,
+                mail_account_id: accounts[0]?.id,
                 log: JSON.stringify(error),
               },
             });
@@ -139,6 +134,7 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
     throw error;
   }
 };
+
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   let statusRecord;
