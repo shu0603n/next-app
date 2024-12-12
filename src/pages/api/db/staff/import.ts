@@ -43,8 +43,8 @@ async function processStaffData(staffData: any[]) {
       };
     });
 
-    const batchSize = 100; // 一度に処理するデータのサイズ
-    const limit = pLimit(5); // 並列処理数を制限（例: 同時に5つのバッチを処理）
+    const batchSize = 50; // 一度に処理するデータのサイズ
+    const limit = pLimit(2); // 並列処理数を制限（例: 同時に5つのバッチを処理）
     const promises = [];
 
     // バッチ処理を並列に実行
