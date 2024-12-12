@@ -38,6 +38,20 @@ const TabProfile = () => {
       throw error;
     }
   }
+  const checkProcessingStatus = async () => {
+    try {
+      const response = await fetch('/api/sendMail/sendAllAtOnce');
+      if (!response.ok) {
+        throw new Error('ステータス確認に失敗しました。');
+      }
+      const data = await response.json();
+      alertSnackBar(`ステータス：${data.status.status}`, 'success');
+    } catch (error) {
+      console.error('ステータス確認エラー:', error);
+      alertSnackBar('ステータス確認に失敗しました。', 'error');
+    }
+  };
+
   async function sendMail() {
     try {
       const requestOptions = {
@@ -147,6 +161,18 @@ const TabProfile = () => {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <MainCard title="送信先一覧">
+                  <Grid container spacing={3}>
+                    <Grid item xs={12}>
+                      <Button
+                        variant="outlined"
+                        onClick={() => {
+                          checkProcessingStatus();
+                        }}
+                      >
+                        APIステータスを確認する
+                      </Button>
+                    </Grid>
+                  </Grid>
                   {mailDestinationData && (
                     <Grid container spacing={3}>
                       <Grid item xs={12}>
