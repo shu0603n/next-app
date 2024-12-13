@@ -5,7 +5,10 @@ export const selectDestination = async () => {
   const data = await prisma.staff.findMany({
     where: {
       staff_status_id: {
-        in: [1, 2] // staff_status_idが1(新規), 2（既存）のいずれかであるデータを取得
+        in: [
+          1, 2
+          // , 3, 8
+        ] // staff_status_idが1(新規), 2（既存）, 3,（稼働中, 8,（世論）のいずれかであるデータを取得
       }
     },
     select: {

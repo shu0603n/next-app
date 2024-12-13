@@ -148,9 +148,9 @@ export default async function handler(request: NextApiRequest, response: NextApi
       });
 
       const currentTime = new Date();
-      if (status && status.start_at && currentTime.getTime() - new Date(status.start_at).getTime() < 30000) {
+      if (status && status.start_at && currentTime.getTime() - new Date(status.start_at).getTime() < maxDuration * 1000) {
         return response.status(429).json({
-          error: '前回の処理が開始されてから30秒以内です。少し時間をおいて再試行してください。'
+          error: '前回の処理が開始されてから3分以内です。少し時間をおいて再試行してください。'
         });
       }
 

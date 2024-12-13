@@ -55,7 +55,7 @@ const TabProfile = () => {
           if (!response.ok) {
             if (response.status === 429) {
               // エラー時にresponseをエラーオブジェクトに追加
-              const error = new Error('前回の処理が開始されてから30秒以内です。少し時間をおいて再試行してください。');
+              const error = new Error('前回の処理が開始されてから3分以内です。少し時間をおいて再試行してください。');
               throw error;
             }
             // エラー時にresponseをエラーオブジェクトに追加
