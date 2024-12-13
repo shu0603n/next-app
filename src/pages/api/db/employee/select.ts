@@ -30,7 +30,8 @@ export const selectEmployee = async () => {
         }
       },
       retirement_date: true,
-      joining_date: true
+      joining_date: true,
+      department_id: true
     }
   });
 
