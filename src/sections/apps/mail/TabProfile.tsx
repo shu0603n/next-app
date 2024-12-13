@@ -121,7 +121,7 @@ const TabProfile = () => {
   };
 
   const areAllComplete = () => {
-    return mailDestinationData?.every((item) => item.complete_flg === 1) ?? false;
+    return mailDestinationData?.every((item) => item.complete_flg === 0 || item.complete_flg === 1) ?? false;
   };
   const getErrorReason = (item: any) => {
     try {
