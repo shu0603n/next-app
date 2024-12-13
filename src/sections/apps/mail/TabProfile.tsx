@@ -40,40 +40,60 @@ const TabProfile = () => {
   }
 
   async function sendMail() {
+    let attemptCount = 0; // 試行回数
+    const maxAttempts = 10; // 最大試行回数
+    const interval = 3 * 60 * 1000; // 3分（ミリ秒）
     try {
+      const sendRequest = (requestOptions: any) => {
+        attemptCount++;
+        console.log(`試行回数: ${attemptCount}`);
+
+        fetch(`/api/sendMail/sendAllAtOnce?id=${id}`, requestOptions)
+          .then((response) => {
+            if (!response.ok) {
+              if (response.status === 429) {
+                throw new Error('前回の処理が開始されてから3分以内です。少し時間をおいて再試行してください。');
+              }
+              throw new Error('送信処理中にエラーが発生しました。処理を続行します・・・');
+            }
+            return response.json();
+          })
+          .then((data) => {
+            alertSnackBar('送信処理が完了しました。', 'success');
+            setLoading(false); // 成功したらローディング終了
+            clearInterval(timer); // タイマー停止
+          })
+          .catch((error) => {
+            console.error('エラー:', error);
+            alertSnackBar(error.message, 'error');
+
+            if (attemptCount >= maxAttempts) {
+              alertSnackBar('最大試行回数に到達しました。リクエストを停止します。', 'error');
+              setLoading(false); // ローディング終了
+              clearInterval(timer); // タイマー停止
+            } else {
+              alertSnackBar(`${error.message}(${attemptCount}/${maxAttempts})`, 'secondary');
+            }
+          });
+      };
+
       const requestOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json' // 必要に応じてヘッダーを調整
         }
       };
+      // タイマーを設定して3分ごとにリクエストを送信
+      const timer = setInterval(() => {
+        sendRequest(requestOptions);
 
+        if (attemptCount >= maxAttempts) {
+          clearInterval(timer); // 最大回数に達したらタイマー停止
+        }
+      }, interval);
       setLoading(true); // ローディング開始
       alertSnackBar('処理中…', 'secondary');
-      fetch(`/api/sendMail/sendAllAtOnce?id=${id}`, requestOptions)
-        .then((response) => {
-          if (!response.ok) {
-            if (response.status === 429) {
-              // エラー時にresponseをエラーオブジェクトに追加
-              const error = new Error('前回の処理が開始されてから30秒以内です。少し時間をおいて再試行してください。');
-              throw error;
-            }
-            // エラー時にresponseをエラーオブジェクトに追加
-            const error = new Error('送信処理中にエラーが発生しました。');
-            throw error;
-          }
-          return response.json();
-        })
-        .then((data) => {
-          alertSnackBar('送信処理が完了しました。', 'success');
-        })
-        .catch((error) => {
-          console.error('エラー:', error);
-          alertSnackBar(error.message, 'error');
-        })
-        .finally(() => {
-          setLoading(false); // ローディング終了
-        });
+      sendRequest(requestOptions);
     } catch (error) {
       console.error(error);
     }
@@ -103,10 +123,10 @@ const TabProfile = () => {
   const areAllComplete = () => {
     return mailDestinationData?.every((item) => item.complete_flg === 1) ?? false;
   };
-  const getErrorReason = (str: string) => {
+  const getErrorReason = (item: any) => {
     try {
       // JSONを解析
-      const data = JSON.parse(str);
+      const data = JSON.parse(item.log);
 
       // 必要なプロパティが存在するか確認
       if (!data.responseCode) {
@@ -116,17 +136,17 @@ const TabProfile = () => {
       // responseCodeに基づいてエラー理由を返す
       switch (data.responseCode) {
         case 454:
-          return '試行回数が多すぎます';
+          return item.staff.mail + '試行回数が多すぎます';
         case 535:
-          return 'アカウント情報に誤りがあります';
+          return item.staff.mail + 'アカウント情報に誤りがあります';
         case 550:
-          return '1日に送信できるメールの上限を超えました';
+          return item.staff.mail + '1日に送信できるメールの上限を超えました';
         default:
-          return `不明なエラーコード: ${data.responseCode}`;
+          return item.staff.mail + `不明なエラーコード: ${data.responseCode}`;
       }
     } catch (e) {
       // JSON解析エラーの場合
-      return str;
+      return item;
     }
   };
 
@@ -203,6 +223,14 @@ const TabProfile = () => {
                                     <Chip
                                       color="success"
                                       label="送信完了"
+                                      onClick={() => alert(getErrorReason(item))}
+                                      size="small"
+                                      variant="light"
+                                    />
+                                  ) : item.complete_flg === 0 ? (
+                                    <Chip
+                                      color="secondary"
+                                      label="アドレス無し"
                                       onClick={() => alert(getErrorReason(item?.log))}
                                       size="small"
                                       variant="light"
@@ -211,7 +239,7 @@ const TabProfile = () => {
                                     <Chip
                                       color="error"
                                       label="送信エラー"
-                                      onClick={() => alert(getErrorReason(item?.log))}
+                                      onClick={() => alert(getErrorReason(item))}
                                       size="small"
                                       variant="light"
                                     />
@@ -219,7 +247,7 @@ const TabProfile = () => {
                                     <Chip
                                       color="primary"
                                       label="未送信"
-                                      onClick={() => alert(getErrorReason(item?.log))}
+                                      onClick={() => alert(getErrorReason(item))}
                                       size="small"
                                       variant="light"
                                     />
