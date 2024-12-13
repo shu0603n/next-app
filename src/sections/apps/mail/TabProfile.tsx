@@ -123,10 +123,10 @@ const TabProfile = () => {
   const areAllComplete = () => {
     return mailDestinationData?.every((item) => item.complete_flg === 1) ?? false;
   };
-  const getErrorReason = (str: string) => {
+  const getErrorReason = (item: any) => {
     try {
       // JSONを解析
-      const data = JSON.parse(str);
+      const data = JSON.parse(item.log);
 
       // 必要なプロパティが存在するか確認
       if (!data.responseCode) {
@@ -136,17 +136,17 @@ const TabProfile = () => {
       // responseCodeに基づいてエラー理由を返す
       switch (data.responseCode) {
         case 454:
-          return '試行回数が多すぎます';
+          return item.staff.mail + '試行回数が多すぎます';
         case 535:
-          return 'アカウント情報に誤りがあります';
+          return item.staff.mail + 'アカウント情報に誤りがあります';
         case 550:
-          return '1日に送信できるメールの上限を超えました';
+          return item.staff.mail + '1日に送信できるメールの上限を超えました';
         default:
-          return `不明なエラーコード: ${data.responseCode}`;
+          return item.staff.mail + `不明なエラーコード: ${data.responseCode}`;
       }
     } catch (e) {
       // JSON解析エラーの場合
-      return str;
+      return item;
     }
   };
 
@@ -223,6 +223,14 @@ const TabProfile = () => {
                                     <Chip
                                       color="success"
                                       label="送信完了"
+                                      onClick={() => alert(getErrorReason(item))}
+                                      size="small"
+                                      variant="light"
+                                    />
+                                  ) : item.complete_flg === 0 ? (
+                                    <Chip
+                                      color="secondary"
+                                      label="アドレス無し"
                                       onClick={() => alert(getErrorReason(item?.log))}
                                       size="small"
                                       variant="light"
@@ -231,7 +239,7 @@ const TabProfile = () => {
                                     <Chip
                                       color="error"
                                       label="送信エラー"
-                                      onClick={() => alert(getErrorReason(item?.log))}
+                                      onClick={() => alert(getErrorReason(item))}
                                       size="small"
                                       variant="light"
                                     />
@@ -239,7 +247,7 @@ const TabProfile = () => {
                                     <Chip
                                       color="primary"
                                       label="未送信"
-                                      onClick={() => alert(getErrorReason(item?.log))}
+                                      onClick={() => alert(getErrorReason(item))}
                                       size="small"
                                       variant="light"
                                     />

@@ -21,7 +21,7 @@ const getTransporter = (account: { user: string; pass: string }) => {
     service: 'gmail',
     auth: {
       user: account.user,
-      pass: account.pass,
+      pass: account.pass
     },
   } as TransportOptions);
   tokenCache.set(account.user, transporter);
@@ -71,6 +71,8 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
 
     const timeoutPromise = (ms: any) => new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
 
+    let accountIndex = 0; // アカウントを順番に使うためのインデックス
+
     const emailPromises = mailDestinations.map((item: any) => {
       return limit(async () => {
         const mailOptions = buildMailOptions(item);
@@ -78,43 +80,61 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
         // accounts配列が空でないか確認
         if (item.staff.mail && accounts.length > 0) {
           try {
+            const account = accounts[accountIndex]; // 使用するアカウントを取得
+
             await Promise.race([
-              sendMail(mailOptions, accounts[0]), // 最初のアカウントで送信
-              timeoutPromise(maxTimeOut), // タイムアウト設定
+              sendMail(mailOptions, account), // 現在のアカウントで送信
+              timeoutPromise(maxTimeOut) // タイムアウト設定
             ]);
 
             await prisma.mail_destination.updateMany({
               where: {
                 mail_list_id: item.mail_list_id,
-                staff_id: item.staff.id,
+                staff_id: item.staff.id
               },
               data: {
                 complete_flg: 1,
-                mail_account_id: accounts[0].id, // 最初のアカウントIDを記録
-                log: 'success',
-              },
+                mail_account_id: account.id, // 使用したアカウントIDを記録
+                log: 'success'
+              }
             });
-            console.log('メール送信完了:', item.staff.mail);
+
+            console.log('メール送信完了:', item.staff.name, ':', item.staff.mail, `(送信アカウント：${account.name})`);
+
+            // 次のアカウントに切り替え
+            accountIndex = (accountIndex + 1) % accounts.length;
           } catch (error: any) {
-            console.error('メール送信エラー:', item.staff.mail, error);
+            console.error('メール送信エラー:', item.staff.mail, `(送信アカウント: ${accounts[accountIndex].name})`, error);
 
             if ([454, 535, 550].includes(error?.responseCode)) {
-              console.warn(`一時的に無効化されるアカウント: ${accounts[0].user}`);
-              accounts.shift(); // アカウントを削除
+              console.warn(`一時的に無効化されるアカウント: ${accounts[accountIndex].name}`);
+              accounts.splice(accountIndex, 1); // 無効なアカウントを削除
             }
 
             await prisma.mail_destination.updateMany({
               where: {
                 mail_list_id: item.mail_list_id,
-                staff_id: item.staff.id,
+                staff_id: item.staff.id
               },
               data: {
                 complete_flg: -1,
-                mail_account_id: accounts[0]?.id,
-                log: JSON.stringify(error),
-              },
+                mail_account_id: accounts[accountIndex]?.id,
+                log: JSON.stringify(error)
+              }
             });
           }
+        } else if (!item.staff.mail && accounts.length > 0) {
+          console.warn('メールアドレスが存在しません：', item.staff.name);
+          await prisma.mail_destination.updateMany({
+            where: {
+              mail_list_id: item.mail_list_id,
+              staff_id: item.staff.id
+            },
+            data: {
+              complete_flg: 0,
+              log: 'メールアドレス未設定'
+            }
+          });
         } else {
           console.warn('使用可能なアカウントなくなりました。処理を中断します。');
         }
@@ -169,23 +189,25 @@ export default async function handler(request: NextApiRequest, response: NextApi
       const mailDestinations = await prisma.mail_destination.findMany({
         where: {
           mail_list_id: Number(id),
-          OR: [{ complete_flg: null }, { complete_flg: 0 }, { complete_flg: -1 }],
+          OR: [{ complete_flg: null }, { complete_flg: -1 }] //未送信と送信エラーのみ
         },
         select: {
           staff: { select: { id: true, name: true, mail: true } },
-          mail_list: { select: { title: true, main_text: true } },
+          mail_list: { select: { title: true, main_text: true } }
         },
         orderBy: {
-          staff_id: 'asc',
-        },
+          staff_id: 'asc'
+        }
       });
 
       const accounts = await prisma.mail_account.findMany({
         where: { use: true },
-        select: { id: true, user: true, pass: true },
+        select: { id: true, name: true, user: true, pass: true }
       });
+      // ランダムに並び替える
+      const shuffledAccounts = accounts.sort(() => Math.random() - 0.5);
 
-      await sendEmailsInBackground(mailDestinations, accounts, maxDuration);
+      await sendEmailsInBackground(mailDestinations, shuffledAccounts, maxDuration);
 
       // メール送信完了後、ステータスを更新
       await prisma.send_mail_status.update({
@@ -216,6 +238,6 @@ export default async function handler(request: NextApiRequest, response: NextApi
       });
     }
 
-    return response.status(500).json({ error: 'データを取得できませんでした。' });
+    return response.status(500).json({ error: '処理が終了しました' });
   }
 }
