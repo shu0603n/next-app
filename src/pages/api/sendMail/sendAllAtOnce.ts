@@ -10,8 +10,6 @@ export const maxDuration = 300;
 const tokenCache = new Map();
 // １回の送信処理のタイムアウト(s)
 const maxTimeOut = 10000; // 10秒
-// １回の送信処理のリトライ回数
-const retries = 3;
 
 // メール送信用トランスポーターを作成またはキャッシュから取得
 const getTransporter = (account: { user: string; pass: string }) => {
@@ -56,22 +54,14 @@ const buildMailOptions = (item: any) => {
   };
 };
 
-// リトライ付きメール送信
-const sendMailWithRetry = async (mailOptions: any, accounts: any) => {
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    const accountIndex = (attempt - 1) % accounts.length; // リトライ時に異なるアカウントを選択
-    const currentAccount = accounts[accountIndex];
-    const transporter = getTransporter(currentAccount);
-
-    try {
-      await transporter.sendMail(mailOptions);
-      return 'success';
-    } catch (error: any) {
-      console.warn(`メール送信エラー (試行 ${attempt}/${retries}):`, error);
-      if (attempt === retries) {
-        throw error;
-      }
-    }
+// メール送信
+const sendMail = async (mailOptions: any, account: any) => {
+  const transporter = getTransporter(account);
+  try {
+    await transporter.sendMail(mailOptions);
+    return 'success';
+  } catch (error: any) {
+    throw error;
   }
 };
 
@@ -81,14 +71,15 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
 
     const timeoutPromise = (ms: any) => new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
 
-    const emailPromises = mailDestinations.map((item: any, index: any) => {
+    const emailPromises = mailDestinations.map((item: any) => {
       return limit(async () => {
         const mailOptions = buildMailOptions(item);
 
-        if (item.staff.mail) {
+        // accounts配列が空でないか確認
+        if (item.staff.mail && accounts.length > 0) {
           try {
             await Promise.race([
-              sendMailWithRetry(mailOptions, accounts), // 異なるアカウントでリトライ
+              sendMail(mailOptions, accounts[0]), // 最初のアカウントで送信
               timeoutPromise(maxTimeOut), // タイムアウト設定
             ]);
 
@@ -108,7 +99,7 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
             console.error('メール送信エラー:', item.staff.mail, error);
 
             if ([454, 535, 550].includes(error?.responseCode)) {
-              console.warn(`無効化されるアカウント: ${accounts[0].user}`);
+              console.warn(`一時的に無効化されるアカウント: ${accounts[0].user}`);
               accounts.shift(); // アカウントを削除
             }
 
@@ -124,9 +115,16 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
               },
             });
           }
+        } else {
+          console.warn('使用可能なアカウントなくなりました。処理を中断します。');
         }
       });
     });
+
+    // アカウントが無効化された場合に処理を中断
+    if (accounts.length === 0) {
+      throw new Error('使用可能なアカウントがありません。');
+    }
 
     await Promise.race([Promise.all(emailPromises), timeoutPromise(maxDuration * 1000)]);
   } catch (error) {
@@ -134,7 +132,6 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
     throw error;
   }
 };
-
 
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   let statusRecord;
@@ -148,10 +145,16 @@ export default async function handler(request: NextApiRequest, response: NextApi
       });
 
       const currentTime = new Date();
-      if (status && status.start_at && currentTime.getTime() - new Date(status.start_at).getTime() < maxDuration * 1000) {
-        return response.status(429).json({
-          error: '前回の処理が開始されてから3分以内です。少し時間をおいて再試行してください。'
-        });
+      if (status) {
+        if (status.end_at) {
+          // end_atが存在する場合、処理を続行
+          console.log('前回の処理が正常終了しているため、新たに処理を開始します。');
+        } else if (status.start_at && currentTime.getTime() - new Date(status.start_at).getTime() < maxDuration * 1000) {
+          // end_atが存在しない場合、前回の処理が終了していないと判断
+          return response.status(429).json({
+            error: '前回の処理が開始されてから3分以内です。少し時間をおいて再試行してください。'
+          });
+        }
       }
 
       // メール送信処理を開始し、ステータスを「processing」に設定
@@ -216,4 +219,3 @@ export default async function handler(request: NextApiRequest, response: NextApi
     return response.status(500).json({ error: 'データを取得できませんでした。' });
   }
 }
-

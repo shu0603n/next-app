@@ -40,40 +40,60 @@ const TabProfile = () => {
   }
 
   async function sendMail() {
+    let attemptCount = 0; // 試行回数
+    const maxAttempts = 10; // 最大試行回数
+    const interval = 3 * 60 * 1000; // 3分（ミリ秒）
     try {
+      const sendRequest = (requestOptions: any) => {
+        attemptCount++;
+        console.log(`試行回数: ${attemptCount}`);
+
+        fetch(`/api/sendMail/sendAllAtOnce?id=${id}`, requestOptions)
+          .then((response) => {
+            if (!response.ok) {
+              if (response.status === 429) {
+                throw new Error('前回の処理が開始されてから3分以内です。少し時間をおいて再試行してください。');
+              }
+              throw new Error('送信処理中にエラーが発生しました。処理を続行します・・・');
+            }
+            return response.json();
+          })
+          .then((data) => {
+            alertSnackBar('送信処理が完了しました。', 'success');
+            setLoading(false); // 成功したらローディング終了
+            clearInterval(timer); // タイマー停止
+          })
+          .catch((error) => {
+            console.error('エラー:', error);
+            alertSnackBar(error.message, 'error');
+
+            if (attemptCount >= maxAttempts) {
+              alertSnackBar('最大試行回数に到達しました。リクエストを停止します。', 'error');
+              setLoading(false); // ローディング終了
+              clearInterval(timer); // タイマー停止
+            } else {
+              alertSnackBar(`${error.message}(${attemptCount}/${maxAttempts})`, 'secondary');
+            }
+          });
+      };
+
       const requestOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json' // 必要に応じてヘッダーを調整
         }
       };
+      // タイマーを設定して3分ごとにリクエストを送信
+      const timer = setInterval(() => {
+        sendRequest(requestOptions);
 
+        if (attemptCount >= maxAttempts) {
+          clearInterval(timer); // 最大回数に達したらタイマー停止
+        }
+      }, interval);
       setLoading(true); // ローディング開始
       alertSnackBar('処理中…', 'secondary');
-      fetch(`/api/sendMail/sendAllAtOnce?id=${id}`, requestOptions)
-        .then((response) => {
-          if (!response.ok) {
-            if (response.status === 429) {
-              // エラー時にresponseをエラーオブジェクトに追加
-              const error = new Error('前回の処理が開始されてから3分以内です。少し時間をおいて再試行してください。');
-              throw error;
-            }
-            // エラー時にresponseをエラーオブジェクトに追加
-            const error = new Error('送信処理中にエラーが発生しました。');
-            throw error;
-          }
-          return response.json();
-        })
-        .then((data) => {
-          alertSnackBar('送信処理が完了しました。', 'success');
-        })
-        .catch((error) => {
-          console.error('エラー:', error);
-          alertSnackBar(error.message, 'error');
-        })
-        .finally(() => {
-          setLoading(false); // ローディング終了
-        });
+      sendRequest(requestOptions);
     } catch (error) {
       console.error(error);
     }
