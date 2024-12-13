@@ -23,4 +23,5 @@ export type EmployeeType = {
   remarks: string;
   avatar: string;
   status: number;
+  department_id: number;
 };
