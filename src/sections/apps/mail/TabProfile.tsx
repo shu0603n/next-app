@@ -218,7 +218,7 @@ const TabProfile = () => {
               <Grid item xs={12}>
                 <MainCard title="本日の送信アカウント数">
                   <List sx={{ py: 0 }}>
-                    <ListItem>
+                    <ListItem divider={!matchDownMD}>
                       <Grid container spacing={1}>
                         {account &&
                           account.map((item, i) => (
@@ -229,7 +229,7 @@ const TabProfile = () => {
                               <Grid item xs={6} key={i}>
                                 <Typography sx={{ lineHeight: 1.2 }}>{`${item?.count ?? 0}/1500`}</Typography>
                               </Grid>
-                           </>
+                            </>
                           ))}
                       </Grid>
                     </ListItem>
@@ -237,7 +237,7 @@ const TabProfile = () => {
                 </MainCard>
                 <MainCard title="このメールでの送信アカウント数">
                   <List sx={{ py: 0 }}>
-                    <ListItem>
+                    <ListItem divider={!matchDownMD}>
                       <Grid container spacing={1}>
                         {account_mail_list &&
                           account_mail_list.map((item, i) => (
@@ -265,7 +265,7 @@ const TabProfile = () => {
                     </Grid>
                   )}
                   <List sx={{ py: 0 }}>
-                    <ListItem>
+                    <ListItem divider={!matchDownMD}>
                       <Grid container spacing={1}>
                         {mailDestinationData &&
                           mailDestinationData.map((item, i) => (
