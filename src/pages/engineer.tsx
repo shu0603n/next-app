@@ -30,19 +30,19 @@ import ScrollX from 'components/ScrollX';
 import Avatar from 'components/@extended/Avatar';
 import { CSVExport, HeaderSort, SortingSelect, TablePagination } from 'components/third-party/ReactTable';
 
-import AddCustomer from 'sections/apps/employee/AddCustomer';
+import AddCustomer from 'sections/apps/engineer/AddCustomer';
 import { renderFilterTypes, GlobalFilter } from 'utils/react-table';
 // assets
 import { PlusOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/router';
-import { EmployeeType } from 'types/employee/employee';
+import { EngineerType } from 'types/engineer/engineer';
 import useUser from 'hooks/useUser';
 
 // ==============================|| REACT TABLE ||============================== //
 
 interface Props {
   columns: Column[];
-  data: Array<EmployeeType>;
+  data: Array<EngineerType>;
   handleAdd: () => void;
   getHeaderProps: (column: HeaderGroup) => {};
 }
@@ -98,7 +98,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
   }, [matchDownSM]);
 
   const handleChangeDetail = (newValue: string) => {
-    router.push(`/employee/detail/${newValue}/basic`);
+    router.push(`/engineer/detail/${newValue}/basic`);
   };
 
   return (
@@ -183,7 +183,7 @@ function ReactTable({ columns, data, handleAdd, getHeaderProps }: Props) {
 // ==============================|| CUSTOMER - LIST ||============================== //
 async function fetchTableData() {
   try {
-    const response = await fetch('/api/db/employee/select');
+    const response = await fetch('/api/db/engineer/select');
     if (!response.ok) {
       throw new Error('API request failed');
     }
@@ -199,14 +199,13 @@ const CustomerEmployeePage = () => {
   const theme = useTheme();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const [tableData, setTableData] = useState<Array<EmployeeType>>(); // データを保持する状態変数
+  const [tableData, setTableData] = useState<Array<EngineerType>>(); // データを保持する状態変数
 
   useEffect(() => {
     // ページがロードされたときにデータを取得
     fetchTableData()
       .then((data) => {
-        const filteredData = data.data.filter((item: EmployeeType) => item.department_id === 2);
-        setTableData(filteredData);
+        setTableData(data.data);
       })
       .catch((error) => {
         // エラーハンドリング

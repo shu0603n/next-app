@@ -55,7 +55,6 @@ const engineering: NavItemType = {
       type: 'item',
       url: '/engineer',
       icon: icons.TeamOutlined,
-      disabled: true,
       children: [
         {
           id: 'engineer-detail',
