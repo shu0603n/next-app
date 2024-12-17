@@ -24,7 +24,8 @@ const TabProfile = () => {
 
   const [data, setData] = useState<mailListType>();
   const [mailDestinationData, setMailDestinationData] = useState<Array<mailListType>>();
-
+  const [account, setAccount] = useState<Array<{ name: string; count: Number }>>();
+  const [account_mail_list, setAccount_mail_list] = useState<Array<{ name: string; count: Number }>>();
   async function fetchTableData(id: string) {
     try {
       const response = await fetch(`/api/db/mail/basic/select?id=${id}`);
@@ -43,6 +44,7 @@ const TabProfile = () => {
     let attemptCount = 0; // 試行回数
     const maxAttempts = 10; // 最大試行回数
     const interval = 3 * 60 * 1000; // 3分（ミリ秒）
+
     try {
       const sendRequest = (requestOptions: any) => {
         attemptCount++;
@@ -51,10 +53,14 @@ const TabProfile = () => {
         fetch(`/api/sendMail/sendAllAtOnce?id=${id}`, requestOptions)
           .then((response) => {
             if (!response.ok) {
+              console.log(response.status);
               if (response.status === 429) {
                 throw new Error('前回の処理が開始されてから3分以内です。少し時間をおいて再試行してください。');
               }
-              throw new Error('送信処理中にエラーが発生しました。処理を続行します・・・');
+              if (response.status === 422) {
+                throw { retry: true, message: '送信処理中にエラーが発生しました。処理を続行します・・・' };
+              }
+              throw new Error('予期せぬエラーが発生しました。');
             }
             return response.json();
           })
@@ -64,15 +70,18 @@ const TabProfile = () => {
             clearInterval(timer); // タイマー停止
           })
           .catch((error) => {
-            console.error('エラー:', error);
-            alertSnackBar(error.message, 'error');
-
-            if (attemptCount >= maxAttempts) {
+            if (error.retry) {
+              console.warn(`再試行: ${error.message}`);
+              alertSnackBar(`${error.message}(${attemptCount}/${maxAttempts})`, 'secondary');
+            } else if (attemptCount >= maxAttempts) {
               alertSnackBar('最大試行回数に到達しました。リクエストを停止します。', 'error');
               setLoading(false); // ローディング終了
               clearInterval(timer); // タイマー停止
             } else {
-              alertSnackBar(`${error.message}(${attemptCount}/${maxAttempts})`, 'secondary');
+              console.error('エラー:', error);
+              alertSnackBar(error.message, 'error');
+              setLoading(false); // ローディング終了
+              clearInterval(timer); // タイマー停止
             }
           });
       };
@@ -80,17 +89,20 @@ const TabProfile = () => {
       const requestOptions = {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json' // 必要に応じてヘッダーを調整
-        }
+          'Content-Type': 'application/json', // 必要に応じてヘッダーを調整
+        },
       };
+
       // タイマーを設定して3分ごとにリクエストを送信
       const timer = setInterval(() => {
+        getUpdateData();
         sendRequest(requestOptions);
 
         if (attemptCount >= maxAttempts) {
           clearInterval(timer); // 最大回数に達したらタイマー停止
         }
       }, interval);
+
       setLoading(true); // ローディング開始
       alertSnackBar('処理中…', 'secondary');
       sendRequest(requestOptions);
@@ -98,11 +110,14 @@ const TabProfile = () => {
       console.error(error);
     }
   }
+
   const getUpdateData = () => {
     fetchTableData(id)
       .then((data) => {
         setData(data.mailList);
         setMailDestinationData(data.mailDestination);
+        setAccount(data.sent_account);
+        setAccount_mail_list(data.sent_account_with_mail_list);
       })
       .catch((error) => {
         // エラーハンドリング
@@ -117,6 +132,7 @@ const TabProfile = () => {
   }, []); // 空の依存リストを指定することで、一度だけ実行される
 
   const handleEdit = async () => {
+    getUpdateData();
     sendMail();
   };
 
@@ -200,6 +216,44 @@ const TabProfile = () => {
           <Grid item xs={12} sm={5} md={4} xl={3}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
+                <MainCard title="本日の送信アカウント数">
+                  <List sx={{ py: 0 }}>
+                    <ListItem>
+                      <Grid container spacing={1}>
+                        {account &&
+                          account.map((item, i) => (
+                            <>
+                              <Grid item xs={6} key={i}>
+                                <Typography sx={{ lineHeight: 1.2 }}>{item?.name}</Typography>
+                              </Grid>
+                              <Grid item xs={6} key={i}>
+                                <Typography sx={{ lineHeight: 1.2 }}>{`${item?.count ?? 0}/1500`}</Typography>
+                              </Grid>
+                           </>
+                          ))}
+                      </Grid>
+                    </ListItem>
+                  </List>
+                </MainCard>
+                <MainCard title="このメールでの送信アカウント数">
+                  <List sx={{ py: 0 }}>
+                    <ListItem>
+                      <Grid container spacing={1}>
+                        {account_mail_list &&
+                          account_mail_list.map((item, i) => (
+                            <>
+                              <Grid item xs={6} key={i}>
+                                <Typography sx={{ lineHeight: 1.2 }}>{item?.name}</Typography>
+                              </Grid>
+                              <Grid item xs={6} key={i}>
+                                <Typography sx={{ lineHeight: 1.2 }}>{`${item?.count ?? 0}/1500`}</Typography>
+                              </Grid>
+                            </>
+                          ))}
+                      </Grid>
+                    </ListItem>
+                  </List>
+                </MainCard>
                 <MainCard title="送信先一覧">
                   {mailDestinationData && (
                     <Grid container spacing={3}>
@@ -211,56 +265,54 @@ const TabProfile = () => {
                     </Grid>
                   )}
                   <List sx={{ py: 0 }}>
-                    <ListItem divider={!matchDownMD}>
-                      <Grid container spacing={3}>
-                        <Grid item xs={12}>
-                          {mailDestinationData &&
-                            mailDestinationData.map((item, i) => (
-                              <Grid container spacing={1} key={i}>
-                                {/* 送信状態を表示 */}
-                                <Grid item xs={6}>
-                                  {item.complete_flg === 1 ? (
-                                    <Chip
-                                      color="success"
-                                      label="送信完了"
-                                      onClick={() => alert(getErrorReason(item))}
-                                      size="small"
-                                      variant="light"
-                                    />
-                                  ) : item.complete_flg === 0 ? (
-                                    <Chip
-                                      color="secondary"
-                                      label="アドレス無し"
-                                      onClick={() => alert(getErrorReason(item?.log))}
-                                      size="small"
-                                      variant="light"
-                                    />
-                                  ) : item.complete_flg === -1 ? (
-                                    <Chip
-                                      color="error"
-                                      label="送信エラー"
-                                      onClick={() => alert(getErrorReason(item))}
-                                      size="small"
-                                      variant="light"
-                                    />
-                                  ) : (
-                                    <Chip
-                                      color="primary"
-                                      label="未送信"
-                                      onClick={() => alert(getErrorReason(item))}
-                                      size="small"
-                                      variant="light"
-                                    />
-                                  )}
-                                </Grid>
-
-                                {/* スタッフ名を表示 */}
-                                <Grid item xs={6}>
-                                  <Typography sx={{ lineHeight: 1.2 }}>{item?.staff?.name}</Typography>
-                                </Grid>
+                    <ListItem>
+                      <Grid container spacing={1}>
+                        {mailDestinationData &&
+                          mailDestinationData.map((item, i) => (
+                            <Grid container spacing={12} key={i}>
+                              {/* 送信状態を表示 */}
+                              <Grid item xs={6}>
+                                {item.complete_flg === 1 ? (
+                                  <Chip
+                                    color="success"
+                                    label="送信完了"
+                                    onClick={() => alert(getErrorReason(item))}
+                                    size="small"
+                                    variant="light"
+                                  />
+                                ) : item.complete_flg === 0 ? (
+                                  <Chip
+                                    color="secondary"
+                                    label="アドレス無し"
+                                    onClick={() => alert(getErrorReason(item?.log))}
+                                    size="small"
+                                    variant="light"
+                                  />
+                                ) : item.complete_flg === -1 ? (
+                                  <Chip
+                                    color="error"
+                                    label="送信エラー"
+                                    onClick={() => alert(getErrorReason(item))}
+                                    size="small"
+                                    variant="light"
+                                  />
+                                ) : (
+                                  <Chip
+                                    color="primary"
+                                    label="未送信"
+                                    onClick={() => alert(getErrorReason(item))}
+                                    size="small"
+                                    variant="light"
+                                  />
+                                )}
                               </Grid>
-                            ))}
-                        </Grid>
+
+                              {/* スタッフ名を表示 */}
+                              <Grid item xs={6}>
+                                <Typography sx={{ lineHeight: 1.2 }}>{item?.staff?.name}</Typography>
+                              </Grid>
+                            </Grid>
+                          ))}
                       </Grid>
                     </ListItem>
                   </List>
