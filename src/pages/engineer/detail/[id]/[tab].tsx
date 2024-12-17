@@ -10,12 +10,12 @@ import { Box, Tab, Tabs } from '@mui/material';
 import Layout from 'layout';
 import Page from 'components/Page';
 import MainCard from 'components/MainCard';
-import TabProfile from 'sections/apps/employee/TabProfile';
-import TabSkill from 'sections/apps/employee/TabSkill';
-import TabInvoice from 'sections/apps/employee/TabInvoice';
-import TabPassword from 'sections/apps/employee/TabPassword';
-import TabSettings from 'sections/apps/employee/TabSettings';
-import TabWorkHistory from 'sections/apps/employee/TabWorkHistory';
+import TabProfile from 'sections/apps/engineer/TabProfile';
+import TabSkill from 'sections/apps/engineer/TabSkill';
+import TabInvoice from 'sections/apps/engineer/TabInvoice';
+import TabPassword from 'sections/apps/engineer/TabPassword';
+import TabSettings from 'sections/apps/engineer/TabSettings';
+import TabWorkHistory from 'sections/apps/engineer/TabWorkHistory';
 
 // assets
 import { FileTextOutlined, LockOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
@@ -32,7 +32,7 @@ const EngineerDetail = () => {
 
   const handleChange = (_event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
-    router.push(`/employee/detail/${id}/${newValue}`);
+    router.push(`/engineer/detail/${id}/${newValue}`);
   };
 
   return (
