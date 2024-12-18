@@ -42,11 +42,11 @@ const getTransporter = () => {
     auth: {
       user: 'mail@murai-san.com',
       pass: 'Tribegroup'
-    }
+    },
     // localhostから送る場合のみ（SSL/TLS証明書の検証をスキップ）
-    // tls: {
-    //   rejectUnauthorized: false
-    // }
+    tls: {
+      rejectUnauthorized: false
+    }
   } as TransportOptions);
   tokenCache.set('sv14591.xserver.jp', transporter);
   return transporter;
