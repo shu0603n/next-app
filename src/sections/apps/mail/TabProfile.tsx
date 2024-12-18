@@ -43,7 +43,7 @@ const TabProfile = () => {
   async function sendMail() {
     let attemptCount = 0; // 試行回数
     const maxAttempts = 10; // 最大試行回数
-    const interval = 3 * 60 * 1000; // 3分（ミリ秒）
+    const interval = 4 * 60 * 1000; // 3分（ミリ秒）
 
     try {
       const sendRequest = (requestOptions: any) => {
@@ -56,6 +56,9 @@ const TabProfile = () => {
               console.log(response.status);
               if (response.status === 429) {
                 throw new Error('前回の処理が開始されてから3分以内です。少し時間をおいて再試行してください。');
+              }
+              if (response.status === 408) {
+                throw { retry: true, message: '送信処理がタイムアウトしました。処理を続行します・・・' };
               }
               if (response.status === 422) {
                 throw { retry: true, message: '送信処理中にエラーが発生しました。処理を続行します・・・' };
@@ -95,8 +98,8 @@ const TabProfile = () => {
 
       // タイマーを設定して3分ごとにリクエストを送信
       const timer = setInterval(() => {
-        getUpdateData();
         sendRequest(requestOptions);
+        getUpdateData();
 
         if (attemptCount >= maxAttempts) {
           clearInterval(timer); // 最大回数に達したらタイマー停止
@@ -155,6 +158,8 @@ const TabProfile = () => {
           return item.staff.mail + '試行回数が多すぎます';
         case 535:
           return item.staff.mail + 'アカウント情報に誤りがあります';
+        case 543:
+          return item.staff.mail + 'ログインパスワードが設定されています。アプリパスワードを登録してください。';
         case 550:
           return item.staff.mail + '1日に送信できるメールの上限を超えました';
         default:

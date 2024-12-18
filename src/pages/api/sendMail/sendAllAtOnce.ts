@@ -9,7 +9,23 @@ export const maxDuration = 300;
 // トークンをキャッシュするためのオブジェクト
 const tokenCache = new Map();
 // １回の送信処理のタイムアウト(s)
-const maxTimeOut = 10000; // 10秒
+const maxMailTimeOut = maxDuration * 1000;
+
+// 日本時間 (JST) で表示
+const formatJST = (date: Date): Date => {
+  // UTC時間から日本時間（Asia/Tokyo）への調整
+  const jstOffset = 9 * 60; // 日本時間のUTCオフセット（日本はUTC+9）
+  // UTC時間のミリ秒を取得し、日本時間に変換
+  const jstDate = new Date(date.getTime() + jstOffset * 60 * 1000);
+  return jstDate; // 日本時間を反映した Date オブジェクトを返す
+};
+// 日本時間 (JST) で表示
+const formatNowJST = (): Date => {
+  const today = new Date();
+  // 日本時間 (Asia/Tokyo) に合わせる
+  const todayInJST = new Date(today.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }));
+  return formatJST(todayInJST); // 日本時間を反映した Date オブジェクトを返す
+};
 
 // メール送信用トランスポーターを作成またはキャッシュから取得
 const getTransporter = (account: { user: string; pass: string }) => {
@@ -55,7 +71,7 @@ const buildMailOptions = (item: any) => {
 };
 
 // メール送信
-const sendMail = async (mailOptions: any, account: any, mail_list_id: any) => {
+const sendMailProcess = async (mailOptions: any, account: any, mail_list_id: any, staffId: any) => {
   const today = new Date();
 
   // 日本時間 (Asia/Tokyo) に合わせる
@@ -69,23 +85,11 @@ const sendMail = async (mailOptions: any, account: any, mail_list_id: any) => {
   const endOfDayJST = new Date(todayInJST);
   endOfDayJST.setHours(23, 59, 59, 999);
 
-  // 日本時間 (JST) で表示
-  const formatNowJST = (): Date => {
-    const today = new Date();
-
-    // 日本時間 (Asia/Tokyo) に合わせる
-    const todayInJST = new Date(today.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }));
-
-    // UTC時間から日本時間（Asia/Tokyo）への調整
-    const jstOffset = 9 * 60; // 日本時間のUTCオフセット（日本はUTC+9）
-    // UTC時間のミリ秒を取得し、日本時間に変換
-    const jstDate = new Date(todayInJST.getTime() + jstOffset * 60 * 1000);
-    return jstDate; // 日本時間を反映した Date オブジェクトを返す
-  };
   const transporter = getTransporter(account);
   const statusRecord = await prisma.mail_send_logs.create({
     data: {
       mail_list_id: mail_list_id,
+      staff_id: staffId,
       mail_account_id: account.id,
       status: 0,
       log: '',
@@ -98,6 +102,7 @@ const sendMail = async (mailOptions: any, account: any, mail_list_id: any) => {
       where: { id: statusRecord.id },
       data: {
         mail_list_id: mail_list_id,
+        staff_id: staffId,
         mail_account_id: account.id,
         status: 1,
         log: '',
@@ -110,6 +115,7 @@ const sendMail = async (mailOptions: any, account: any, mail_list_id: any) => {
       where: { id: statusRecord.id },
       data: {
         mail_list_id: mail_list_id,
+        staff_id: staffId,
         mail_account_id: account.id,
         status: -1,
         log: JSON.stringify(error),
@@ -119,28 +125,38 @@ const sendMail = async (mailOptions: any, account: any, mail_list_id: any) => {
     throw error;
   }
 };
-
-const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxDuration: number) => {
+const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxTimeOut: number) => {
   try {
     const limit = pLimit(10); // 並列処理数の制限
 
-    const timeoutPromise = (ms: any) => new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
-
     let accountIndex = 0; // アカウントを順番に使うためのインデックス
+    let isError = false; // タイムアウトフラグ
+
+    // タイムアウトの設定
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => {
+        isError = true;
+        reject(new Error('408')); // 全体のタイムアウト
+      }, maxTimeOut)
+    );
 
     const emailPromises = mailDestinations.map((item: any) => {
       return limit(async () => {
+        if (isError) {
+          return; // タイムアウト後は処理をスキップ
+        }
+
         const mailOptions = buildMailOptions(item);
         let account = null;
 
-        // accounts配列が空でないか確認
         if (item.staff.mail && accounts.length > 0) {
           try {
             account = accounts[accountIndex]; // 使用するアカウントを取得
 
+            // Promise.raceで個別のメール送信にタイムアウトを設定
             await Promise.race([
-              sendMail(mailOptions, account, item.mail_list.id), // 現在のアカウントで送信
-              timeoutPromise(maxTimeOut) // タイムアウト設定
+              sendMailProcess(mailOptions, account, item.mail_list.id, item.staff.id), // メール送信プロセス
+              new Promise((_, reject) => setTimeout(() => reject(new Error('408')), maxTimeOut)) // 個別タイムアウト
             ]);
 
             await prisma.mail_destination.updateMany({
@@ -160,9 +176,9 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
             // 次のアカウントに切り替え
             accountIndex = (accountIndex + 1) % accounts.length;
           } catch (error: any) {
-            console.error('メール送信エラー:', item.staff.mail, `(送信アカウント: ${accounts[accountIndex].name})`, error);
+            console.error('メール送信エラー:', item.staff.mail, `(送信アカウント: ${accounts[accountIndex]?.name})`, error);
 
-            if ([454, 535, 550].includes(error?.responseCode)) {
+            if ([454, 535, 543, 550].includes(error?.responseCode)) {
               if (error.responseCode === 550 && account) {
                 await prisma.mail_account.update({
                   where: { id: account.id },
@@ -171,9 +187,11 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
                   }
                 });
               }
-              console.warn(`一時的に無効化されるアカウント: ${accounts[accountIndex].name}`);
+              console.warn(`一時的に無効化されるアカウント: ${account.name}`);
               accounts.splice(accountIndex, 1); // 無効なアカウントを削除
             }
+            const log =
+              accounts.length > 0 ? JSON.stringify(error) : '全てのアカウントでエラーが起きたため、実行できるアカウントがありません。';
 
             await prisma.mail_destination.updateMany({
               where: {
@@ -182,10 +200,15 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
               },
               data: {
                 complete_flg: -1,
-                mail_account_id: accounts[accountIndex]?.id,
-                log: JSON.stringify(error)
+                mail_account_id: account.id,
+                log: log
               }
             });
+            if (accounts.length > 0) {
+              console.error('全てのアカウントでエラーが起きました。');
+              isError = true;
+              throw new Error('422');
+            }
           }
         } else if (!item.staff.mail && accounts.length > 0) {
           console.warn('メールアドレスが存在しません：', item.staff.name);
@@ -199,22 +222,32 @@ const sendEmailsInBackground = async (mailDestinations: any, accounts: any, maxD
               log: 'メールアドレス未設定'
             }
           });
+        } else if (!item.staff.mail && accounts.length > 0) {
+          isError = true;
+          throw new Error('422'); // エラーメッセージを明示的に指定
         } else {
-          console.warn('使用可能なアカウントなくなりました。処理を中断します。');
-          throw new Error('NoAvailableAccounts'); // エラーメッセージを明示的に指定
+          isError = true;
+          throw new Error('500'); // エラーメッセージを明示的に指定
         }
       });
     });
 
-    await Promise.race([Promise.all(emailPromises), timeoutPromise(maxDuration * 1000)]);
+    // 全体のタイムアウトとメール送信処理を並列で実行
+    await Promise.race([
+      Promise.all(emailPromises), // 全てのメール送信処理
+      timeoutPromise // タイムアウト
+    ]);
   } catch (error: any) {
-    if (error.message === 'NoAvailableAccounts') {
+    if (error.message === '408') {
+      console.error('全体の処理がタイムアウトしました。');
+      throw new Error('408');
+    } else if (error.message === '422') {
       console.error('使用可能なアカウントがありません。');
-      throw new Error('NoAvailableAccounts');
+      throw new Error('422');
+    } else {
+      console.error('メール送信処理中にエラーが発生しました:', error);
+      throw error;
     }
-
-    console.error('メール送信処理中にエラーが発生しました:', error);
-    throw error;
   }
 };
 
@@ -231,15 +264,6 @@ const getMailAccountsSentToday = async () => {
   // JSTで今日の23時59分59秒に設定
   const endOfDayJST = new Date(todayInJST);
   endOfDayJST.setHours(23, 59, 59, 999);
-
-  // 日本時間 (JST) で表示
-  const formatJST = (date: Date): Date => {
-    // UTC時間から日本時間（Asia/Tokyo）への調整
-    const jstOffset = 9 * 60; // 日本時間のUTCオフセット（日本はUTC+9）
-    // UTC時間のミリ秒を取得し、日本時間に変換
-    const jstDate = new Date(date.getTime() + jstOffset * 60 * 1000);
-    return jstDate; // 日本時間を反映した Date オブジェクトを返す
-  };
 
   // 今日送信されたログを取得（`mail_send_logs`から）
   const result = await prisma.mail_send_logs.groupBy({
@@ -293,14 +317,11 @@ export default async function handler(request: NextApiRequest, response: NextApi
         orderBy: { start_at: 'desc' }
       });
 
-      const currentTime = new Date();
       if (status) {
         if (status.end_at) {
           console.log('前回の処理が正常終了しているため、新たに処理を開始します。');
-        } else if (status.start_at && currentTime.getTime() - new Date(status.start_at).getTime() < maxDuration * 1000) {
-          return response.status(429).json({
-            error: '前回の処理が開始されてから3分以内です。少し時間をおいて再試行してください。'
-          });
+        } else if (status.start_at && formatNowJST().getTime() - status.start_at.getTime() < maxMailTimeOut) {
+          throw new Error('429');
         }
       }
 
@@ -308,7 +329,7 @@ export default async function handler(request: NextApiRequest, response: NextApi
         data: {
           status: 'processing',
           error_log: '',
-          start_at: new Date()
+          start_at: formatNowJST()
         }
       });
 
@@ -330,14 +351,14 @@ export default async function handler(request: NextApiRequest, response: NextApi
 
       const shuffledAccounts = accounts.sort(() => Math.random() - 0.5);
 
-      await sendEmailsInBackground(mailDestinations, shuffledAccounts, maxDuration);
+      await sendEmailsInBackground(mailDestinations, shuffledAccounts, maxMailTimeOut);
 
       await prisma.send_mail_status.update({
         where: { id: statusRecord.id },
         data: {
           status: 'completed',
           error_log: '',
-          end_at: new Date()
+          end_at: formatNowJST()
         }
       });
 
@@ -346,34 +367,49 @@ export default async function handler(request: NextApiRequest, response: NextApi
 
     return response.status(405).json({ error: 'Method Not Allowed' });
   } catch (error: any) {
-    console.error('エラーが発生しました:', error);
+    console.error('エラーが発生しました:', error, error.message);
 
-    if (statusRecord) {
-      await prisma.send_mail_status.update({
-        where: { id: statusRecord.id },
-        data: {
-          status: 'failed',
-          error_log: JSON.stringify(error),
-          end_at: new Date()
-        }
-      });
-    }
-
-    console.log(error.message);
-    if (error.message === 'NoAvailableAccounts') {
+    console.log('message:', error.message);
+    if (error.message === '422') {
       if (statusRecord) {
         await prisma.send_mail_status.update({
           where: { id: statusRecord.id },
           data: {
             status: 'failed',
             error_log: '使用可能なアカウントがありません。',
-            end_at: new Date()
+            end_at: formatNowJST()
           }
         });
       }
       return response.status(422).json({ error: '使用可能なアカウントがありません。' });
+    } else if (error.message === '408') {
+      if (statusRecord) {
+        prisma.send_mail_status.update({
+          where: { id: statusRecord.id },
+          data: {
+            status: 'failed',
+            error_log: 'タイムアウトが発生しました。',
+            end_at: formatNowJST()
+          }
+        });
+      }
+      return response.status(408).json({ error: 'タイムアウトが発生しました。処理を終了します。' });
+    } else if (error.message === '429') {
+      return response.status(429).json({
+        error: '前回の処理が開始されてから3分以内です。少し時間をおいて再試行してください。'
+      });
     } else {
-      return response.status(500).json({ error: '処理が終了しました' });
+      if (statusRecord) {
+        prisma.send_mail_status.update({
+          where: { id: statusRecord.id },
+          data: {
+            status: 'failed',
+            error_log: '不明なエラーが発生しました。',
+            end_at: formatNowJST()
+          }
+        });
+      }
+      return response.status(500).json({ error: '不明なエラーが発生したため、処理が終了しました。' });
     }
   }
 }

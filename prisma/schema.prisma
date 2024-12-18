@@ -364,6 +364,7 @@ model staff {
   created_at       DateTime?          @default(now()) @db.Timestamp(6)
   updated_at       DateTime?          @default(now()) @db.Timestamp(6)
   mail_destination mail_destination[]
+  mail_send_logs   mail_send_logs[]
   import_status    import_status?     @relation(fields: [import_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_import_status")
   staff_status     staff_status?      @relation(fields: [staff_status_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_staff_status")
 }
@@ -429,6 +430,8 @@ model mail_send_logs {
   status          Int          @db.SmallInt
   log             String?
   sent_at         DateTime?    @db.Timestamp(6)
+  staff_id        Int?
   mail_account    mail_account @relation(fields: [mail_account_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_mail_account")
   mail_list       mail_list    @relation(fields: [mail_list_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_mail_list")
+  staff           staff?       @relation(fields: [staff_id], references: [id], onUpdate: NoAction)
 }
