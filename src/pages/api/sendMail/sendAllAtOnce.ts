@@ -41,7 +41,7 @@ const getTransporter = () => {
     secure: true, // 465を使う場合はtrue
     auth: {
       user: 'mail@murai-san.com',
-      pass: 'Tribegroup'
+      pass: 'Tribegroupmurai'
     },
     // localhostから送る場合のみ（SSL/TLS証明書の検証をスキップ）
     tls: {
