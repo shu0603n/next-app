@@ -24,8 +24,6 @@ const TabProfile = () => {
 
   const [data, setData] = useState<mailListType>();
   const [mailDestinationData, setMailDestinationData] = useState<Array<mailListType>>();
-  const [account, setAccount] = useState<Array<{ name: string; count: Number }>>();
-  const [account_mail_list, setAccount_mail_list] = useState<Array<{ name: string; count: Number }>>();
   async function fetchTableData(id: string) {
     try {
       const response = await fetch(`/api/db/mail/basic/select?id=${id}`);
@@ -43,74 +41,75 @@ const TabProfile = () => {
   async function sendMail() {
     let attemptCount = 0; // 試行回数
     const maxAttempts = 10; // 最大試行回数
-    const interval = 4 * 60 * 1000; // 3分（ミリ秒）
+    let isError = false;
 
-    try {
-      const sendRequest = (requestOptions: any) => {
-        attemptCount++;
-        console.log(`試行回数: ${attemptCount}`);
+    const sendRequest = async (requestOptions: any): Promise<boolean> => {
+      attemptCount++;
+      console.log(`試行回数: ${attemptCount}`);
+      try {
+        const response = await fetch(`/api/sendMail/sendAllAtOnce?id=${id}`, requestOptions);
 
-        fetch(`/api/sendMail/sendAllAtOnce?id=${id}`, requestOptions)
-          .then((response) => {
-            if (!response.ok) {
-              console.log(response.status);
-              if (response.status === 429) {
-                throw new Error('前回の処理が開始されてから3分以内です。少し時間をおいて再試行してください。');
-              }
-              if (response.status === 408) {
-                throw { retry: true, message: '送信処理がタイムアウトしました。処理を続行します・・・' };
-              }
-              if (response.status === 422) {
-                throw { retry: true, message: '送信処理中にエラーが発生しました。処理を続行します・・・' };
-              }
-              throw new Error('予期せぬエラーが発生しました。');
-            }
-            return response.json();
-          })
-          .then((data) => {
-            alertSnackBar('送信処理が完了しました。', 'success');
-            setLoading(false); // 成功したらローディング終了
-            clearInterval(timer); // タイマー停止
-          })
-          .catch((error) => {
-            if (error.retry) {
-              console.warn(`再試行: ${error.message}`);
-              alertSnackBar(`${error.message}(${attemptCount}/${maxAttempts})`, 'secondary');
-            } else if (attemptCount >= maxAttempts) {
-              alertSnackBar('最大試行回数に到達しました。リクエストを停止します。', 'error');
-              setLoading(false); // ローディング終了
-              clearInterval(timer); // タイマー停止
-            } else {
-              console.error('エラー:', error);
-              alertSnackBar(error.message, 'error');
-              setLoading(false); // ローディング終了
-              clearInterval(timer); // タイマー停止
-            }
-          });
-      };
+        if (response.ok) {
+          const data = await response.json();
+          console.log('成功:', data);
+          alertSnackBar('送信処理が完了しました。', 'success');
+          setLoading(false); // 成功したらローディング終了
+          getUpdateData();
+          return true; // 成功
+        } else {
+          console.log('ステータス:', response.status);
 
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json', // 必要に応じてヘッダーを調整
-        },
-      };
-
-      // タイマーを設定して3分ごとにリクエストを送信
-      const timer = setInterval(() => {
-        sendRequest(requestOptions);
-        getUpdateData();
-
-        if (attemptCount >= maxAttempts) {
-          clearInterval(timer); // 最大回数に達したらタイマー停止
+          if (response.status === 429) {
+            throw new Error('前回の処理が開始されてから3分以内です。少し時間をおいて再試行してください。');
+          } else if (response.status === 408) {
+            throw { retry: true, message: '送信処理がタイムアウトしました。処理を続行します・・・' };
+          } else if (response.status === 422) {
+            throw { retry: true, message: '送信処理中にエラーが発生しました。処理を続行します・・・' };
+          } else {
+            throw new Error('予期せぬエラーが発生しました。');
+          }
         }
-      }, interval);
+      } catch (error: any) {
+        if (error.retry) {
+          console.warn(`再試行: ${error.message}`);
+          alertSnackBar(`${error.message} (${attemptCount}/${maxAttempts})`, 'secondary');
+        } else {
+          isError = true;
+          console.error('エラー:', error);
+          alertSnackBar(error.message || 'エラーが発生しました。', 'error');
+        }
+        return false; // 処理失敗
+      }
+    };
 
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json' // 必要に応じてヘッダーを調整
+      }
+    };
+
+    // メイン処理
+    try {
       setLoading(true); // ローディング開始
       alertSnackBar('処理中…', 'secondary');
-      sendRequest(requestOptions);
+
+      while (attemptCount < maxAttempts && !isError) {
+        getUpdateData();
+        const success = await sendRequest(requestOptions);
+        if (success) {
+          break; // 成功したらループ終了
+        }
+      }
+
+      if (attemptCount >= maxAttempts) {
+        alertSnackBar('最大試行回数に到達しました。リクエストを停止します。', 'error');
+      }
     } catch (error) {
-      console.error(error);
+      console.error('致命的なエラー:', error);
+      alertSnackBar('処理中に予期せぬエラーが発生しました。', 'error');
+    } finally {
+      setLoading(false); // 最終的にローディング終了
     }
   }
 
@@ -119,8 +118,6 @@ const TabProfile = () => {
       .then((data) => {
         setData(data.mailList);
         setMailDestinationData(data.mailDestination);
-        setAccount(data.sent_account);
-        setAccount_mail_list(data.sent_account_with_mail_list);
       })
       .catch((error) => {
         // エラーハンドリング
@@ -221,44 +218,6 @@ const TabProfile = () => {
           <Grid item xs={12} sm={5} md={4} xl={3}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <MainCard title="本日の送信アカウント数">
-                  <List sx={{ py: 0 }}>
-                    <ListItem divider={!matchDownMD}>
-                      <Grid container spacing={1}>
-                        {account &&
-                          account.map((item, i) => (
-                            <>
-                              <Grid item xs={6} key={i}>
-                                <Typography sx={{ lineHeight: 1.2 }}>{item?.name}</Typography>
-                              </Grid>
-                              <Grid item xs={6} key={i}>
-                                <Typography sx={{ lineHeight: 1.2 }}>{`${item?.count ?? 0}/1500`}</Typography>
-                              </Grid>
-                            </>
-                          ))}
-                      </Grid>
-                    </ListItem>
-                  </List>
-                </MainCard>
-                <MainCard title="このメールでの送信アカウント数">
-                  <List sx={{ py: 0 }}>
-                    <ListItem divider={!matchDownMD}>
-                      <Grid container spacing={1}>
-                        {account_mail_list &&
-                          account_mail_list.map((item, i) => (
-                            <>
-                              <Grid item xs={6} key={i}>
-                                <Typography sx={{ lineHeight: 1.2 }}>{item?.name}</Typography>
-                              </Grid>
-                              <Grid item xs={6} key={i}>
-                                <Typography sx={{ lineHeight: 1.2 }}>{`${item?.count ?? 0}/1500`}</Typography>
-                              </Grid>
-                            </>
-                          ))}
-                      </Grid>
-                    </ListItem>
-                  </List>
-                </MainCard>
                 <MainCard title="送信先一覧">
                   {mailDestinationData && (
                     <Grid container spacing={3}>
@@ -289,7 +248,7 @@ const TabProfile = () => {
                                   <Chip
                                     color="secondary"
                                     label="アドレス無し"
-                                    onClick={() => alert(getErrorReason(item?.log))}
+                                    onClick={() => alert(getErrorReason(item))}
                                     size="small"
                                     variant="light"
                                   />
