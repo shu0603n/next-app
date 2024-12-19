@@ -90,18 +90,19 @@ DATABASE="verceldb"
 ![image](https://github.com/shu0603n/next-app/assets/61679407/cafa4439-0f24-40c9-afba-88b16c7cee33)
 
 # DMP エクスポート/インポート
-バックアップ
-set PGPASSWORD=本番環境のパスワード
-pg_dump --host="ep-late-queen-16733624-pooler.us-east-1.postgres.vercel-storage.com" --port="5432" --username="default" --dbname="verceldb" --format=c --blobs --no-owner --no-privileges --verbose --file="C:\Users\info\your_backup.backup"
+##　 本番環境からローカルにデータ移行する場合
+###　バックアップ
+`set PGPASSWORD=6RqIonDQNgY8`
+`pg_dump --host="ep-late-queen-16733624-pooler.us-east-1.postgres.vercel-storage.com" --port="5432" --username="default" --dbname="verceldb" --format=c --blobs --no-owner --no-privileges --verbose --file="C:\Users\info\your_backup.backup"`
 
-リストア
-set PGPASSWORD=ローカル環境のパスワード
+###　リストア
+`set PGPASSWORD=postgres`
 スキーマ削除
-psql --host="localhost" --port="5432" --username="postgres" --dbname="postgres" -c "DROP SCHEMA public CASCADE;"
+`psql --host="localhost" --port="5432" --username="postgres" --dbname="postgres" -c "DROP SCHEMA public CASCADE;"`
 スキーマ作成
-psql --host="localhost" --port="5432" --username="postgres" --dbname="postgres" -c "CREATE SCHEMA public;"
+`psql --host="localhost" --port="5432" --username="postgres" --dbname="postgres" -c "CREATE SCHEMA public;"`
 リストア
-pg_restore --host="localhost" --port="5432" --username="postgres" --dbname="postgres" --no-owner --verbose "C:\Users\info\your_backup.backup"
+`pg_restore --host="localhost" --port="5432" --username="postgres" --dbname="postgres" --no-owner --verbose "C:\Users\info\your_backup.backup"`
 
 
 # 起動方法
