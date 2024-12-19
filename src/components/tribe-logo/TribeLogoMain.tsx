@@ -6,7 +6,7 @@ const TribeLogoMain = ({ reverse, ...others }: { reverse?: boolean }) => {
 
   // 画像パスを設定
   const logo = '/assets/images/tribe-logo.png'; // ロゴ画像のパス
-  const logoDark = '/assets/images/tribe-logo-dark.png'; // ダークモード用ロゴ画像のパス
+  const logoDark = '/assets/images/tribe-logo.png'; // ダークモード用ロゴ画像のパス
 
   return (
     <Image

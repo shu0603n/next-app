@@ -4,6 +4,14 @@ import pLimit from 'p-limit'; // 並列処理数を制限
 
 export const maxDuration = 300;
 
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb' // 必要なサイズを設定 (例: 10MB)
+    }
+  }
+};
+
 export default async function handler(request: NextApiRequest, response: NextApiResponse) {
   if (request.method === 'DELETE') {
     try {
@@ -74,6 +82,7 @@ async function processStaffData(staffData: any[]) {
 
       promises.push(insertPromise);
     }
+    console.log(promises);
 
     // すべての並列処理が完了するまで待つ
     await Promise.all(promises);
