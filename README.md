@@ -50,7 +50,36 @@ node.js をインストールすると npm が入っているはずなので以�
 next-app 直下で以下コマンドを実施
 `yarn`
 
+# ローカルDB 設定
+### 以下リンクからPostgreSQL 15.10をダウンロードし、インストールする
+https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
+
+![image](https://github.com/user-attachments/assets/e6c9adc7-244a-4460-961e-e66ca920cdc0)
+
+![image](https://github.com/user-attachments/assets/047a2f74-f87c-4065-b1f1-0d65fbb8519b)
+
+![image](https://github.com/user-attachments/assets/befb292a-563b-42fd-8c75-44560dbbb4ba)
+
+![image](https://github.com/user-attachments/assets/6ec8d795-9f33-450b-bf85-a2048726b10b)
+
+パスワード：postgres
+![image](https://github.com/user-attachments/assets/d209bdf0-9dcb-47fb-b595-2eafd09bb7d6)
+
+![image](https://github.com/user-attachments/assets/0e38788b-8470-4842-b98c-f3713bac2757)
+
+![image](https://github.com/user-attachments/assets/8f5c7dd4-0e25-475f-857c-7e5b68d69444)
+
+![image](https://github.com/user-attachments/assets/da9f568e-7d95-4b4d-b5ba-7bd9128f81f3)
+
+![image](https://github.com/user-attachments/assets/47520da0-5a8c-4514-81fc-39ac50147149)
+
+![image](https://github.com/user-attachments/assets/654f1bd7-6563-494f-be92-bfda119b58fe)
+
+postgresを入力
+
 # pgAdmin 設定
+
+## 本番環境DB 設定
 
 HOST="ep-late-queen-16733624-pooler.us-east-1.postgres.vercel-storage.com"
 USER="default"
@@ -59,6 +88,21 @@ DATABASE="verceldb"
 
 ![image](https://github.com/shu0603n/next-app/assets/61679407/a997e497-1bd5-46c1-a0e3-48633e5caa21)
 ![image](https://github.com/shu0603n/next-app/assets/61679407/cafa4439-0f24-40c9-afba-88b16c7cee33)
+
+# DMP エクスポート/インポート
+バックアップ
+set PGPASSWORD=本番環境のパスワード
+pg_dump --host="ep-late-queen-16733624-pooler.us-east-1.postgres.vercel-storage.com" --port="5432" --username="default" --dbname="verceldb" --format=c --blobs --no-owner --no-privileges --verbose --file="C:\Users\info\your_backup.backup"
+
+リストア
+set PGPASSWORD=ローカル環境のパスワード
+スキーマ削除
+psql --host="localhost" --port="5432" --username="postgres" --dbname="postgres" -c "DROP SCHEMA public CASCADE;"
+スキーマ作成
+psql --host="localhost" --port="5432" --username="postgres" --dbname="postgres" -c "CREATE SCHEMA public;"
+リストア
+pg_restore --host="localhost" --port="5432" --username="postgres" --dbname="postgres" --no-owner --verbose "C:\Users\info\your_backup.backup"
+
 
 # 起動方法
 
