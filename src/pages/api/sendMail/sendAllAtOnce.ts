@@ -1,7 +1,7 @@
 import { NextApiResponse, NextApiRequest } from 'next';
 import nodemailer, { TransportOptions } from 'nodemailer';
 import { prisma } from '../db/prisma';
-import pLimit from 'p-limit';
+import Bottleneck from 'bottleneck';
 
 // 処理全体のタイムアウト時間の設定(ms)
 export const maxDuration = 300;
@@ -10,8 +10,6 @@ export const maxDuration = 300;
 const tokenCache = new Map();
 // １回の送信処理のタイムアウト(s)
 const maxMailTimeOut = maxDuration * 1000;
-// １回に同時送信する数
-const numberOfParallelProcessing = 5;
 
 // 日本時間 (JST) で表示
 const formatJST = (date: Date): Date => {
@@ -21,17 +19,17 @@ const formatJST = (date: Date): Date => {
   const jstDate = new Date(date.getTime() + jstOffset * 60 * 1000);
   return jstDate; // 日本時間を反映した Date オブジェクトを返す
 };
+
 // 日本時間 (JST) で表示
 const formatNowJST = (): Date => {
   const today = new Date();
-  // 日本時間 (Asia/Tokyo) に合わせる
-  const todayInJST = new Date(today.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }));
-  return formatJST(todayInJST); // 日本時間を反映した Date オブジェクトを返す
+  // 日本時間 (Asia/Tokyo) に合わせるため、タイムスタンプを9時間進める
+  return formatJST(today); // UTCの`today`を日本時間に変換
 };
 
 // メール送信用トランスポーターを作成またはキャッシュから取得
 const getTransporter = () => {
-  const cachedTransporter = tokenCache.get('sv14591.xserver.jp');
+  const cachedTransporter = tokenCache.get('xserver');
   if (cachedTransporter) {
     return cachedTransporter;
   }
@@ -46,9 +44,12 @@ const getTransporter = () => {
     // localhostから送る場合のみ（SSL/TLS証明書の検証をスキップ）
     tls: {
       rejectUnauthorized: false
-    }
+    },
+    pool: true, // 接続プールを使う
+    maxConnections: 5, // 最大接続数を制限
+    rateLimit: 1 // 1秒あたりの最大送信数を制限
   } as TransportOptions);
-  tokenCache.set('sv14591.xserver.jp', transporter);
+  tokenCache.set('xserver', transporter);
   return transporter;
 };
 
@@ -88,9 +89,13 @@ const sendMailProcess = async (mailOptions: any, mail_list_id: any, staffId: any
     throw error;
   }
 };
+
 const sendEmailsInBackground = async (mailDestinations: any, maxTimeOut: number) => {
   try {
-    const limit = pLimit(numberOfParallelProcessing); // 並列処理数の制限
+    const limiter = new Bottleneck({
+      maxConcurrent: 10, // 同時に実行できる最大数
+      minTime: 2400 // 1秒あたり約0.4167回()
+    });
 
     let isError = false; // タイムアウトフラグ
 
@@ -103,7 +108,7 @@ const sendEmailsInBackground = async (mailDestinations: any, maxTimeOut: number)
     );
 
     const emailPromises = mailDestinations.map((item: any) => {
-      return limit(async () => {
+      return limiter.schedule(async () => {
         if (isError) {
           return; // タイムアウト後は処理をスキップ
         }
