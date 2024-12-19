@@ -90,7 +90,10 @@ postgresを入力
 ![image](https://github.com/shu0603n/next-app/assets/61679407/cafa4439-0f24-40c9-afba-88b16c7cee33)
 
 # DMP エクスポート/インポート
-## 本番環境からローカルにデータ移行する場合
+## 本番環境からローカルにデータ移行する場合（コマンドプロンプトで実行）
+### 環境変数の設定
+以下をPathに追加する
+`C:\Program Files\PostgreSQL\15\bin`
 ### バックアップ
 `set PGPASSWORD=6RqIonDQNgY8`
 `pg_dump --host="ep-late-queen-16733624-pooler.us-east-1.postgres.vercel-storage.com" --port="5432" --username="default" --dbname="verceldb" --format=c --blobs --no-owner --no-privileges --verbose --file="C:\Users\info\your_backup.backup"`
