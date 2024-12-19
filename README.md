@@ -62,7 +62,7 @@ https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
 
 ![image](https://github.com/user-attachments/assets/6ec8d795-9f33-450b-bf85-a2048726b10b)
 
-パスワード：postgres
+### パスワード：postgres
 ![image](https://github.com/user-attachments/assets/d209bdf0-9dcb-47fb-b595-2eafd09bb7d6)
 
 ![image](https://github.com/user-attachments/assets/0e38788b-8470-4842-b98c-f3713bac2757)
@@ -81,27 +81,27 @@ postgresを入力
 
 ## 本番環境DB 設定
 
-HOST="ep-late-queen-16733624-pooler.us-east-1.postgres.vercel-storage.com"
-USER="default"
-PASSWORD="6RqIonDQNgY8"
-DATABASE="verceldb"
+### HOST="ep-late-queen-16733624-pooler.us-east-1.postgres.vercel-storage.com"
+### USER="default"
+### PASSWORD="6RqIonDQNgY8"
+### DATABASE="verceldb"
 
 ![image](https://github.com/shu0603n/next-app/assets/61679407/a997e497-1bd5-46c1-a0e3-48633e5caa21)
 ![image](https://github.com/shu0603n/next-app/assets/61679407/cafa4439-0f24-40c9-afba-88b16c7cee33)
 
 # DMP エクスポート/インポート
-##　 本番環境からローカルにデータ移行する場合
-###　バックアップ
+## 本番環境からローカルにデータ移行する場合
+### バックアップ
 `set PGPASSWORD=6RqIonDQNgY8`
 `pg_dump --host="ep-late-queen-16733624-pooler.us-east-1.postgres.vercel-storage.com" --port="5432" --username="default" --dbname="verceldb" --format=c --blobs --no-owner --no-privileges --verbose --file="C:\Users\info\your_backup.backup"`
 
-###　リストア
+### リストア
 `set PGPASSWORD=postgres`
-スキーマ削除
+### スキーマ削除
 `psql --host="localhost" --port="5432" --username="postgres" --dbname="postgres" -c "DROP SCHEMA public CASCADE;"`
-スキーマ作成
+### スキーマ作成
 `psql --host="localhost" --port="5432" --username="postgres" --dbname="postgres" -c "CREATE SCHEMA public;"`
-リストア
+### リストア
 `pg_restore --host="localhost" --port="5432" --username="postgres" --dbname="postgres" --no-owner --verbose "C:\Users\info\your_backup.backup"`
 
 
